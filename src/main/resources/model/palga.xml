@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<molgenis name="org.molgenis">
+    <module name="palga">
+        <entity name="PalgaSample" label="PALGA">
+            <field name="id" type="autoid" hidden="true" />
+            <field name="diagnose" label="Diagnose" type="mref" xref_entity="Diagnosis" />
+            <field name="materiaal" label="Materiaal" type="categorical" xref_entity="Material" />
+            <field name="jaar" label="Jaar" description="Jaar van verslaglegging" type="int" />
+            <field name="geslacht" label="Geslacht" type="categorical" xref_entity="Gender" />
+            <field name="leeftijd" label="Leeftijd" type="int" />
+        </entity>
+        <entity name="Diagnosis" label="Diagnose" xref_label="identifier" xref_lookup="identifier,description">
+            <field name="id" type="autoid" hidden="true" />
+            <field name="identifier" label="Code" type="string" />
+            <field name="description" label="Omschrijving" type="string" />
+            <unique fields="identifier" />
+        </entity>
+        <entity name="Material" label="Materiaal" xref_label="type" xref_lookup="type">
+            <field name="id" type="autoid" hidden="true" />
+            <field name="type" type="string" />
+            <unique fields="type" />
+        </entity>
+        <entity name="Gender" label="Geslacht" xref_label="gender" xref_lookup="gender">
+            <field name="id" type="autoid" hidden="true" />
+            <field name="gender" type="string" />
+            <unique fields="gender" />
+        </entity>
+
+        <entity name="PalgaSample3" label="PALGA 20K">
+            <field name="id" type="autoid" hidden="true" />
+            <field name="diagnose" label="Diagnose" type="mref" xref_entity="Diagnosis" />
+            <field name="materiaal" label="Materiaal" type="categorical" xref_entity="Material" />
+            <field name="jaar" label="Jaar" description="Jaar van verslaglegging" type="int" />
+            <field name="geslacht" label="Geslacht" type="categorical" xref_entity="Gender" />
+            <field name="leeftijd" label="Leeftijdscategorie" type="categorical" xref_entity="Agegroup3" />
+        </entity>
+        <entity name="Agegroup3" label="Leeftijdscategorie" xref_label="agegroup" xref_lookup="agegroup">
+            <field name="id" type="autoid" hidden="true" />
+            <field name="agegroup" type="string" />
+            <unique fields="agegroup" />
+        </entity>
+    </module>
+</molgenis>
