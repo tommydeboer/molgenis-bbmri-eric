@@ -1,4 +1,4 @@
-package org.molgenis.omx;
+package org.molgenis.palga;
 
 import java.util.Collection;
 import java.util.regex.Matcher;

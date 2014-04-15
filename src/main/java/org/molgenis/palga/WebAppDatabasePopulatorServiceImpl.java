@@ -1,4 +1,4 @@
-package org.molgenis.omx;
+package org.molgenis.palga;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,8 +16,8 @@ import org.molgenis.omx.auth.GroupAuthority;
 import org.molgenis.omx.auth.MolgenisGroup;
 import org.molgenis.omx.auth.MolgenisUser;
 import org.molgenis.omx.auth.UserAuthority;
-import org.molgenis.omx.controller.HomeController;
 import org.molgenis.omx.core.RuntimeProperty;
+import org.molgenis.palga.controller.HomeController;
 import org.molgenis.security.account.AccountService;
 import org.molgenis.security.core.utils.SecurityUtils;
 import org.molgenis.security.runas.RunAsSystem;

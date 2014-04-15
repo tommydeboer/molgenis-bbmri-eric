@@ -6,6 +6,7 @@ import static org.springframework.security.access.AccessDecisionVoter.ACCESS_DEN
 import static org.springframework.security.access.AccessDecisionVoter.ACCESS_GRANTED;
 import static org.testng.Assert.assertEquals;
 
+import org.molgenis.palga.MolgenisAccessDecisionVoter;
 import org.molgenis.security.core.MolgenisPermissionService;
 import org.molgenis.security.core.Permission;
 import org.molgenis.ui.MolgenisUi;

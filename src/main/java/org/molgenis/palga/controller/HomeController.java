@@ -1,6 +1,6 @@
-package org.molgenis.omx.controller;
+package org.molgenis.palga.controller;
 
-import static org.molgenis.omx.controller.HomeController.URI;
+import static org.molgenis.palga.controller.HomeController.URI;
 
 import org.molgenis.framework.ui.MolgenisPluginController;
 import org.springframework.stereotype.Controller;

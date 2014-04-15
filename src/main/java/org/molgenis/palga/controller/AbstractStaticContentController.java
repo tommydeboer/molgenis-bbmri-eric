@@ -1,4 +1,4 @@
-package org.molgenis.omx.controller;
+package org.molgenis.palga.controller;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,9 +1,10 @@
-package org.molgenis.omx;
+package org.molgenis.palga;
 
 import org.molgenis.DatabaseConfig;
 import org.molgenis.catalogmanager.CatalogManagerService;
 import org.molgenis.data.DataService;
 import org.molgenis.elasticsearch.config.EmbeddedElasticSearchConfig;
+import org.molgenis.omx.OmxConfig;
 import org.molgenis.omx.catalogmanager.OmxCatalogManagerService;
 import org.molgenis.omx.config.DataExplorerConfig;
 import org.molgenis.omx.studymanager.OmxStudyManagerService;

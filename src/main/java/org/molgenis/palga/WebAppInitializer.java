@@ -1,4 +1,4 @@
-package org.molgenis.omx;
+package org.molgenis.palga;
 
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContext;
