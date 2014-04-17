@@ -91,7 +91,7 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 
         GroupAuthority usersGroupHomeAuthority = new GroupAuthority();
         usersGroupHomeAuthority.setMolgenisGroup(usersGroup);
-        usersGroupHomeAuthority.setRole(SecurityUtils.AUTHORITY_PLUGIN_READ_PREFIX + HomeController.ID.toUpperCase());
+		usersGroupHomeAuthority.setRole(SecurityUtils.AUTHORITY_PLUGIN_READ_PREFIX + HomeController.ID.toUpperCase());
         dataService.add(GroupAuthority.ENTITY_NAME, usersGroupHomeAuthority);
 
         GroupAuthority usersGroupUserAccountAuthority = new GroupAuthority();
