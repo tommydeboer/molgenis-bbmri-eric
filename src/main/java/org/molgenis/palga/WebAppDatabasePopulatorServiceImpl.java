@@ -12,11 +12,17 @@ import org.molgenis.data.annotation.impl.DbnsfpVariantServiceAnnotator;
 import org.molgenis.data.support.QueryImpl;
 import org.molgenis.dataexplorer.controller.DataExplorerController;
 import org.molgenis.framework.db.WebAppDatabasePopulatorService;
+import org.molgenis.omx.auth.GroupAuthority;
+import org.molgenis.omx.auth.MolgenisGroup;
 import org.molgenis.omx.auth.MolgenisUser;
+import org.molgenis.omx.auth.UserAuthority;
 import org.molgenis.omx.core.RuntimeProperty;
 import org.molgenis.palga.controller.HomeController;
 import org.molgenis.security.MolgenisSecurityWebAppDatabasePopulatorService;
+import org.molgenis.security.account.AccountService;
+import org.molgenis.security.core.utils.SecurityUtils;
 import org.molgenis.security.runas.RunAsSystem;
+import org.molgenis.security.user.UserAccountController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +35,10 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 	public static final String CHAINS = "chains";
 	public static final String SOURCES = "sources";
 	public static final String BROWSERLINKS = "browserLinks";
+
+    static final String KEY_APP_HREF_CSS = "app.href.css";
+    static final String KEY_APP_NAME = "app.name";
+    static final String KEY_APP_HREF_LOGO = "app.href.logo";
 
     private final DataService dataService;
 	private final MolgenisSecurityWebAppDatabasePopulatorService molgenisSecurityWebAppDatabasePopulatorService;
@@ -53,8 +63,82 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
     {
 		molgenisSecurityWebAppDatabasePopulatorService.populateDatabase(this.dataService, HomeController.ID);
 
+        MolgenisUser anonymousUser = molgenisSecurityWebAppDatabasePopulatorService.getAnonymousUser();
+
+        UserAuthority anonymousAuthority = new UserAuthority();
+        anonymousAuthority.setMolgenisUser(anonymousUser);
+        anonymousAuthority.setRole(SecurityUtils.AUTHORITY_ANONYMOUS);
+        dataService.add(UserAuthority.ENTITY_NAME, anonymousAuthority);
+
+        MolgenisGroup usersGroup = new MolgenisGroup();
+        usersGroup.setName(AccountService.ALL_USER_GROUP);
+        dataService.add(MolgenisGroup.ENTITY_NAME, usersGroup);
+        usersGroup.setName(AccountService.ALL_USER_GROUP);
+
+        GroupAuthority usersGroupHomeAuthority = new GroupAuthority();
+        usersGroupHomeAuthority.setMolgenisGroup(usersGroup);
+        usersGroupHomeAuthority.setRole(SecurityUtils.AUTHORITY_PLUGIN_READ_PREFIX + HomeController.ID.toUpperCase());
+        dataService.add(GroupAuthority.ENTITY_NAME, usersGroupHomeAuthority);
+
+        GroupAuthority usersGroupUserAccountAuthority = new GroupAuthority();
+        usersGroupUserAccountAuthority.setMolgenisGroup(usersGroup);
+        usersGroupUserAccountAuthority.setRole(SecurityUtils.AUTHORITY_PLUGIN_WRITE_PREFIX
+                + UserAccountController.ID.toUpperCase());
+        dataService.add(GroupAuthority.ENTITY_NAME, usersGroupUserAccountAuthority);
+
+        UserAuthority anonymousDataExplorerAuthority = new UserAuthority();
+        anonymousDataExplorerAuthority.setMolgenisUser(anonymousUser);
+        anonymousDataExplorerAuthority.setRole(SecurityUtils.AUTHORITY_PLUGIN_WRITE_PREFIX
+                + DataExplorerController.ID.toUpperCase());
+        dataService.add(UserAuthority.ENTITY_NAME, anonymousDataExplorerAuthority);
+
+        UserAuthority anonymousHomeAuthority = new UserAuthority();
+        anonymousHomeAuthority.setMolgenisUser(anonymousUser);
+        anonymousHomeAuthority.setRole(SecurityUtils.AUTHORITY_PLUGIN_WRITE_PREFIX
+                + HomeController.ID.toUpperCase());
+        dataService.add(UserAuthority.ENTITY_NAME, anonymousHomeAuthority);
+
+
+        UserAuthority entityPalgaSample3Authority = new UserAuthority();
+        entityPalgaSample3Authority.setMolgenisUser(anonymousUser);
+        entityPalgaSample3Authority.setRole("ROLE_ENTITY_COUNT_" + PalgaSample3.ENTITY_NAME.toUpperCase());
+        dataService.add(UserAuthority.ENTITY_NAME, entityPalgaSample3Authority);
+
+        UserAuthority entityPaglasampleAuthority = new UserAuthority();
+        entityPaglasampleAuthority.setMolgenisUser(anonymousUser);
+        entityPaglasampleAuthority.setRole("ROLE_ENTITY_COUNT_" + PalgaSample.ENTITY_NAME.toUpperCase());
+        dataService.add(UserAuthority.ENTITY_NAME, entityPaglasampleAuthority);
+
+        UserAuthority entityMaterialAuthority = new UserAuthority();
+        entityMaterialAuthority.setMolgenisUser(anonymousUser);
+        entityMaterialAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX + Material.ENTITY_NAME.toUpperCase());
+        dataService.add(UserAuthority.ENTITY_NAME, entityMaterialAuthority);
+
+        UserAuthority entityDiagnosisAuthority = new UserAuthority();
+        entityDiagnosisAuthority.setMolgenisUser(anonymousUser);
+        entityDiagnosisAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX + Diagnosis.ENTITY_NAME.toUpperCase());
+        dataService.add(UserAuthority.ENTITY_NAME, entityDiagnosisAuthority);
+
+        UserAuthority entityAgegroupAuthority = new UserAuthority();
+        entityAgegroupAuthority.setMolgenisUser(anonymousUser);
+        entityAgegroupAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX + Agegroup3.ENTITY_NAME.toUpperCase());
+        dataService.add(UserAuthority.ENTITY_NAME, entityAgegroupAuthority);
+
+        UserAuthority entityGenderAuthority = new UserAuthority();
+        entityGenderAuthority.setMolgenisUser(anonymousUser);
+        entityGenderAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX + Gender.ENTITY_NAME.toUpperCase());
+        dataService.add(UserAuthority.ENTITY_NAME, entityGenderAuthority);
+
+        UserAuthority entityRTPAuthority = new UserAuthority();
+        entityRTPAuthority.setMolgenisUser(anonymousUser);
+        entityRTPAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX + RuntimeProperty.ENTITY_NAME.toUpperCase());
+        dataService.add(UserAuthority.ENTITY_NAME, entityRTPAuthority);
+
         // Genomebrowser stuff
         Map<String, String> runtimePropertyMap = new HashMap<String, String>();
+        runtimePropertyMap.put(KEY_APP_HREF_CSS, "palga.css");
+        runtimePropertyMap.put(KEY_APP_HREF_LOGO, "/img/logo_palga.png");
+        runtimePropertyMap.put(KEY_APP_NAME, "/img/logo_palga");
 
         runtimePropertyMap.put(INITLOCATION,
                 "chr:'1',viewStart:10000000,viewEnd:10100000,cookieKey:'human',nopersist:true");
