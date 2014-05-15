@@ -5,8 +5,8 @@ import static org.molgenis.palga.elasticsearch.ElasticSearchController.URI;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Repository;
 import org.molgenis.data.elasticsearch.ElasticSearchRepository;
-import org.molgenis.elasticsearch.ElasticSearchService;
 import org.molgenis.framework.ui.MolgenisPluginController;
+import org.molgenis.search.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -21,16 +21,16 @@ public class ElasticSearchController extends MolgenisPluginController
 	public static final String ID = "elasticsearch";
 	public static final String URI = MolgenisPluginController.PLUGIN_URI_PREFIX + ID;
 
-	private final ElasticSearchService elasticSearchService;
+	private final SearchService searchService;
 	private final DataService dataService;
 
 	@Autowired
-	public ElasticSearchController(ElasticSearchService elasticSearchService, DataService dataService)
+	public ElasticSearchController(SearchService elasticSearchService, DataService dataService)
 	{
 		super(URI);
 		if (elasticSearchService == null) throw new IllegalArgumentException("elasticSearchService is null");
 		if (dataService == null) throw new IllegalArgumentException("dataService is null");
-		this.elasticSearchService = elasticSearchService;
+		this.searchService = elasticSearchService;
 		this.dataService = dataService;
 	}
 
@@ -43,6 +43,6 @@ public class ElasticSearchController extends MolgenisPluginController
 		{
 			repository = ((ElasticSearchRepository) repository).getRepository();
 		}
-		elasticSearchService.indexRepository(repository);
+		searchService.indexRepository(repository);
 	}
 }

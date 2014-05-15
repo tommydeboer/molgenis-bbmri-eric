@@ -1,12 +1,10 @@
 package org.molgenis.palga.elasticsearch;
 
-import java.io.IOException;
-
 import org.molgenis.data.DataService;
 import org.molgenis.data.Repository;
 import org.molgenis.data.elasticsearch.ElasticSearchRepository;
 import org.molgenis.elasticsearch.ElasticSearchService;
-import org.molgenis.palga.PalgaSample3;
+import org.molgenis.omx.observ.ObservableFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -37,15 +35,8 @@ public class ElasticSearchRepositoryRegistrator implements ApplicationListener<C
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event)
 	{
-		Repository repository = dataService.getRepositoryByEntityName(PalgaSample3.ENTITY_NAME);
-		dataService.removeRepository(PalgaSample3.ENTITY_NAME);
-		try
-		{
-			dataService.addRepository(new ElasticSearchRepository(elasticSearchService, repository));
-		}
-		catch (IOException e)
-		{
-			throw new RuntimeException(e);
-		}
+		Repository repository = dataService.getRepositoryByEntityName(ObservableFeature.ENTITY_NAME);
+		dataService.removeRepository(ObservableFeature.ENTITY_NAME);
+		dataService.addRepository(new ElasticSearchRepository(elasticSearchService, repository));
 	}
 }
