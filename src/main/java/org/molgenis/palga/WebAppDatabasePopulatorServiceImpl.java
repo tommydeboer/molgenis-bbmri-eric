@@ -103,6 +103,12 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 				+ Diagnosis.ENTITY_NAME.toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, entityDiagnosisAuthority);
 
+		UserAuthority entityAgegroupAuthority = new UserAuthority();
+		entityAgegroupAuthority.setMolgenisUser(anonymousUser);
+		entityAgegroupAuthority
+				.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX + Agegroup.ENTITY_NAME.toUpperCase());
+		dataService.add(UserAuthority.ENTITY_NAME, entityAgegroupAuthority);
+
 		UserAuthority entityGenderAuthority = new UserAuthority();
 		entityGenderAuthority.setMolgenisUser(anonymousUser);
 		entityGenderAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX + Gender.ENTITY_NAME.toUpperCase());
