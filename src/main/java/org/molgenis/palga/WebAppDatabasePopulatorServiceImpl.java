@@ -29,6 +29,12 @@ import com.google.common.collect.Lists;
 @Service
 public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulatorService
 {
+	public static final String INITLOCATION = "initLocation";
+	public static final String COORDSYSTEM = "coordSystem";
+	public static final String CHAINS = "chains";
+	public static final String SOURCES = "sources";
+	public static final String BROWSERLINKS = "browserLinks";
+
 	static final String KEY_APP_HREF_CSS = "app.href.css";
 	static final String KEY_APP_NAME = "app.name";
 	static final String KEY_APP_HREF_LOGO = "app.href.logo";
@@ -127,7 +133,23 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		Map<String, String> runtimePropertyMap = new HashMap<String, String>();
 		runtimePropertyMap.put(KEY_APP_HREF_CSS, "palga.css");
 		runtimePropertyMap.put(KEY_APP_HREF_LOGO, "/img/logo_palga.png");
-		runtimePropertyMap.put(KEY_APP_NAME, "/img/logo_palga");
+		runtimePropertyMap.put(KEY_APP_NAME, "PALGA");
+
+		runtimePropertyMap.put(INITLOCATION,
+				"chr:'1',viewStart:10000000,viewEnd:10100000,cookieKey:'human',nopersist:true");
+		runtimePropertyMap.put(COORDSYSTEM,
+				"{speciesName: 'Human',taxon: 9606,auth: 'GRCh',version: '37',ucscName: 'hg19'}");
+		runtimePropertyMap
+				.put(CHAINS,
+						"{hg18ToHg19: new Chainset('http://www.derkholm.net:8080/das/hg18ToHg19/', 'NCBI36', 'GRCh37',{speciesName: 'Human',taxon: 9606,auth: 'NCBI',version: 36,ucscName: 'hg18'})}");
+		// for use of the demo dataset add to
+		// SOURCES:",{name:'molgenis mutations',uri:'http://localhost:8080/das/molgenis/',desc:'Default from WebAppDatabasePopulatorService'}"
+		runtimePropertyMap
+				.put(SOURCES,
+						"[{name:'Genome',twoBitURI:'http://www.biodalliance.org/datasets/hg19.2bit',tier_type: 'sequence'},{name: 'Genes',desc: 'Gene structures from GENCODE 19',bwgURI: 'http://www.biodalliance.org/datasets/gencode.bb',stylesheet_uri: 'http://www.biodalliance.org/stylesheets/gencode.xml',collapseSuperGroups: true,trixURI:'http://www.biodalliance.org/datasets/geneIndex.ix'},{name: 'Repeats',desc: 'Repeat annotation from Ensembl 59',bwgURI: 'http://www.biodalliance.org/datasets/repeats.bb',stylesheet_uri: 'http://www.biodalliance.org/stylesheets/bb-repeats.xml'},{name: 'Conservation',desc: 'Conservation',bwgURI: 'http://www.biodalliance.org/datasets/phastCons46way.bw',noDownsample: true}]");
+		runtimePropertyMap
+				.put(BROWSERLINKS,
+						"{Ensembl: 'http://www.ensembl.org/Homo_sapiens/Location/View?r=${chr}:${start}-${end}',UCSC: 'http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg19&position=chr${chr}:${start}-${end}',Sequence: 'http://www.derkholm.net:8080/das/hg19comp/sequence?segment=${chr}:${start},${end}'}");
 
 		// Charts include/exclude charts
 		runtimePropertyMap.put(DataExplorerController.KEY_MOD_AGGREGATES, String.valueOf(true));
