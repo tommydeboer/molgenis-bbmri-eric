@@ -123,7 +123,7 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		Map<String, String> runtimePropertyMap = new HashMap<String, String>();
 		runtimePropertyMap.put(KEY_APP_HREF_CSS, "palga.css");
 		runtimePropertyMap.put(KEY_APP_HREF_LOGO, "/img/logo_palga.png");
-		runtimePropertyMap.put(KEY_APP_NAME, "/img/logo_palga");
+		runtimePropertyMap.put(KEY_APP_NAME, "PALGA");
 
 		// Charts include/exclude charts
 		runtimePropertyMap.put(DataExplorerController.KEY_MOD_AGGREGATES, String.valueOf(true));
