@@ -86,11 +86,6 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		anonymousHomeAuthority.setRole(SecurityUtils.AUTHORITY_PLUGIN_WRITE_PREFIX + HomeController.ID.toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, anonymousHomeAuthority);
 
-		UserAuthority entityPalgaSample3Authority = new UserAuthority();
-		entityPalgaSample3Authority.setMolgenisUser(anonymousUser);
-		entityPalgaSample3Authority.setRole("ROLE_ENTITY_COUNT_" + PalgaSample3.ENTITY_NAME.toUpperCase());
-		dataService.add(UserAuthority.ENTITY_NAME, entityPalgaSample3Authority);
-
 		UserAuthority entityPaglasampleAuthority = new UserAuthority();
 		entityPaglasampleAuthority.setMolgenisUser(anonymousUser);
 		entityPaglasampleAuthority.setRole("ROLE_ENTITY_COUNT_" + PalgaSample.ENTITY_NAME.toUpperCase());
@@ -111,7 +106,7 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		UserAuthority entityAgegroupAuthority = new UserAuthority();
 		entityAgegroupAuthority.setMolgenisUser(anonymousUser);
 		entityAgegroupAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
-				+ Agegroup3.ENTITY_NAME.toUpperCase());
+				+ Agegroup.ENTITY_NAME.toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, entityAgegroupAuthority);
 
 		UserAuthority entityGenderAuthority = new UserAuthority();
