@@ -1,5 +1,9 @@
 package org.molgenis.palga;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.molgenis.data.DataService;
 import org.molgenis.data.support.QueryImpl;
 import org.molgenis.dataexplorer.controller.DataExplorerController;
@@ -18,10 +22,6 @@ import org.molgenis.security.user.UserAccountController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 @Service
 public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulatorService
@@ -86,11 +86,6 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		anonymousHomeAuthority.setRole(SecurityUtils.AUTHORITY_PLUGIN_WRITE_PREFIX + HomeController.ID.toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, anonymousHomeAuthority);
 
-		UserAuthority entityPalgaSample3Authority = new UserAuthority();
-		entityPalgaSample3Authority.setMolgenisUser(anonymousUser);
-		entityPalgaSample3Authority.setRole("ROLE_ENTITY_COUNT_" + PalgaSample3.ENTITY_NAME.toUpperCase());
-		dataService.add(UserAuthority.ENTITY_NAME, entityPalgaSample3Authority);
-
 		UserAuthority entityPaglasampleAuthority = new UserAuthority();
 		entityPaglasampleAuthority.setMolgenisUser(anonymousUser);
 		entityPaglasampleAuthority.setRole("ROLE_ENTITY_COUNT_" + PalgaSample.ENTITY_NAME.toUpperCase());
@@ -107,12 +102,6 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		entityDiagnosisAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
 				+ Diagnosis.ENTITY_NAME.toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, entityDiagnosisAuthority);
-
-		UserAuthority entityAgegroupAuthority = new UserAuthority();
-		entityAgegroupAuthority.setMolgenisUser(anonymousUser);
-		entityAgegroupAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
-				+ Agegroup3.ENTITY_NAME.toUpperCase());
-		dataService.add(UserAuthority.ENTITY_NAME, entityAgegroupAuthority);
 
 		UserAuthority entityGenderAuthority = new UserAuthority();
 		entityGenderAuthority.setMolgenisUser(anonymousUser);
