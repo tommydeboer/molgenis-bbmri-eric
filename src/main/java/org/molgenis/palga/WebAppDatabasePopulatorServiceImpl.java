@@ -107,6 +107,7 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		entityAgegroupAuthority.setMolgenisUser(anonymousUser);
 		entityAgegroupAuthority
 				.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX + Agegroup.ENTITY_NAME.toUpperCase());
+
 		dataService.add(UserAuthority.ENTITY_NAME, entityAgegroupAuthority);
 
 		UserAuthority entityGenderAuthority = new UserAuthority();
