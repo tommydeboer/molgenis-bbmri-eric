@@ -1,5 +1,9 @@
 package org.molgenis.palga;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.molgenis.data.DataService;
 import org.molgenis.data.support.QueryImpl;
 import org.molgenis.dataexplorer.controller.DataExplorerController;
@@ -18,10 +22,6 @@ import org.molgenis.security.user.UserAccountController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 @Service
 public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulatorService
@@ -105,8 +105,9 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 
 		UserAuthority entityAgegroupAuthority = new UserAuthority();
 		entityAgegroupAuthority.setMolgenisUser(anonymousUser);
-		entityAgegroupAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
-				+ Agegroup.ENTITY_NAME.toUpperCase());
+		entityAgegroupAuthority
+				.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX + Agegroup.ENTITY_NAME.toUpperCase());
+
 		dataService.add(UserAuthority.ENTITY_NAME, entityAgegroupAuthority);
 
 		UserAuthority entityGenderAuthority = new UserAuthority();

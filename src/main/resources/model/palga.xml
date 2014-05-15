@@ -13,7 +13,7 @@
         <entity name="Diagnosis" label="Diagnose" xref_label="identifier" xref_lookup="identifier,description">
             <field name="id" type="autoid" hidden="true" />
             <field name="identifier" label="Code" type="string" />
-            <field name="description" label="Omschrijving" type="string" />
+            <field name="description" label="Omschrijving" type="text" />
             <unique fields="identifier" />
         </entity>
         <entity name="RetrievalTerm" label="Retrieval term" xref_label="identifier" xref_lookup="identifier,description">

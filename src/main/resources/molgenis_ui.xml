@@ -3,14 +3,11 @@
 	<menu label="Home" name="main">
 		<plugin id="home" name="Home" url="home"/>
 		<plugin id="dataexplorer" name="Data Explorer" url="dataexplorer?dataset=PalgaSample&#038;wizard=true"/>
-		<menu label="Entities" name ="entities">
-       		<plugin id="form.PalgaSample" name="Palga sample" url="form.PalgaSample"/>	
-       		<plugin id="form.Diagnosis" name="Diagnose" url="form.Diagnosis"/>
-       		<plugin id="form.RetrievalTerm" name="Retrieval term" url="form.RetrievalTerm"/>
-       		<plugin id="form.Material" name="Materiaal" url="form.Material"/>
-       		<plugin id="form.Agegroup" name="Leeftijdscategorie" url="form.Agegroup"/>
-       		<plugin id="form.Gender" name="Geslacht" url="form.Gender"/>
-	    </menu>
+		 <plugin id="palgaimport" name="Import" url="palgaimport"/>
+		<menu label="Admin" name="admin">
+	        <plugin id="permissionmanager" name="Permission Manager" url="permissionmanager"/>
+	        <plugin id="usermanager" name="User Manager" url="usermanager"/>
+		</menu>
 	    <plugin id="useraccount" name="Account" url="useraccount"/>
 	</menu>
 </molgenis>
