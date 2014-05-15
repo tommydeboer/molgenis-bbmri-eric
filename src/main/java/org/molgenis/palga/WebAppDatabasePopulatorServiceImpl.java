@@ -1,6 +1,7 @@
 package org.molgenis.palga;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -22,6 +23,8 @@ import org.molgenis.security.user.UserAccountController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.collect.Lists;
 
 @Service
 public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulatorService
@@ -150,6 +153,77 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 			runtimeProperty.setValue(entry.getValue());
 			dataService.add(RuntimeProperty.ENTITY_NAME, runtimeProperty);
 		}
+
+		// TODO correct lookup lists
+
+		// RetrievalTerms
+		List<RetrievalTerm> retrievalTerms = Lists.newArrayList();
+
+		RetrievalTerm rt1 = new RetrievalTerm();
+		rt1.setIdentifier("1");
+		rt1.setDescription("1");
+		retrievalTerms.add(rt1);
+
+		RetrievalTerm rt2 = new RetrievalTerm();
+		rt2.setIdentifier("2");
+		rt2.setDescription("2");
+		retrievalTerms.add(rt2);
+
+		RetrievalTerm rt15 = new RetrievalTerm();
+		rt15.setIdentifier("15");
+		rt15.setDescription("15");
+		retrievalTerms.add(rt15);
+
+		RetrievalTerm rt22 = new RetrievalTerm();
+		rt22.setIdentifier("22");
+		rt22.setDescription("22");
+		retrievalTerms.add(rt22);
+
+		RetrievalTerm rt23 = new RetrievalTerm();
+		rt23.setIdentifier("23");
+		rt23.setDescription("23");
+		retrievalTerms.add(rt23);
+
+		RetrievalTerm rt24 = new RetrievalTerm();
+		rt24.setIdentifier("24");
+		rt24.setDescription("24");
+		retrievalTerms.add(rt24);
+
+		dataService.add(RetrievalTerm.ENTITY_NAME, retrievalTerms);
+
+		// Material
+		Material cistology = new Material();
+		cistology.setType("Cytologie");
+		dataService.add(Material.ENTITY_NAME, cistology);
+
+		Material histology = new Material();
+		histology.setType("Histology");
+		dataService.add(Material.ENTITY_NAME, histology);
+
+		// Gender
+		Gender man = new Gender();
+		man.setGender("Man");
+		dataService.add(Gender.ENTITY_NAME, man);
+
+		Gender vrouw = new Gender();
+		vrouw.setGender("Vrouw");
+		dataService.add(Gender.ENTITY_NAME, vrouw);
+
+		// Age groups
+		List<Agegroup> ageGroups = Lists.newArrayList();
+		Agegroup ag1 = new Agegroup();
+		ag1.setAgegroup(">50 jaar");
+		ageGroups.add(ag1);
+
+		Agegroup ag2 = new Agegroup();
+		ag2.setAgegroup("<18 jaar");
+		ageGroups.add(ag2);
+
+		Agegroup ag3 = new Agegroup();
+		ag3.setAgegroup("18-50 jaar");
+		ageGroups.add(ag3);
+
+		dataService.add(Agegroup.ENTITY_NAME, ageGroups);
 	}
 
 	@Override
