@@ -3,8 +3,8 @@
     <module name="palga">
         <entity name="PalgaSample" label="PALGA sample">
             <field name="id" type="autoid" hidden="true" />
-            <field name="diagnose" label="Diagnose" type="mref" xref_entity="Diagnosis" />
-            <field name="retrievalTerm" label="Retrieval term" type="mref" xref_entity="RetrievalTerm" />
+            <field name="diagnose" label="Diagnose" type="mref" xref_entity="Diagnosis" nillable="true" />
+            <field name="retrievalTerm" label="Retrieval term" type="mref" xref_entity="RetrievalTerm" nillable="true" />
             <field name="materiaal" label="Materiaal" type="categorical" xref_entity="Material" />
             <field name="jaar" label="Jaar" description="Jaar van verslaglegging" type="int" minRange="1980" maxRange="2014" aggregateable="true" />
             <field name="geslacht" label="Geslacht" type="categorical" xref_entity="Gender" />
