@@ -1,9 +1,11 @@
 package org.molgenis.palga.importer;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
@@ -13,20 +15,24 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.elasticsearch.common.collect.Maps;
-import org.molgenis.data.Entity;
-import org.molgenis.data.Repository;
-import org.molgenis.data.RepositoryCollection;
-import org.molgenis.data.csv.CsvRepositoryCollection;
+import org.molgenis.data.DataService;
+import org.molgenis.data.elasticsearch.ElasticSearchRepository;
 import org.molgenis.palga.Agegroup;
 import org.molgenis.palga.Diagnosis;
 import org.molgenis.palga.Gender;
 import org.molgenis.palga.Material;
 import org.molgenis.palga.PalgaSample;
 import org.molgenis.palga.RetrievalTerm;
+import org.molgenis.search.SearchService;
+import org.molgenis.security.runas.RunAsSystem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+
+import au.com.bytecode.opencsv.CSVReader;
+
+import com.google.common.collect.Sets;
 
 /**
  * Palga sample file importer.
@@ -39,14 +45,15 @@ import org.springframework.stereotype.Service;
 public class PalgaSampleImporter
 {
 	private static final Logger logger = Logger.getLogger(PalgaSampleImporter.class);
-	private static final String DIAGNOSE_COLUMN = "PALGA-code";
-	private static final String RETRIEVAL_TERM_COLUMN = "Retrievalterm";
-	private static final String MATERIAAL_COLUMN = "Soort onderzoek";
-	private static final String JAAR_COLUMN = "Jaar onderzoek";
-	private static final String GESLACHT_COLUMN = "Geslacht";
-	private static final String LEEFTIJD_COLUMN = "Leeftijdscategorie";
+	private static final int DIAGNOSE_COLUMN = 2;
+	private static final int RETRIEVAL_TERM_COLUMN = 3;
+	private static final int MATERIAAL_COLUMN = 4;
+	private static final int JAAR_COLUMN = 5;
+	private static final int GESLACHT_COLUMN = 6;
+	private static final int LEEFTIJD_COLUMN = 7;
+	private static final char SEPARATOR = '|';
 	private static final String IN_COLUMN_SEPARATOR = "\\*";
-	private static int BATCH_SIZE = 100000;
+	private static int BATCH_SIZE = 10000;
 
 	private final Map<String, String> materialMapping = Maps.newHashMap();
 	private final Map<String, String> geslachtMapping = Maps.newHashMap();
@@ -54,37 +61,26 @@ public class PalgaSampleImporter
 	private final String dbUser;
 	private final String dbPassword;
 
+	private final DataService dataService;
+	private final SearchService searchService;
+
 	@Autowired
 	public PalgaSampleImporter(@Value("${db_user:@null}") String dbUser,
-			@Value("${db_password:@null}") String dbPassword)
+			@Value("${db_password:@null}") String dbPassword, DataService dataService, SearchService searchService)
 	{
-		// TODO
-		materialMapping.put("T", "Cytologie");
-		materialMapping.put("M", "Histologie");
+		materialMapping.put("C", "Cytologie");
+		materialMapping.put("T", "Histologie");
 		geslachtMapping.put("m", "Man");
 		geslachtMapping.put("v", "Vrouw");
 
 		this.dbUser = dbUser;
 		this.dbPassword = dbPassword;
-	}
-
-	public static void main(String[] args)
-	{
-		File f = new File(args[0]);
-		String dbUser = args[1];
-		String dbPassword = args[2];
-
-		try
-		{
-			new PalgaSampleImporter(dbUser, dbPassword).importFile(f);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+		this.dataService = dataService;
+		this.searchService = searchService;
 	}
 
 	@Async
+	@RunAsSystem
 	public void importFile(File file) throws InvalidFormatException, IOException
 	{
 		Map<String, String> props = Maps.newHashMap();
@@ -95,11 +91,7 @@ public class PalgaSampleImporter
 				.createEntityManager();
 
 		String fileName = file.getAbsolutePath();
-		logger.info("Going to import palga sample file [" + fileName + "]");
-
-		RepositoryCollection source = new CsvRepositoryCollection(file);
-		String repoName = source.getEntityNames().iterator().next();
-		Repository sampleRepo = source.getRepositoryByEntityName(repoName);
+		logger.info("Import of palga sample file [" + fileName + "] started");
 
 		Map<String, RetrievalTerm> retrievalTerms = getRetrievalTerms(entityManager);
 		Map<String, Diagnosis> diagnosis = getDiagnosis(entityManager);
@@ -107,37 +99,43 @@ public class PalgaSampleImporter
 		Map<String, Gender> genders = getGenders(entityManager);
 		Map<String, Agegroup> agegroups = getAgeGroups(entityManager);
 
+		CSVReader reader = new CSVReader(new FileReader(file), SEPARATOR);
+		reader.readNext();// header
+
 		long t0 = System.currentTimeMillis();
-		long row = 0;
+		long count = 0;
+		long row = 2;
 		try
 		{
 			long start = 0;
-			for (Entity entity : sampleRepo)
+			String[] line = reader.readNext();
+			while (line != null)
 			{
-				if (row % BATCH_SIZE == 0)
+				if ((count % BATCH_SIZE == 0) && !entityManager.getTransaction().isActive())
 				{
-					start = row;
+					start = count;
 					entityManager.getTransaction().begin();
 				}
 
-				PalgaSample sample = createPalgaSample(entity, row, diagnosis, retrievalTerms, materials, genders,
+				PalgaSample sample = createPalgaSample(line, row++, diagnosis, retrievalTerms, materials, genders,
 						agegroups);
 				if (sample != null)
 				{
 					entityManager.persist(sample);
-					row++;
+					count++;
 				}
 
 				// Commit if BATCH_SIZE is reached
-				if (row == (start + BATCH_SIZE))
+				if (count == (start + BATCH_SIZE))
 				{
 					entityManager.getTransaction().commit();
 					entityManager.flush();
 					entityManager.clear();
-					long t = System.currentTimeMillis() - t0;
 
-					logger.info("Inserted [" + row + "] rows in [" + t + "] msec.");
+					long t = (System.currentTimeMillis() - t0) / 1000;
+					logger.info("Imported [" + count + "] rows in [" + t + "] sec.");
 				}
+				line = reader.readNext();
 			}
 
 			// Commit the rest
@@ -146,10 +144,9 @@ public class PalgaSampleImporter
 				entityManager.getTransaction().commit();
 			}
 
-			long t = System.currentTimeMillis() - t0;
-			logger.info("Import of palga sample file [" + fileName + "] completed in " + t + " msec. Added [" + row
+			long t = (System.currentTimeMillis() - t0) / 1000;
+			logger.info("Import of palga sample file [" + fileName + "] completed in " + t + " sec. Added [" + count
 					+ "] rows.");
-
 		}
 		catch (Exception e)
 		{
@@ -158,71 +155,79 @@ public class PalgaSampleImporter
 		}
 		finally
 		{
-			IOUtils.closeQuietly(sampleRepo);
+			IOUtils.closeQuietly(reader);
 			entityManager.close();
 		}
+
+		// Index the samples
+		long t = System.currentTimeMillis();
+
+		ElasticSearchRepository esRepository = (ElasticSearchRepository) dataService
+				.getRepositoryByEntityName(PalgaSample.ENTITY_NAME);
+		searchService.indexRepository(esRepository.getRepository());
+
+		long t1 = (System.currentTimeMillis() - t) / 1000;
+		logger.info("Palga samples indexed in [" + t1 + "] sec");
+
+		long tTotal = (System.currentTimeMillis() - t0) / 1000;
+		logger.info("Import finished in [" + tTotal + "] sec");
 	}
 
-	private PalgaSample createPalgaSample(Entity csvRow, long row, Map<String, Diagnosis> diagnosis,
+	private PalgaSample createPalgaSample(String[] csvRow, long row, Map<String, Diagnosis> diagnosis,
 			Map<String, RetrievalTerm> retrievalTerms, Map<String, Material> materials, Map<String, Gender> genders,
 			Map<String, Agegroup> agegroups)
 	{
 		PalgaSample sample = new PalgaSample();
 
 		// Diagnosis
-		String diagnose = csvRow.getString(DIAGNOSE_COLUMN);
+		String diagnose = csvRow[DIAGNOSE_COLUMN];
 		if (StringUtils.isBlank(diagnose))
 		{
-			logger.warn(DIAGNOSE_COLUMN + " column of row [" + row + "] is empty");
+			logger.warn("Palga-code column of row [" + row + "] is empty");
 			return null;
 		}
-		for (String code : diagnose.split(IN_COLUMN_SEPARATOR))
+		String[] diagnoseArray = diagnose.split(IN_COLUMN_SEPARATOR);
+		Set<Diagnosis> diagnoses = Sets.newHashSetWithExpectedSize(diagnoseArray.length);
+		for (String code : diagnoseArray)
 		{
 			Diagnosis d = diagnosis.get(code);
-			if (d == null)
+			if (d != null)
 			{
-				logger.warn("Unknown PALGA-code [" + code + "] on row [" + row + "]");
-				return null;
+				diagnoses.add(d);
 			}
-			sample.getDiagnose().add(d);
 		}
-		if (sample.getDiagnose().isEmpty())
+		if (!diagnoses.isEmpty())
 		{
-			logger.warn("Missing PALGA-code on row [" + row + "]");
-			return null;
+			sample.getDiagnose().addAll(diagnoses);
+		}
+		else
+		{
+			logger.warn("Missing PALGA codes on row [" + row + "]");
 		}
 
 		// RetrievalTerms
-		String termIdentifiers = csvRow.getString(RETRIEVAL_TERM_COLUMN);
-		if (StringUtils.isBlank(termIdentifiers))
+		String termIdentifiers = csvRow[RETRIEVAL_TERM_COLUMN];
 		{
-			logger.warn(RETRIEVAL_TERM_COLUMN + " column of row [" + row + "] is empty");
-			return null;
-		}
-		for (String termIdentifier : termIdentifiers.split(IN_COLUMN_SEPARATOR))
-		{
-			if (StringUtils.isNotBlank(termIdentifier))
+			for (String termIdentifier : termIdentifiers.split(IN_COLUMN_SEPARATOR))
 			{
-				RetrievalTerm term = retrievalTerms.get(termIdentifier);
-				if (term == null)
+				if (StringUtils.isNotBlank(termIdentifier))
 				{
-					logger.warn("Unknown Retrievalterm [" + termIdentifier + "] on row [" + row + "]");
-					return null;
+					RetrievalTerm term = retrievalTerms.get(termIdentifier);
+					if (term == null)
+					{
+						logger.warn("Unknown Retrievalterm [" + termIdentifier + "] on row [" + row + "]");
+						return null;
+					}
+					sample.getRetrievalTerm().add(term);
 				}
-				sample.getRetrievalTerm().add(term);
 			}
-		}
-		if (sample.getRetrievalTerm().isEmpty())
-		{
-			logger.warn("Missing Retrievalterm on row [" + row + "]");
-			return null;
 		}
 
 		// Materials
-		String materialTypeCode = csvRow.getString(MATERIAAL_COLUMN);
+		String materialTypeCode = csvRow[MATERIAAL_COLUMN];
 		if (StringUtils.isBlank(materialTypeCode))
 		{
-			logger.warn(MATERIAAL_COLUMN + " column of row [" + row + "] is empty");
+			logger.warn("'Soort onderzoek' column of row [" + row + "] is empty");
 			return null;
 		}
 		String materialType = materialMapping.get(materialTypeCode);
@@ -231,13 +236,22 @@ public class PalgaSampleImporter
 			logger.warn("Unknown material [" + materialTypeCode + "] on row [" + row + "]");
 			return null;
 		}
-		sample.setMateriaal(materials.get(materialType));
+		Material material = materials.get(materialType);
+		if (material == null)
+		{
+			logger.warn("Unknown material [" + materialType + "] on row [" + row + "]");
+			return null;
+		}
+		else
+		{
+			sample.setMateriaal(material);
+		}
 
 		// Year
-		String year = csvRow.getString(JAAR_COLUMN);
+		String year = csvRow[JAAR_COLUMN];
 		if (StringUtils.isBlank(year))
 		{
-			logger.warn(JAAR_COLUMN + " column of row [" + row + "] is empty");
+			logger.warn("'Jaar onderzoek' column of row [" + row + "] is empty");
 		}
 		if (!StringUtils.isNumeric(year))
 		{
@@ -247,25 +261,34 @@ public class PalgaSampleImporter
 		sample.setJaar(Integer.valueOf(year));
 
 		// Gender
-		String genderCode = csvRow.getString(GESLACHT_COLUMN);
+		String genderCode = csvRow[GESLACHT_COLUMN];
 		if (StringUtils.isBlank(genderCode))
 		{
-			logger.warn(GESLACHT_COLUMN + " column of row [" + row + "] is empty");
+			logger.warn("Geslacht column of row [" + row + "] is empty");
 			return null;
 		}
-		String gender = geslachtMapping.get(genderCode);
-		if (gender == null)
+		String genderStr = geslachtMapping.get(genderCode);
+		if (genderStr == null)
 		{
 			logger.warn("Unknown gender [" + genderCode + "] on row [" + row + "]");
 			return null;
 		}
-		sample.setGeslacht(genders.get(gender));
+		Gender gender = genders.get(genderStr);
+		if (gender == null)
+		{
+			logger.warn("Unkown gender [" + genderStr + "] on row [" + row + "]");
+			return null;
+		}
+		else
+		{
+			sample.setGeslacht(gender);
+		}
 
 		// Agegroups
-		String agegroupCode = csvRow.getString(LEEFTIJD_COLUMN);
+		String agegroupCode = csvRow[LEEFTIJD_COLUMN];
 		if (StringUtils.isBlank(agegroupCode))
 		{
-			logger.warn(LEEFTIJD_COLUMN + " column of row [" + row + "] is empty");
+			logger.warn("Leeftijdscategorie column of row [" + row + "] is empty");
 			return null;
 		}
 
