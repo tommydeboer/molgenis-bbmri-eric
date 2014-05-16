@@ -132,6 +132,8 @@ public class PalgaSampleImporter
 				if (row == (start + BATCH_SIZE))
 				{
 					entityManager.getTransaction().commit();
+					entityManager.flush();
+					entityManager.clear();
 					long t = System.currentTimeMillis() - t0;
 
 					logger.info("Inserted [" + row + "] rows in [" + t + "] msec.");
