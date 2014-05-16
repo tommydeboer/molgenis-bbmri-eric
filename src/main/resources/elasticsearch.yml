@@ -124,7 +124,8 @@ index:
     			tokenizer: default_tokenizer
     	tokenizer:
     		default_tokenizer:
-    			type: keyword
+    			type: pattern
+    			pattern: ([\,\.]+)
     
 index.number_of_shards: 1
 index.number_of_replicas: 0
