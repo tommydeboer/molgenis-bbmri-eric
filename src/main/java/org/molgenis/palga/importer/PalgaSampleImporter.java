@@ -129,6 +129,8 @@ public class PalgaSampleImporter
 				if (count == (start + BATCH_SIZE))
 				{
 					entityManager.getTransaction().commit();
+					entityManager.flush();
+					entityManager.clear();
 
 					long t = (System.currentTimeMillis() - t0) / 1000;
 					logger.info("Imported [" + count + "] rows in [" + t + "] sec.");
