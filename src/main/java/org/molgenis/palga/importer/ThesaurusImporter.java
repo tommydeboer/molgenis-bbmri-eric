@@ -57,9 +57,6 @@ public class ThesaurusImporter
 		logger.info("Going to import thesaurus file [" + fileName + "]");
 
 		RepositoryCollection source = new ExcelRepositoryCollection(file);
-
-		// entityManager.getTransaction().begin();
-
 		Repository thesaurusRepo = null;
 		try
 		{
@@ -96,15 +93,12 @@ public class ThesaurusImporter
 				}
 			}
 
-			// entityManager.getTransaction().commit();
-
 			long t = System.currentTimeMillis() - t0;
 			logger.info("Import of thesaurus file [" + fileName + "] completed in " + t + " msec");
 		}
 		catch (Exception e)
 		{
 			logger.error("Exception importing thesaurus file [" + fileName + "] ", e);
-			// entityManager.getTransaction().rollback();
 			throw e;
 		}
 		finally
