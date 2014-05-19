@@ -1,5 +1,7 @@
 package org.molgenis.palga.importer;
 
+import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -14,16 +16,24 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.common.collect.Maps;
-import org.molgenis.data.DataService;
-import org.molgenis.data.elasticsearch.ElasticSearchRepository;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.ImmutableSettings.Builder;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.node.Node;
 import org.molgenis.palga.Agegroup;
 import org.molgenis.palga.Diagnosis;
 import org.molgenis.palga.Gender;
 import org.molgenis.palga.Material;
 import org.molgenis.palga.PalgaSample;
 import org.molgenis.palga.RetrievalTerm;
-import org.molgenis.search.SearchService;
 import org.molgenis.security.runas.RunAsSystem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,6 +55,7 @@ import com.google.common.collect.Sets;
 public class PalgaSampleImporter
 {
 	private static final Logger logger = Logger.getLogger(PalgaSampleImporter.class);
+
 	private static final int DIAGNOSE_COLUMN = 2;
 	private static final int RETRIEVAL_TERM_COLUMN = 3;
 	private static final int MATERIAAL_COLUMN = 4;
@@ -61,12 +72,9 @@ public class PalgaSampleImporter
 	private final String dbUser;
 	private final String dbPassword;
 
-	private final DataService dataService;
-	private final SearchService searchService;
-
 	@Autowired
 	public PalgaSampleImporter(@Value("${db_user:@null}") String dbUser,
-			@Value("${db_password:@null}") String dbPassword, DataService dataService, SearchService searchService)
+			@Value("${db_password:@null}") String dbPassword)
 	{
 		materialMapping.put("C", "Cytologie");
 		materialMapping.put("T", "Histologie");
@@ -75,8 +83,6 @@ public class PalgaSampleImporter
 
 		this.dbUser = dbUser;
 		this.dbPassword = dbPassword;
-		this.dataService = dataService;
-		this.searchService = searchService;
 	}
 
 	@Async
@@ -99,6 +105,11 @@ public class PalgaSampleImporter
 		Map<String, Gender> genders = getGenders(entityManager);
 		Map<String, Agegroup> agegroups = getAgeGroups(entityManager);
 
+		Builder builder = ImmutableSettings.settingsBuilder().loadFromClasspath("elasticsearch.yml");
+		Settings settings = builder.build();
+		Node node = nodeBuilder().settings(settings).local(true).node();
+		Client client = node.client();
+
 		CSVReader reader = new CSVReader(new FileReader(file), SEPARATOR);
 		reader.readNext();// header
 
@@ -107,29 +118,34 @@ public class PalgaSampleImporter
 		long row = 2;
 		try
 		{
+			createMappings(client);
+			BulkRequestBuilder bulkRequest = null;
 			long start = 0;
 			String[] line = reader.readNext();
 			while (line != null)
 			{
-				if ((count % BATCH_SIZE == 0) && !entityManager.getTransaction().isActive())
+				if (count % BATCH_SIZE == 0)
 				{
 					start = count;
-					entityManager.getTransaction().begin();
+					bulkRequest = client.prepareBulk();
 				}
 
-				PalgaSample sample = createPalgaSample(line, row++, diagnosis, retrievalTerms, materials, genders,
-						agegroups);
+				Map<String, Object> sample = createPalgaSample(line, row++, diagnosis, retrievalTerms, materials,
+						genders, agegroups);
 				if (sample != null)
 				{
-					entityManager.persist(sample);
+					bulkRequest.add(client.prepareIndex("molgenis", PalgaSample.ENTITY_NAME).setSource(sample));
 					count++;
 				}
 
 				// Commit if BATCH_SIZE is reached
 				if (count == (start + BATCH_SIZE))
 				{
-					entityManager.getTransaction().commit();
-					entityManager.clear();
+					BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+					if (bulkResponse.hasFailures())
+					{
+						throw new RuntimeException("error while indexing row [" + count + "]: " + bulkResponse);
+					}
 
 					long t = (System.currentTimeMillis() - t0) / 1000;
 					logger.info("Imported [" + count + "] rows in [" + t + "] sec.");
@@ -138,9 +154,10 @@ public class PalgaSampleImporter
 			}
 
 			// Commit the rest
-			if (entityManager.getTransaction().isActive())
+			BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+			if (bulkResponse.hasFailures())
 			{
-				entityManager.getTransaction().commit();
+				throw new RuntimeException("error while indexing row [" + count + "]: " + bulkResponse);
 			}
 
 			long t = (System.currentTimeMillis() - t0) / 1000;
@@ -155,28 +172,14 @@ public class PalgaSampleImporter
 		finally
 		{
 			IOUtils.closeQuietly(reader);
-			entityManager.close();
 		}
-
-		// Index the samples
-		long t = System.currentTimeMillis();
-
-		ElasticSearchRepository esRepository = (ElasticSearchRepository) dataService
-				.getRepositoryByEntityName(PalgaSample.ENTITY_NAME);
-		searchService.indexRepository(esRepository.getRepository());
-
-		long t1 = (System.currentTimeMillis() - t) / 1000;
-		logger.info("Palga samples indexed in [" + t1 + "] sec");
-
-		long tTotal = (System.currentTimeMillis() - t0) / 1000;
-		logger.info("Import finished in [" + tTotal + "] sec");
 	}
 
-	private PalgaSample createPalgaSample(String[] csvRow, long row, Map<String, Diagnosis> diagnosis,
+	private Map<String, Object> createPalgaSample(String[] csvRow, long row, Map<String, Diagnosis> diagnosis,
 			Map<String, RetrievalTerm> retrievalTerms, Map<String, Material> materials, Map<String, Gender> genders,
 			Map<String, Agegroup> agegroups)
 	{
-		PalgaSample sample = new PalgaSample();
+		Map<String, Object> sample = Maps.newHashMapWithExpectedSize(10);
 
 		// Diagnosis
 		String diagnose = csvRow[DIAGNOSE_COLUMN];
@@ -186,18 +189,18 @@ public class PalgaSampleImporter
 			return null;
 		}
 		String[] diagnoseArray = diagnose.split(IN_COLUMN_SEPARATOR);
-		Set<Diagnosis> diagnoses = Sets.newHashSetWithExpectedSize(diagnoseArray.length);
+		Set<String> diagnoses = Sets.newHashSetWithExpectedSize(diagnoseArray.length);
 		for (String code : diagnoseArray)
 		{
 			Diagnosis d = diagnosis.get(code);
 			if (d != null)
 			{
-				diagnoses.add(d);
+				diagnoses.add(d.getIdentifier());
 			}
 		}
 		if (!diagnoses.isEmpty())
 		{
-			sample.getDiagnose().addAll(diagnoses);
+			sample.put("diagnose", diagnoses);
 		}
 		else
 		{
@@ -207,7 +210,9 @@ public class PalgaSampleImporter
 		// RetrievalTerms
 		String termIdentifiers = csvRow[RETRIEVAL_TERM_COLUMN];
 		{
-			for (String termIdentifier : termIdentifiers.split(IN_COLUMN_SEPARATOR))
+			String[] termIdentifiersArray = termIdentifiers.split(IN_COLUMN_SEPARATOR);
+			Set<String> retrievalTermDescriptions = Sets.newHashSetWithExpectedSize(termIdentifiersArray.length);
+			for (String termIdentifier : termIdentifiersArray)
 			{
 				if (StringUtils.isNotBlank(termIdentifier))
 				{
@@ -217,8 +222,13 @@ public class PalgaSampleImporter
 						logger.warn("Unknown Retrievalterm [" + termIdentifier + "] on row [" + row + "]");
 						return null;
 					}
-					sample.getRetrievalTerm().add(term);
+
+					retrievalTermDescriptions.add(term.getIdentifier());
 				}
+			}
+			if (!retrievalTermDescriptions.isEmpty())
+			{
+				sample.put("retrievalTerm", retrievalTermDescriptions);
 			}
 		}
 
@@ -243,7 +253,7 @@ public class PalgaSampleImporter
 		}
 		else
 		{
-			sample.setMateriaal(material);
+			sample.put("materiaal", material.getType());
 		}
 
 		// Year
@@ -257,7 +267,7 @@ public class PalgaSampleImporter
 			logger.warn("Invalid year [" + year + "] on row [" + row + "]");
 			return null;
 		}
-		sample.setJaar(Integer.valueOf(year));
+		sample.put("jaar", Integer.valueOf(year));
 
 		// Gender
 		String genderCode = csvRow[GESLACHT_COLUMN];
@@ -280,7 +290,7 @@ public class PalgaSampleImporter
 		}
 		else
 		{
-			sample.setGeslacht(gender);
+			sample.put("geslacht", gender.getGender());
 		}
 
 		// Agegroups
@@ -297,7 +307,7 @@ public class PalgaSampleImporter
 			logger.warn("Unknown agegroup [" + agegroup + "] on row [" + row + "]");
 			return null;
 		}
-		sample.setLeeftijd(agegroup);
+		sample.put("leeftijd", agegroup.getAgegroup());
 
 		return sample;
 	}
@@ -369,5 +379,41 @@ public class PalgaSampleImporter
 		}
 
 		return result;
+	}
+
+	private void createMappings(Client client) throws IOException
+	{
+		XContentBuilder jsonBuilder = XContentFactory.jsonBuilder().startObject().startObject("PalgaSample");
+
+		jsonBuilder.startObject("_source").field("enabled", false).endObject();
+		jsonBuilder.startObject("properties");
+		jsonBuilder.startObject("diagnose").field("type", "string").field("store", "no").field("index", "not_analyzed")
+				.endObject();
+		jsonBuilder.startObject("retrievalTerm").field("type", "string").field("store", "no")
+				.field("index", "not_analyzed").endObject();
+		jsonBuilder.startObject("materiaal").field("type", "string").field("store", "no")
+				.field("index", "not_analyzed").endObject();
+		jsonBuilder.startObject("jaar").field("type", "string").field("store", "no").field("index", "not_analyzed")
+				.endObject();
+		jsonBuilder.startObject("geslacht").field("type", "string").field("store", "no").field("index", "not_analyzed")
+				.endObject();
+		jsonBuilder.startObject("leeftijd").field("type", "string").field("store", "no").field("index", "not_analyzed")
+				.endObject();
+		jsonBuilder.endObject(); // properties
+		jsonBuilder.endObject(); // documentType
+		jsonBuilder.endObject(); // PalgaSample
+
+		logger.info("Going to create mapping [" + jsonBuilder.string() + "]");
+
+		PutMappingResponse response = client.admin().indices().preparePutMapping("molgenis").setType("PalgaSample")
+				.setSource(jsonBuilder).execute().actionGet();
+
+		if (!response.isAcknowledged())
+		{
+			throw new ElasticsearchException("Creation of mapping for documentType [PalgaSample] failed. Response="
+					+ response);
+		}
+
+		logger.info("Mapping for documentType [PalgaSample] created");
 	}
 }
