@@ -5,6 +5,7 @@ import org.molgenis.data.Repository;
 import org.molgenis.data.elasticsearch.ElasticSearchRepository;
 import org.molgenis.elasticsearch.ElasticSearchService;
 import org.molgenis.palga.PalgaSample;
+import org.molgenis.search.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -15,10 +16,10 @@ import org.springframework.stereotype.Component;
 public class ElasticSearchRepositoryRegistrator implements ApplicationListener<ContextRefreshedEvent>, Ordered
 {
 	private final DataService dataService;
-	private final ElasticSearchService elasticSearchService;
+	private final SearchService elasticSearchService;
 
 	@Autowired
-	public ElasticSearchRepositoryRegistrator(DataService dataService, ElasticSearchService elasticSearchService)
+	public ElasticSearchRepositoryRegistrator(DataService dataService, SearchService elasticSearchService)
 	{
 		if (dataService == null) throw new IllegalArgumentException("dataService is null");
 		if (elasticSearchService == null) throw new IllegalArgumentException("elasticSearchService is null");
@@ -37,6 +38,6 @@ public class ElasticSearchRepositoryRegistrator implements ApplicationListener<C
 	{
 		Repository repository = dataService.getRepositoryByEntityName(PalgaSample.ENTITY_NAME);
 		dataService.removeRepository(PalgaSample.ENTITY_NAME);
-		dataService.addRepository(new ElasticSearchRepository(elasticSearchService, repository));
+		dataService.addRepository(new ElasticSearchRepository((ElasticSearchService) elasticSearchService, repository));
 	}
 }
