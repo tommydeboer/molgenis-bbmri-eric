@@ -112,11 +112,11 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 				+ Diagnosis.ENTITY_NAME.toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, entityDiagnosisAuthority);
 
-        UserAuthority entityRetrievalTermAuthority = new UserAuthority();
-        entityRetrievalTermAuthority.setMolgenisUser(anonymousUser);
-        entityRetrievalTermAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
-                + RetrievalTerm.ENTITY_NAME.toUpperCase());
-        dataService.add(UserAuthority.ENTITY_NAME, entityRetrievalTermAuthority);
+		UserAuthority entityRetrievalTermAuthority = new UserAuthority();
+		entityRetrievalTermAuthority.setMolgenisUser(anonymousUser);
+		entityRetrievalTermAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
+				+ RetrievalTerm.ENTITY_NAME.toUpperCase());
+		dataService.add(UserAuthority.ENTITY_NAME, entityRetrievalTermAuthority);
 
 		UserAuthority entityAgegroupAuthority = new UserAuthority();
 		entityAgegroupAuthority.setMolgenisUser(anonymousUser);
