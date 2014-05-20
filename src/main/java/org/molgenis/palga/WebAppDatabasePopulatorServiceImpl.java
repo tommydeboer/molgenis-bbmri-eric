@@ -1,10 +1,6 @@
 package org.molgenis.palga;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.google.common.collect.Lists;
 import org.molgenis.data.DataService;
 import org.molgenis.data.support.QueryImpl;
 import org.molgenis.dataexplorer.controller.DataExplorerController;
@@ -23,7 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 @Service
 public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulatorService
@@ -156,7 +155,8 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		runtimePropertyMap.put(DataExplorerController.KEY_MOD_AGGREGATES, String.valueOf(true));
 		runtimePropertyMap.put(DataExplorerController.KEY_MOD_CHARTS, String.valueOf(false));
 		runtimePropertyMap.put(DataExplorerController.KEY_MOD_ANNOTATORS, String.valueOf(false));
-		runtimePropertyMap.put(DataExplorerController.KEY_MOD_DATA, String.valueOf(true));
+		runtimePropertyMap.put(DataExplorerController.KEY_MOD_DATA, String.valueOf(false));
+		runtimePropertyMap.put(DataExplorerController.WIZARD_TITLE, "Zoekvraag");
 
 		// Annotators include files/tools
 		String molgenisHomeDir = System.getProperty("molgenis.home");

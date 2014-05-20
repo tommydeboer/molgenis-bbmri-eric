@@ -7,6 +7,7 @@
 		<menu label="Admin" name="admin">
 	        <plugin id="permissionmanager" name="Permission Manager" url="permissionmanager"/>
 	        <plugin id="usermanager" name="User Manager" url="usermanager"/>
+            <plugin id="form.RuntimeProperty" name="Configuration" url="form.RuntimeProperty"/>
 		</menu>
 	    <plugin id="useraccount" name="Account" url="useraccount"/>
 	</menu>
