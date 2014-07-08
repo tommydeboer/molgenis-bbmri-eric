@@ -195,7 +195,7 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		// Age groups
 		List<Agegroup> ageGroups = Lists.newArrayList();
 		Agegroup ag1 = new Agegroup();
-		ag1.setAgegroup("> 50");
+		ag1.setAgegroup(">50");
 		ageGroups.add(ag1);
 
 		Agegroup ag3 = new Agegroup();
@@ -203,7 +203,7 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		ageGroups.add(ag3);
 
 		Agegroup ag2 = new Agegroup();
-		ag2.setAgegroup("< 18");
+		ag2.setAgegroup("<18");
 		ageGroups.add(ag2);
 		
 //		dataService.add(Agegroup.ENTITY_NAME, ageGroups);
