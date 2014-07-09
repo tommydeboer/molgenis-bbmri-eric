@@ -385,7 +385,7 @@ public class PalgaSampleImporter
 	{
 		XContentBuilder jsonBuilder = XContentFactory.jsonBuilder().startObject().startObject("PalgaSample");
 
-		jsonBuilder.startObject("_source").field("enabled", false).endObject();
+//		jsonBuilder.startObject("_source").field("enabled", false).endObject();
 		jsonBuilder.startObject("properties");
 		jsonBuilder.startObject("diagnose").field("type", "string").field("store", "no").field("index", "not_analyzed")
 				.endObject();
