@@ -43,7 +43,7 @@ public class PalgaImporterController extends MolgenisPluginController
 	@RequestMapping(method = RequestMethod.GET)
 	public String showImportForm(Model model)
 	{
-		// Only show thesuaus if not imported yet
+		// Only show thesuarus if not imported yet
 		long diagnosisCount = dataService.count(Diagnosis.ENTITY_NAME, new QueryImpl());
 		model.addAttribute("showThesurus", (diagnosisCount == 0));
 		return "view-palga-import";

@@ -206,8 +206,6 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		ag2.setAgegroup("<18");
 		ageGroups.add(ag2);
 		
-//		dataService.add(Agegroup.ENTITY_NAME, ageGroups);
-		
 		dataService.add(Agegroup.ENTITY_NAME, ag2);
 		dataService.add(Agegroup.ENTITY_NAME, ag3);
 		dataService.add(Agegroup.ENTITY_NAME, ag1);
