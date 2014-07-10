@@ -240,9 +240,6 @@ public class PalgaSampleImporter
 		// the rows to get information from
 		String[] csvRow = csvRows.get(0);
 
-		// String PALGAexcerptnr = csvRow[0];
-		// sample.put("PALGAexcerptnr", PALGAexcerptnr);
-
 		// Diagnosis
 		List<Map<String, Object>> diagnoses = new ArrayList<Map<String, Object>>();
 		for (String[] eachRow : csvRows)
