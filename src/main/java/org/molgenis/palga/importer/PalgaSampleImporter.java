@@ -47,8 +47,6 @@ import org.springframework.stereotype.Service;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-//import static org.molgenis.MolgenisFieldTypes;
-
 /**
  * Palga sample file importer.
  * 
@@ -298,8 +296,6 @@ public class PalgaSampleImporter
 					{
 						retrivalTermInfo.put(attributeName, term.get(attributeName));
 					}
-					// retrivalTermInfo.put(retrievalTermLabelAttribute.getName(),
-					// term.get(retrievalTermLabelAttribute.getName()));
 					retrivalTerms.add(retrivalTermInfo);
 				}
 			}
