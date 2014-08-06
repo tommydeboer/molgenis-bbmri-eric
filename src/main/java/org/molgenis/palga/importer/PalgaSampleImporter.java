@@ -198,6 +198,7 @@ public class PalgaSampleImporter
 						materials, genders, agegroups, entityMetaData);
 				if (sample != null)
 				{
+					if (bulkRequest == null) bulkRequest = client.prepareBulk();
 					bulkRequest.add(client.prepareIndex("molgenis", PalgaSample.ENTITY_NAME).setSource(sample));
 					count++;
 				}
@@ -239,16 +240,19 @@ public class PalgaSampleImporter
 		String[] csvRow = csvRows.get(0);
 
 		// Diagnosis
-		List<Map<String, Object>> diagnoses = new ArrayList<Map<String, Object>>();
+		List<Map<String, List<Object>>> diagnoses = new ArrayList<Map<String, List<Object>>>();
 		for (String[] eachRow : csvRows)
 		{
 			String diagnose = eachRow[DIAGNOSE_COLUMN];
 			if (StringUtils.isBlank(diagnose))
 			{
 				logger.warn("Palga-code column of row [" + row + "] is empty");
+				// TODO : ask Dennis about what should happen if the value for
+				// diagnose is null, same goes for RetrievialTerm
 				return null;
 			}
 			String[] diagnoseArray = diagnose.split(IN_COLUMN_SEPARATOR);
+			Map<String, List<Object>> disgnosisInfo = new HashMap<String, List<Object>>();
 			for (String code : diagnoseArray)
 			{
 				if (StringUtils.isNotBlank(code))
@@ -256,15 +260,19 @@ public class PalgaSampleImporter
 					Diagnosis d = diagnosis.get(code);
 					if (d != null)
 					{
-						Map<String, Object> disgnosisInfo = new HashMap<String, Object>();
 						for (String attributeName : d.getAttributeNames())
 						{
-							disgnosisInfo.put(attributeName, d.get(attributeName));
+							if (!disgnosisInfo.containsKey(attributeName))
+							{
+								disgnosisInfo.put(attributeName, new ArrayList<Object>());
+							}
+
+							disgnosisInfo.get(attributeName).add(d.get(attributeName));
 						}
-						diagnoses.add(disgnosisInfo);
 					}
 				}
 			}
+			diagnoses.add(disgnosisInfo);
 		}
 		if (!diagnoses.isEmpty())
 		{
@@ -281,6 +289,7 @@ public class PalgaSampleImporter
 		{
 			String termIdentifiers = eachRow[RETRIEVAL_TERM_COLUMN];
 			String[] termIdentifiersArray = termIdentifiers.split(IN_COLUMN_SEPARATOR);
+			Map<String, List<Object>> retrivalTermInfo = new HashMap<String, List<Object>>();
 			for (String termIdentifier : termIdentifiersArray)
 			{
 				if (StringUtils.isNotBlank(termIdentifier))
@@ -291,12 +300,15 @@ public class PalgaSampleImporter
 						logger.warn("Unknown Retrievalterm [" + termIdentifier + "] on row [" + row + "]");
 						return null;
 					}
-					Map<String, Object> retrivalTermInfo = new HashMap<String, Object>();
+
 					for (String attributeName : term.getAttributeNames())
 					{
-						retrivalTermInfo.put(attributeName, term.get(attributeName));
+						if (!retrivalTermInfo.containsKey(attributeName))
+						{
+							retrivalTermInfo.put(attributeName, new ArrayList<Object>());
+						}
+						retrivalTermInfo.get(attributeName).add(term.get(attributeName));
 					}
-					retrivalTerms.add(retrivalTermInfo);
 				}
 			}
 		}
