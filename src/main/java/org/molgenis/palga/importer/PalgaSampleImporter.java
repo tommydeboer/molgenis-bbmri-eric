@@ -247,9 +247,6 @@ public class PalgaSampleImporter
 			if (StringUtils.isBlank(diagnose))
 			{
 				logger.warn("Palga-code column of row [" + row + "] is empty");
-				// TODO : ask Dennis about what should happen if the value for
-				// diagnose is null, same goes for RetrievialTerm
-				return null;
 			}
 			String[] diagnoseArray = diagnose.split(IN_COLUMN_SEPARATOR);
 			Map<String, List<Object>> disgnosisInfo = new HashMap<String, List<Object>>();
@@ -298,7 +295,6 @@ public class PalgaSampleImporter
 					if (term == null)
 					{
 						logger.warn("Unknown Retrievalterm [" + termIdentifier + "] on row [" + row + "]");
-						return null;
 					}
 
 					for (String attributeName : term.getAttributeNames())
@@ -469,7 +465,7 @@ public class PalgaSampleImporter
 	private void createMappings(Client client) throws IOException
 	{
 		XContentBuilder jsonBuilder = XContentFactory.jsonBuilder().startObject().startObject(PalgaSample.ENTITY_NAME);
-
+		jsonBuilder.startObject("_source").field("enabled", false).endObject();
 		jsonBuilder.startObject("properties");
 
 		if (dataService.hasRepository(PalgaSample.ENTITY_NAME))
@@ -481,9 +477,7 @@ public class PalgaSampleImporter
 				{
 					jsonBuilder.startObject(attributeMetaData.getName()).field("type", "nested")
 							.startObject("properties");
-					// TODO : what if the attributes in refEntity is also an
-					// MREF
-					// field?
+
 					for (AttributeMetaData refEntityAttr : attributeMetaData.getRefEntity().getAttributes())
 					{
 						if (refEntityAttr.isLabelAttribute())
