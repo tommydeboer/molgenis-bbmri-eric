@@ -258,7 +258,6 @@ public class PalgaSampleImporter
 					if (d != null)
 					{
 						String labelAttributeName = d.getEntityMetaData().getLabelAttribute().getName();
-						;
 						if (!disgnosisInfo.containsKey(labelAttributeName))
 						{
 							disgnosisInfo.put(labelAttributeName, new ArrayList<Object>());
