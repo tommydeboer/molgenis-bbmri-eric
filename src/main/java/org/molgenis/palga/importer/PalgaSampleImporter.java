@@ -257,15 +257,13 @@ public class PalgaSampleImporter
 					Diagnosis d = diagnosis.get(code);
 					if (d != null)
 					{
-						for (String attributeName : d.getAttributeNames())
+						String labelAttributeName = d.getEntityMetaData().getLabelAttribute().getName();
+						;
+						if (!disgnosisInfo.containsKey(labelAttributeName))
 						{
-							if (!disgnosisInfo.containsKey(attributeName))
-							{
-								disgnosisInfo.put(attributeName, new ArrayList<Object>());
-							}
-
-							disgnosisInfo.get(attributeName).add(d.get(attributeName));
+							disgnosisInfo.put(labelAttributeName, new ArrayList<Object>());
 						}
+						disgnosisInfo.get(labelAttributeName).add(d.get(labelAttributeName));
 					}
 				}
 			}
@@ -297,14 +295,13 @@ public class PalgaSampleImporter
 						logger.warn("Unknown Retrievalterm [" + termIdentifier + "] on row [" + row + "]");
 					}
 
-					for (String attributeName : term.getAttributeNames())
+					String labelAttributeName = term.getEntityMetaData().getLabelAttribute().getName();
+
+					if (!retrivalTermInfo.containsKey(labelAttributeName))
 					{
-						if (!retrivalTermInfo.containsKey(attributeName))
-						{
-							retrivalTermInfo.put(attributeName, new ArrayList<Object>());
-						}
-						retrivalTermInfo.get(attributeName).add(term.get(attributeName));
+						retrivalTermInfo.put(labelAttributeName, new ArrayList<Object>());
 					}
+					retrivalTermInfo.get(labelAttributeName).add(term.get(labelAttributeName));
 				}
 			}
 		}
