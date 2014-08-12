@@ -198,6 +198,7 @@ public class PalgaSampleImporter
 						materials, genders, agegroups, entityMetaData);
 				if (sample != null)
 				{
+					if (bulkRequest == null) bulkRequest = client.prepareBulk();
 					bulkRequest.add(client.prepareIndex("molgenis", PalgaSample.ENTITY_NAME).setSource(sample));
 					count++;
 				}
@@ -239,16 +240,16 @@ public class PalgaSampleImporter
 		String[] csvRow = csvRows.get(0);
 
 		// Diagnosis
-		List<Map<String, Object>> diagnoses = new ArrayList<Map<String, Object>>();
+		List<Map<String, List<Object>>> diagnoses = new ArrayList<Map<String, List<Object>>>();
 		for (String[] eachRow : csvRows)
 		{
 			String diagnose = eachRow[DIAGNOSE_COLUMN];
 			if (StringUtils.isBlank(diagnose))
 			{
 				logger.warn("Palga-code column of row [" + row + "] is empty");
-				return null;
 			}
 			String[] diagnoseArray = diagnose.split(IN_COLUMN_SEPARATOR);
+			Map<String, List<Object>> disgnosisInfo = new HashMap<String, List<Object>>();
 			for (String code : diagnoseArray)
 			{
 				if (StringUtils.isNotBlank(code))
@@ -256,15 +257,16 @@ public class PalgaSampleImporter
 					Diagnosis d = diagnosis.get(code);
 					if (d != null)
 					{
-						Map<String, Object> disgnosisInfo = new HashMap<String, Object>();
-						for (String attributeName : d.getAttributeNames())
+						String labelAttributeName = d.getEntityMetaData().getLabelAttribute().getName();
+						if (!disgnosisInfo.containsKey(labelAttributeName))
 						{
-							disgnosisInfo.put(attributeName, d.get(attributeName));
+							disgnosisInfo.put(labelAttributeName, new ArrayList<Object>());
 						}
-						diagnoses.add(disgnosisInfo);
+						disgnosisInfo.get(labelAttributeName).add(d.get(labelAttributeName));
 					}
 				}
 			}
+			diagnoses.add(disgnosisInfo);
 		}
 		if (!diagnoses.isEmpty())
 		{
@@ -281,6 +283,7 @@ public class PalgaSampleImporter
 		{
 			String termIdentifiers = eachRow[RETRIEVAL_TERM_COLUMN];
 			String[] termIdentifiersArray = termIdentifiers.split(IN_COLUMN_SEPARATOR);
+			Map<String, List<Object>> retrivalTermInfo = new HashMap<String, List<Object>>();
 			for (String termIdentifier : termIdentifiersArray)
 			{
 				if (StringUtils.isNotBlank(termIdentifier))
@@ -289,14 +292,15 @@ public class PalgaSampleImporter
 					if (term == null)
 					{
 						logger.warn("Unknown Retrievalterm [" + termIdentifier + "] on row [" + row + "]");
-						return null;
 					}
-					Map<String, Object> retrivalTermInfo = new HashMap<String, Object>();
-					for (String attributeName : term.getAttributeNames())
+
+					String labelAttributeName = term.getEntityMetaData().getLabelAttribute().getName();
+
+					if (!retrivalTermInfo.containsKey(labelAttributeName))
 					{
-						retrivalTermInfo.put(attributeName, term.get(attributeName));
+						retrivalTermInfo.put(labelAttributeName, new ArrayList<Object>());
 					}
-					retrivalTerms.add(retrivalTermInfo);
+					retrivalTermInfo.get(labelAttributeName).add(term.get(labelAttributeName));
 				}
 			}
 		}
@@ -457,7 +461,7 @@ public class PalgaSampleImporter
 	private void createMappings(Client client) throws IOException
 	{
 		XContentBuilder jsonBuilder = XContentFactory.jsonBuilder().startObject().startObject(PalgaSample.ENTITY_NAME);
-
+		jsonBuilder.startObject("_source").field("enabled", false).endObject();
 		jsonBuilder.startObject("properties");
 
 		if (dataService.hasRepository(PalgaSample.ENTITY_NAME))
@@ -469,9 +473,7 @@ public class PalgaSampleImporter
 				{
 					jsonBuilder.startObject(attributeMetaData.getName()).field("type", "nested")
 							.startObject("properties");
-					// TODO : what if the attributes in refEntity is also an
-					// MREF
-					// field?
+
 					for (AttributeMetaData refEntityAttr : attributeMetaData.getRefEntity().getAttributes())
 					{
 						if (refEntityAttr.isLabelAttribute())
