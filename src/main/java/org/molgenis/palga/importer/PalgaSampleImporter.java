@@ -278,7 +278,7 @@ public class PalgaSampleImporter
 		}
 
 		// RetrievalTerms
-		List<Map<String, Object>> retrivalTerms = new ArrayList<Map<String, Object>>();
+		List<Map<String, List<Object>>> retrivalTerms = new ArrayList<Map<String, List<Object>>>();
 		for (String[] eachRow : csvRows)
 		{
 			String termIdentifiers = eachRow[RETRIEVAL_TERM_COLUMN];
@@ -303,6 +303,7 @@ public class PalgaSampleImporter
 					retrivalTermInfo.get(labelAttributeName).add(term.get(labelAttributeName));
 				}
 			}
+			retrivalTerms.add(retrivalTermInfo);
 		}
 		if (!retrivalTerms.isEmpty())
 		{
