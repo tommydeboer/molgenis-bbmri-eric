@@ -462,8 +462,7 @@ public class PalgaSampleImporter
 	private void createMappings(Client client) throws IOException
 	{
 		XContentBuilder jsonBuilder = XContentFactory.jsonBuilder().startObject().startObject(PalgaSample.ENTITY_NAME);
-		// jsonBuilder.startObject("_source").field("enabled",
-		// false).endObject();
+		jsonBuilder.startObject("_source").field("enabled", false).endObject();
 		jsonBuilder.startObject("properties");
 
 		if (dataService.hasRepository(PalgaSample.ENTITY_NAME))
