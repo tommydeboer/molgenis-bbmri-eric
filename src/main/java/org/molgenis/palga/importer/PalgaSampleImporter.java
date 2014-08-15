@@ -278,7 +278,7 @@ public class PalgaSampleImporter
 		}
 
 		// RetrievalTerms
-		List<Map<String, Object>> retrivalTerms = new ArrayList<Map<String, Object>>();
+		List<Map<String, List<Object>>> retrivalTerms = new ArrayList<Map<String, List<Object>>>();
 		for (String[] eachRow : csvRows)
 		{
 			String termIdentifiers = eachRow[RETRIEVAL_TERM_COLUMN];
@@ -303,6 +303,7 @@ public class PalgaSampleImporter
 					retrivalTermInfo.get(labelAttributeName).add(term.get(labelAttributeName));
 				}
 			}
+			retrivalTerms.add(retrivalTermInfo);
 		}
 		if (!retrivalTerms.isEmpty())
 		{
@@ -461,7 +462,8 @@ public class PalgaSampleImporter
 	private void createMappings(Client client) throws IOException
 	{
 		XContentBuilder jsonBuilder = XContentFactory.jsonBuilder().startObject().startObject(PalgaSample.ENTITY_NAME);
-		jsonBuilder.startObject("_source").field("enabled", false).endObject();
+		// jsonBuilder.startObject("_source").field("enabled",
+		// false).endObject();
 		jsonBuilder.startObject("properties");
 
 		if (dataService.hasRepository(PalgaSample.ENTITY_NAME))
