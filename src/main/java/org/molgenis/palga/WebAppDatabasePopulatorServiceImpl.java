@@ -1,6 +1,10 @@
 package org.molgenis.palga;
 
-import com.google.common.collect.Lists;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.molgenis.data.DataService;
 import org.molgenis.data.support.QueryImpl;
 import org.molgenis.dataexplorer.controller.DataExplorerController;
@@ -19,15 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import com.google.common.collect.Lists;
 
 @Service
 public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulatorService
 {
-    static final String KEY_APP_HREF_CSS = "app.href.css";
+	static final String KEY_APP_HREF_CSS = "app.href.css";
 	static final String KEY_APP_NAME = "app.name";
 	static final String KEY_APP_HREF_LOGO = "app.href.logo";
 
@@ -151,6 +152,7 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		runtimePropertyMap.put(DataExplorerController.KEY_MOD_ANNOTATORS, String.valueOf(false));
 		runtimePropertyMap.put(DataExplorerController.KEY_MOD_DATA, String.valueOf(false));
 
+		runtimePropertyMap.put(DataExplorerController.WIZARD_TITLE, "Zoekvraag");
         runtimePropertyMap.put("i18nLocale", "palga");
 
         // Annotators include files/tools
@@ -206,7 +208,7 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		Agegroup ag2 = new Agegroup();
 		ag2.setAgegroup("<18");
 		ageGroups.add(ag2);
-		
+
 		dataService.add(Agegroup.ENTITY_NAME, ag2);
 		dataService.add(Agegroup.ENTITY_NAME, ag3);
 		dataService.add(Agegroup.ENTITY_NAME, ag1);
