@@ -151,13 +151,7 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		runtimePropertyMap.put(DataExplorerController.KEY_MOD_CHARTS, String.valueOf(false));
 		runtimePropertyMap.put(DataExplorerController.KEY_MOD_ANNOTATORS, String.valueOf(false));
 		runtimePropertyMap.put(DataExplorerController.KEY_MOD_DATA, String.valueOf(false));
-		runtimePropertyMap.put(DataExplorerController.WIZARD_TITLE, "Zoekvraag");
-		runtimePropertyMap.put(DataExplorerController.WIZARD_BUTTON_TITLE,
-				DataExplorerController.DEFAULT_VAL_WIZARD_BTN_TITLE);
-		runtimePropertyMap.put(DataExplorerController.KEY_SHOW_WIZARD_ONINIT,
-				String.valueOf(DataExplorerController.DEFAULT_VAL_SHOW_WIZARD_ONINIT));
-		runtimePropertyMap.put(DataExplorerController.AGGREGATES_NORESULTS_MESSAGE,
-				DataExplorerController.DEFAULT_AGGREGATES_NORESULTS_MESSAGE);
+		runtimePropertyMap.put("i18nLocale", "palga");
 
 		// Annotators include files/tools
 		String molgenisHomeDir = System.getProperty("molgenis.home");
