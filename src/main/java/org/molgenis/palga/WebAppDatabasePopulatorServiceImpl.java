@@ -1,7 +1,6 @@
 package org.molgenis.palga;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -22,8 +21,6 @@ import org.molgenis.security.user.UserAccountController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.collect.Lists;
 
 @Service
 public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulatorService
@@ -197,23 +194,18 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		vrouw.setGender("Vrouw");
 		dataService.add(Gender.ENTITY_NAME, vrouw);
 
-		// Age groups
-		List<Agegroup> ageGroups = Lists.newArrayList();
 		Agegroup ag1 = new Agegroup();
-		ag1.setAgegroup(">50");
-		ageGroups.add(ag1);
-
-		Agegroup ag3 = new Agegroup();
-		ag3.setAgegroup("18-50");
-		ageGroups.add(ag3);
+		ag1.setAgegroup("0-18");
 
 		Agegroup ag2 = new Agegroup();
-		ag2.setAgegroup("<18");
-		ageGroups.add(ag2);
+		ag2.setAgegroup("18-50");
 
+		Agegroup ag3 = new Agegroup();
+		ag3.setAgegroup("50+");
+
+		dataService.add(Agegroup.ENTITY_NAME, ag1);
 		dataService.add(Agegroup.ENTITY_NAME, ag2);
 		dataService.add(Agegroup.ENTITY_NAME, ag3);
-		dataService.add(Agegroup.ENTITY_NAME, ag1);
 	}
 
 	@Override
