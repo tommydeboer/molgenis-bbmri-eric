@@ -8,9 +8,9 @@
             <field name="materiaal" label="Materiaal" type="categorical" xref_entity="Material" />
             <field name="geslacht" label="Geslacht" type="categorical" xref_entity="Gender" />
             <field name="leeftijd" label="Leeftijdscategorie" type="categorical" xref_entity="Agegroup" />
-            <field name="jaar" label="Jaar" description="Jaar van verslaglegging" type="int" minRange="1980" maxRange="2014" aggregateable="true" />
+            <field name="jaar" label="Jaar" description="Jaar van verslaglegging" type="int" minRange="1991" maxRange="2014" aggregateable="true" />
         </entity>
-        <entity name="Diagnosis" label="Diagnose" xref_label="identifier" xref_lookup="identifier,description">
+        <entity name="Diagnosis" label="Zoekterm" xref_label="identifier" xref_lookup="identifier,description">
             <field name="id" type="autoid" hidden="true" />
             <field name="identifier" label="Code" type="string" />
             <field name="description" label="Omschrijving" type="text" />
