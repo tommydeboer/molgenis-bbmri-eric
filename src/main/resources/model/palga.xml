@@ -3,6 +3,7 @@
     <module name="palga">
         <entity name="PalgaSample" label="PALGA Openbare Databank">
             <field name="id" type="autoid" hidden="true" />
+            <field name="excerptNr" label="Excerpt nummer" type="int" />
             <field name="diagnose" label="Diagnose" type="mref" xref_entity="Diagnosis" nillable="true" />
             <field name="retrievalTerm" label="Retrieval term" type="mref" xref_entity="RetrievalTerm" nillable="true" />
             <field name="materiaal" label="Materiaal" type="categorical" xref_entity="Material" />

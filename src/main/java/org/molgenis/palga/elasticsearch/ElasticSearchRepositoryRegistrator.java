@@ -2,7 +2,7 @@ package org.molgenis.palga.elasticsearch;
 
 import org.molgenis.data.DataService;
 import org.molgenis.data.Repository;
-import org.molgenis.data.elasticsearch.ElasticSearchRepository;
+import org.molgenis.data.elasticsearch.ElasticsearchRepository;
 import org.molgenis.elasticsearch.ElasticSearchService;
 import org.molgenis.palga.PalgaSample;
 import org.molgenis.search.SearchService;
@@ -38,6 +38,7 @@ public class ElasticSearchRepositoryRegistrator implements ApplicationListener<C
 	{
 		Repository repository = dataService.getRepositoryByEntityName(PalgaSample.ENTITY_NAME);
 		dataService.removeRepository(PalgaSample.ENTITY_NAME);
-		dataService.addRepository(new ElasticSearchRepository((ElasticSearchService) elasticSearchService, repository));
+		dataService.addRepository(new ElasticsearchRepository(repository.getEntityMetaData(),
+				(ElasticSearchService) elasticSearchService));
 	}
 }
