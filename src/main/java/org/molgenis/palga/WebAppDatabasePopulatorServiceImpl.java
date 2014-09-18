@@ -14,6 +14,7 @@ import org.molgenis.omx.auth.MolgenisUser;
 import org.molgenis.omx.auth.UserAuthority;
 import org.molgenis.omx.core.RuntimeProperty;
 import org.molgenis.palga.controller.HomeController;
+import org.molgenis.palga.importer.PalgaSampleImporter;
 import org.molgenis.security.MolgenisSecurityWebAppDatabasePopulatorService;
 import org.molgenis.security.core.utils.SecurityUtils;
 import org.molgenis.security.runas.RunAsSystem;
@@ -83,37 +84,39 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 
 		UserAuthority entityPaglasampleAuthority = new UserAuthority();
 		entityPaglasampleAuthority.setMolgenisUser(anonymousUser);
-		entityPaglasampleAuthority.setRole("ROLE_ENTITY_COUNT_" + PalgaSample.ENTITY_NAME.toUpperCase());
+		entityPaglasampleAuthority.setRole("ROLE_ENTITY_COUNT_"
+				+ PalgaSampleImporter.ENTITY_NAME_PALGA_SAMPLE.toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, entityPaglasampleAuthority);
 
 		UserAuthority entityMaterialAuthority = new UserAuthority();
 		entityMaterialAuthority.setMolgenisUser(anonymousUser);
-		entityMaterialAuthority
-				.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX + Material.ENTITY_NAME.toUpperCase());
+		entityMaterialAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
+				+ PalgaSampleImporter.ENTITY_NAME_MATERIAL.toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, entityMaterialAuthority);
 
 		UserAuthority entityDiagnosisAuthority = new UserAuthority();
 		entityDiagnosisAuthority.setMolgenisUser(anonymousUser);
 		entityDiagnosisAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
-				+ Diagnosis.ENTITY_NAME.toUpperCase());
+				+ PalgaSampleImporter.ENTITY_NAME_DIAGNOSIS.toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, entityDiagnosisAuthority);
 
 		UserAuthority entityRetrievalTermAuthority = new UserAuthority();
 		entityRetrievalTermAuthority.setMolgenisUser(anonymousUser);
 		entityRetrievalTermAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
-				+ RetrievalTerm.ENTITY_NAME.toUpperCase());
+				+ PalgaSampleImporter.ENTITY_NAME_RETRIEVAL_TERM.toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, entityRetrievalTermAuthority);
 
 		UserAuthority entityAgegroupAuthority = new UserAuthority();
 		entityAgegroupAuthority.setMolgenisUser(anonymousUser);
-		entityAgegroupAuthority
-				.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX + Agegroup.ENTITY_NAME.toUpperCase());
+		entityAgegroupAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
+				+ PalgaSampleImporter.ENTITY_NAME_AGE_GROUP.toUpperCase());
 
 		dataService.add(UserAuthority.ENTITY_NAME, entityAgegroupAuthority);
 
 		UserAuthority entityGenderAuthority = new UserAuthority();
 		entityGenderAuthority.setMolgenisUser(anonymousUser);
-		entityGenderAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX + Gender.ENTITY_NAME.toUpperCase());
+		entityGenderAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
+				+ PalgaSampleImporter.ENTITY_NAME_GENDER.toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, entityGenderAuthority);
 
 		UserAuthority entityRTPAuthority = new UserAuthority();
@@ -174,38 +177,38 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 			dataService.add(RuntimeProperty.ENTITY_NAME, runtimeProperty);
 		}
 
-		// TODO correct lookup lists
-
-		// Material
-		Material cistology = new Material();
-		cistology.setType("Cytologie");
-		dataService.add(Material.ENTITY_NAME, cistology);
-
-		Material histology = new Material();
-		histology.setType("Histologie");
-		dataService.add(Material.ENTITY_NAME, histology);
-
-		// Gender
-		Gender man = new Gender();
-		man.setGender("Man");
-		dataService.add(Gender.ENTITY_NAME, man);
-
-		Gender vrouw = new Gender();
-		vrouw.setGender("Vrouw");
-		dataService.add(Gender.ENTITY_NAME, vrouw);
-
-		Agegroup ag1 = new Agegroup();
-		ag1.setAgegroup("0-18");
-
-		Agegroup ag2 = new Agegroup();
-		ag2.setAgegroup("18-50");
-
-		Agegroup ag3 = new Agegroup();
-		ag3.setAgegroup("50+");
-
-		dataService.add(Agegroup.ENTITY_NAME, ag1);
-		dataService.add(Agegroup.ENTITY_NAME, ag2);
-		dataService.add(Agegroup.ENTITY_NAME, ag3);
+		// // TODO correct lookup lists
+		//
+		// // Material
+		// Material cistology = new Material();
+		// cistology.setType("Cytologie");
+		// dataService.add(Material.ENTITY_NAME, cistology);
+		//
+		// Material histology = new Material();
+		// histology.setType("Histologie");
+		// dataService.add(Material.ENTITY_NAME, histology);
+		//
+		// // Gender
+		// Gender man = new Gender();
+		// man.setGender("Man");
+		// dataService.add(Gender.ENTITY_NAME, man);
+		//
+		// Gender vrouw = new Gender();
+		// vrouw.setGender("Vrouw");
+		// dataService.add(Gender.ENTITY_NAME, vrouw);
+		//
+		// Agegroup ag1 = new Agegroup();
+		// ag1.setAgegroup("0-18");
+		//
+		// Agegroup ag2 = new Agegroup();
+		// ag2.setAgegroup("18-50");
+		//
+		// Agegroup ag3 = new Agegroup();
+		// ag3.setAgegroup("50+");
+		//
+		// dataService.add(Agegroup.ENTITY_NAME, ag1);
+		// dataService.add(Agegroup.ENTITY_NAME, ag2);
+		// dataService.add(Agegroup.ENTITY_NAME, ag3);
 	}
 
 	@Override

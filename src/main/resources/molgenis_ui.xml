@@ -3,10 +3,12 @@
 	<menu label="Home" name="main">
 		<plugin id="home" name="Home" url="home"/>
 		<plugin id="dataexplorer" name="Data Explorer" url="dataexplorer?dataset=PalgaSample&#038;wizard=true"/>
-		 <plugin id="palgaimport" name="Import" url="palgaimport"/>
+        <plugin id="importwizard" name="Import" url="importwizard" />
+        <plugin id="palgaimport" name="Sample Import" url="palgaimport" />
 		<menu label="Admin" name="admin">
 	        <plugin id="permissionmanager" name="Permission Manager" url="permissionmanager"/>
 	        <plugin id="usermanager" name="User Manager" url="usermanager"/>
+	        <plugin id="indexmanager" name="Index Manager" url="indexmanager"/>
             <plugin id="form.RuntimeProperty" name="Configuration" url="form.RuntimeProperty"/>
 		</menu>
 	    <plugin id="useraccount" name="Account" url="useraccount"/>
