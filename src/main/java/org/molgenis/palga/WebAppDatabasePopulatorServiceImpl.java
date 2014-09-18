@@ -155,6 +155,10 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		runtimePropertyMap.put(DataExplorerController.KEY_HIDE_SEARCH_BOX, String.valueOf(true));
 		runtimePropertyMap.put(DataExplorerController.KEY_HIDE_ITEM_SELECTION, String.valueOf(true));
 
+		runtimePropertyMap.put(DataExplorerController.KEY_MOD_AGGREGATES_DISTINCT_HIDE, String.valueOf(true));
+		runtimePropertyMap.put(DataExplorerController.KEY_MOD_AGGREGATES_DISTINCT_OVERRIDE + "."
+				+ PalgaSampleImporter.ENTITY_NAME_PALGA_SAMPLE, PalgaSampleImporter.ATTR_EXCERPT_NR);
+
 		runtimePropertyMap.put("i18nLocale", "palga");
 
 		// Annotators include files/tools
