@@ -48,7 +48,7 @@ public class PalgaSampleImporter
 	public static final String ENTITY_NAME_MATERIAL = "Material";
 
 	private static final String ATTR_ID = "id";
-	private static final String ATTR_EXCERPT_NR = "excerptNr";
+	public static final String ATTR_EXCERPT_NR = "excerptNr";
 	private static final String ATTR_DIAGNOSE = "diagnose";
 	private static final String ATTR_RETRIEVAL_TERM = "retrievalTerm";
 	private static final String ATTR_MATERIAAL = "materiaal";
