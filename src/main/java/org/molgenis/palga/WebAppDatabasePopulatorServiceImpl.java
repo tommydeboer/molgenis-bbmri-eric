@@ -176,39 +176,6 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 			runtimeProperty.setValue(entry.getValue());
 			dataService.add(RuntimeProperty.ENTITY_NAME, runtimeProperty);
 		}
-
-		// // TODO correct lookup lists
-		//
-		// // Material
-		// Material cistology = new Material();
-		// cistology.setType("Cytologie");
-		// dataService.add(Material.ENTITY_NAME, cistology);
-		//
-		// Material histology = new Material();
-		// histology.setType("Histologie");
-		// dataService.add(Material.ENTITY_NAME, histology);
-		//
-		// // Gender
-		// Gender man = new Gender();
-		// man.setGender("Man");
-		// dataService.add(Gender.ENTITY_NAME, man);
-		//
-		// Gender vrouw = new Gender();
-		// vrouw.setGender("Vrouw");
-		// dataService.add(Gender.ENTITY_NAME, vrouw);
-		//
-		// Agegroup ag1 = new Agegroup();
-		// ag1.setAgegroup("0-18");
-		//
-		// Agegroup ag2 = new Agegroup();
-		// ag2.setAgegroup("18-50");
-		//
-		// Agegroup ag3 = new Agegroup();
-		// ag3.setAgegroup("50+");
-		//
-		// dataService.add(Agegroup.ENTITY_NAME, ag1);
-		// dataService.add(Agegroup.ENTITY_NAME, ag2);
-		// dataService.add(Agegroup.ENTITY_NAME, ag3);
 	}
 
 	@Override
