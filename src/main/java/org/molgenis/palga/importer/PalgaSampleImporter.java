@@ -1,47 +1,28 @@
 package org.molgenis.palga.importer;
 
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
-import static org.molgenis.MolgenisFieldTypes.MREF;
-
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.persistence.EntityManager;
-import javax.persistence.Persistence;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.common.collect.Maps;
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.common.settings.ImmutableSettings.Builder;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.node.Node;
-import org.molgenis.data.AttributeMetaData;
 import org.molgenis.data.DataService;
+import org.molgenis.data.Entity;
 import org.molgenis.data.EntityMetaData;
-import org.molgenis.palga.Agegroup;
-import org.molgenis.palga.Diagnosis;
-import org.molgenis.palga.Gender;
-import org.molgenis.palga.Material;
-import org.molgenis.palga.PalgaSample;
-import org.molgenis.palga.RetrievalTerm;
+import org.molgenis.data.elasticsearch.ElasticsearchRepository;
+import org.molgenis.data.elasticsearch.SearchService;
+import org.molgenis.data.support.MapEntity;
 import org.molgenis.security.runas.RunAsSystem;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -59,6 +40,22 @@ public class PalgaSampleImporter
 {
 	private static final Logger logger = Logger.getLogger(PalgaSampleImporter.class);
 
+	public static final String ENTITY_NAME_PALGA_SAMPLE = "PalgaSample";
+	public static final String ENTITY_NAME_AGE_GROUP = "AgeGroup";
+	public static final String ENTITY_NAME_RETRIEVAL_TERM = "RetrievalTerm";
+	public static final String ENTITY_NAME_GENDER = "Gender";
+	public static final String ENTITY_NAME_DIAGNOSIS = "Diagnosis";
+	public static final String ENTITY_NAME_MATERIAL = "Material";
+
+	private static final String ATTR_ID = "id";
+	private static final String ATTR_EXCERPT_NR = "excerptNr";
+	private static final String ATTR_DIAGNOSE = "diagnose";
+	private static final String ATTR_RETRIEVAL_TERM = "retrievalTerm";
+	private static final String ATTR_MATERIAAL = "materiaal";
+	private static final String ATTR_GESLACHT = "geslacht";
+	private static final String ATTR_LEEFTIJD = "leeftijd";
+	private static final String ATTR_JAAR = "jaar";
+
 	private static final int EXCERPT_NUM = 0;
 	private static final int DIAGNOSE_COLUMN = 2;
 	private static final int RETRIEVAL_TERM_COLUMN = 3;
@@ -68,458 +65,343 @@ public class PalgaSampleImporter
 	private static final int LEEFTIJD_COLUMN = 7;
 	private static final char SEPARATOR = '|';
 	private static final String IN_COLUMN_SEPARATOR = "\\*";
-	private static int BATCH_SIZE = 10000;
 
 	private final Map<String, String> materialMapping = Maps.newHashMap();
 	private final Map<String, String> geslachtMapping = Maps.newHashMap();
-
-	private final String dbUser;
-	private final String dbPassword;
+	private final Map<String, String> ageGroupMapping = Maps.newHashMap();
 
 	@Autowired
 	private DataService dataService;
 
 	@Autowired
-	public PalgaSampleImporter(@Value("${db_user:@null}")
-	String dbUser, @Value("${db_password:@null}")
-	String dbPassword)
+	private SearchService elasticSearchService;
+
+	public PalgaSampleImporter()
 	{
 		materialMapping.put("C", "Cytologie");
 		materialMapping.put("T", "Histologie");
 		geslachtMapping.put("m", "Man");
 		geslachtMapping.put("v", "Vrouw");
-
-		this.dbUser = dbUser;
-		this.dbPassword = dbPassword;
+		ageGroupMapping.put("<18", "0-18");
+		ageGroupMapping.put("18-50", "18-50");
+		ageGroupMapping.put(">50", "50+");
 	}
 
 	@Async
 	@RunAsSystem
-	public void importFile(File file) throws InvalidFormatException, IOException
+	public void importFile(final File file) throws InvalidFormatException, IOException
 	{
-		if (!dataService.hasRepository(PalgaSample.ENTITY_NAME))
+		if (!dataService.hasRepository(ENTITY_NAME_PALGA_SAMPLE))
 		{
-			throw new RuntimeException("The repository " + PalgaSample.ENTITY_NAME + " does not exist!");
+			throw new RuntimeException("The repository " + ENTITY_NAME_PALGA_SAMPLE + " does not exist!");
 		}
 
-		EntityMetaData entityMetaData = dataService.getEntityMetaData(PalgaSample.ENTITY_NAME);
-		Map<String, String> props = Maps.newHashMap();
-		props.put("javax.persistence.jdbc.user", dbUser);
-		props.put("javax.persistence.jdbc.password", dbPassword);
-
-		// Create a entityManager that could talk to the mysql database directly
-		EntityManager entityManager = Persistence.createEntityManagerFactory("palga-import", props)
-				.createEntityManager();
+		EntityMetaData entityMetaData = dataService.getEntityMetaData(ENTITY_NAME_PALGA_SAMPLE);
 
 		String fileName = file.getAbsolutePath();
 		logger.info("Import of palga sample file [" + fileName + "] started");
 
-		Map<String, RetrievalTerm> retrievalTerms = getRetrievalTerms(entityManager);
-		Map<String, Diagnosis> diagnosis = getDiagnosis(entityManager);
-		Map<String, Material> materials = getMaterials(entityManager);
-		Map<String, Gender> genders = getGenders(entityManager);
-		Map<String, Agegroup> agegroups = getAgeGroups(entityManager);
+		final Map<String, Entity> retrievalTerms = getRetrievalTerms();
+		final Map<String, Entity> diagnosis = getDiagnosis();
+		final Map<String, Entity> materials = getMaterials();
+		final Map<String, Entity> genders = getGenders();
+		final Map<String, Entity> agegroups = getAgeGroups();
 
-		// load property file for the ElasticSearch
-		Builder builder = ImmutableSettings.settingsBuilder().loadFromClasspath("elasticsearch.yml");
-		Settings settings = builder.build();
-		Node node = nodeBuilder().settings(settings).local(true).node();
-		Client client = node.client();
+		elasticSearchService.delete(entityMetaData);
+		elasticSearchService.createMappings(entityMetaData, true, false, false); // FIXME set true to false
 
-		CSVReader reader = new CSVReader(new FileReader(file), SEPARATOR);
-		reader.readNext();// header
+		ElasticsearchRepository elasticsearchRepository = new ElasticsearchRepository(entityMetaData,
+				elasticSearchService);
 
-		long t0 = System.currentTimeMillis();
-		long count = 0;
-		long row = 2;
 		try
 		{
-			createMappings(client);
-			String prevExcerptNum = null;
-			BulkRequestBuilder bulkRequest = null;
-			long start = 0;
-			String[] line = reader.readNext();
-			List<String[]> multipleLines = new ArrayList<String[]>();
-			while (line != null)
+			long t0 = System.currentTimeMillis();
+			Integer count = elasticsearchRepository.add(new Iterable<Entity>()
 			{
-				// Remember the previous Excerpt number
-				if (prevExcerptNum == null)
+				@Override
+				public Iterator<Entity> iterator()
 				{
-					prevExcerptNum = line[EXCERPT_NUM];
-				}
-
-				if (prevExcerptNum.equals(line[EXCERPT_NUM]))
-				{
-					multipleLines.add(line);
-				}
-				else
-				{
-					// Remember the new Excerpt number
-					prevExcerptNum = line[EXCERPT_NUM];
-
-					if (count % BATCH_SIZE == 0)
+					try
 					{
-						start = count;
-						bulkRequest = client.prepareBulk();
+						return new PalgaSampleIterator(file, diagnosis, retrievalTerms, materials, materialMapping,
+								agegroups, ageGroupMapping, genders, geslachtMapping);
 					}
-
-					Map<String, Object> sample = createPalgaSample(multipleLines, row++, diagnosis, retrievalTerms,
-							materials, genders, agegroups, entityMetaData);
-
-					if (sample != null)
+					catch (IOException e)
 					{
-						bulkRequest.add(client.prepareIndex("molgenis", PalgaSample.ENTITY_NAME).setSource(sample));
-						count++;
+						throw new RuntimeException(e);
 					}
-
-					// Commit if BATCH_SIZE is reached
-					if (count == (start + BATCH_SIZE))
-					{
-						BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-						if (bulkResponse.hasFailures())
-						{
-							throw new RuntimeException("error while indexing row [" + count + "]: " + bulkResponse);
-						}
-
-						long t = (System.currentTimeMillis() - t0) / 1000;
-						logger.info("Imported [" + count + "] rows in [" + t + "] sec.");
-					}
-
-					// Clear the old lines and add new line
-					multipleLines.clear();
-					multipleLines.add(line);
 				}
-				line = reader.readNext();
-			}
-
-			if (multipleLines.size() > 0)
-			{
-				Map<String, Object> sample = createPalgaSample(multipleLines, row++, diagnosis, retrievalTerms,
-						materials, genders, agegroups, entityMetaData);
-				if (sample != null)
-				{
-					if (bulkRequest == null) bulkRequest = client.prepareBulk();
-					bulkRequest.add(client.prepareIndex("molgenis", PalgaSample.ENTITY_NAME).setSource(sample));
-					count++;
-				}
-			}
-
-			// Commit the rest
-			BulkResponse bulkResponse = bulkRequest.execute().actionGet();
-			if (bulkResponse.hasFailures())
-			{
-				throw new RuntimeException("error while indexing row [" + count + "]: " + bulkResponse);
-			}
-
+			});
 			long t = (System.currentTimeMillis() - t0) / 1000;
 			logger.info("Import of palga sample file [" + fileName + "] completed in " + t + " sec. Added [" + count
 					+ "] rows.");
 		}
-		catch (Exception e)
+		catch (Throwable t)
 		{
-			logger.error("Exception importing palga sample file [" + fileName + "] ", e);
-			entityManager.getTransaction().rollback();
+			logger.error("Exception importing palga sample file [" + fileName + "] ", t);
 		}
-		finally
+
+		if (dataService.hasRepository(ENTITY_NAME_PALGA_SAMPLE))
 		{
-			IOUtils.closeQuietly(reader);
+			dataService.removeRepository(ENTITY_NAME_PALGA_SAMPLE);
 		}
+
+		dataService.addRepository(elasticsearchRepository);
+
 	}
 
-	private Map<String, Object> createPalgaSample(List<String[]> csvRows, long row, Map<String, Diagnosis> diagnosis,
-			Map<String, RetrievalTerm> retrievalTerms, Map<String, Material> materials, Map<String, Gender> genders,
-			Map<String, Agegroup> agegroups, EntityMetaData entityMetaData)
+	private Map<String, Entity> getRetrievalTerms()
 	{
-		Map<String, Object> sample = Maps.newHashMapWithExpectedSize(10);
-
-		// For diagnose, we need to gather information from multiple lines
-		// because one patient could have multiple diagnoses. However for
-		// other columns, the information is the same, we could just take any
-		// one of
-		// the rows to get information from
-		String[] csvRow = csvRows.get(0);
-
-		// Diagnosis
-		List<Map<String, List<Object>>> diagnoses = new ArrayList<Map<String, List<Object>>>();
-		for (String[] eachRow : csvRows)
+		Map<String, Entity> entityMap = Maps.newHashMap();
+		for (Entity entity : dataService.findAll(ENTITY_NAME_RETRIEVAL_TERM))
 		{
-			String diagnose = eachRow[DIAGNOSE_COLUMN];
-			if (StringUtils.isBlank(diagnose))
+			entityMap.put(entity.getIdValue().toString(), entity);
+		}
+		return entityMap;
+	}
+
+	private Map<String, Entity> getDiagnosis()
+	{
+		Map<String, Entity> entityMap = Maps.newHashMap();
+		for (Entity entity : dataService.findAll(ENTITY_NAME_DIAGNOSIS))
+		{
+			entityMap.put(entity.getIdValue().toString(), entity);
+		}
+		return entityMap;
+	}
+
+	private Map<String, Entity> getMaterials()
+	{
+		Map<String, Entity> entityMap = Maps.newHashMap();
+		for (Entity entity : dataService.findAll(ENTITY_NAME_MATERIAL))
+		{
+			entityMap.put(entity.getIdValue().toString(), entity);
+		}
+		return entityMap;
+	}
+
+	private Map<String, Entity> getGenders()
+	{
+		Map<String, Entity> entityMap = Maps.newHashMap();
+		for (Entity entity : dataService.findAll(ENTITY_NAME_GENDER))
+		{
+			entityMap.put(entity.getIdValue().toString(), entity);
+		}
+		return entityMap;
+	}
+
+	private Map<String, Entity> getAgeGroups()
+	{
+		Map<String, Entity> entityMap = Maps.newHashMap();
+		for (Entity entity : dataService.findAll(ENTITY_NAME_AGE_GROUP))
+		{
+			entityMap.put(entity.getIdValue().toString(), entity);
+		}
+		return entityMap;
+	}
+
+	private static class PalgaSampleIterator implements Iterator<Entity>
+	{
+		private final Map<String, Entity> diagnosis;
+		private final Map<String, Entity> retrievalTerms;
+		private final Map<String, Entity> materials;
+		private final Map<String, String> materialMapping;
+		private final Map<String, Entity> agegroups;
+		private final Map<String, String> ageGroupMapping;
+		private final Map<String, Entity> genders;
+		private final Map<String, String> geslachtMapping;
+		private final CSVReader reader;
+		private String[] tokens;
+		private int row;
+		private int id = 0;
+
+		public PalgaSampleIterator(File file, Map<String, Entity> diagnosis, Map<String, Entity> retrievalTerms,
+				Map<String, Entity> materials, Map<String, String> materialMapping, Map<String, Entity> agegroups,
+				Map<String, String> ageGroupMapping, Map<String, Entity> genders, Map<String, String> geslachtMapping)
+				throws IOException
+		{
+			this.diagnosis = diagnosis;
+			this.retrievalTerms = retrievalTerms;
+			this.materials = materials;
+			this.materialMapping = materialMapping;
+			this.agegroups = agegroups;
+			this.ageGroupMapping = ageGroupMapping;
+			this.genders = genders;
+			this.geslachtMapping = geslachtMapping;
+			reader = new CSVReader(new InputStreamReader(new FileInputStream(file), Charset.forName("UTF-8")),
+					SEPARATOR);
+			reader.readNext();// header
+			row = 1;
+		}
+
+		@Override
+		public boolean hasNext()
+		{
+			if (tokens == null)
+			{
+				try
+				{
+					tokens = reader.readNext();
+				}
+				catch (IOException e)
+				{
+					throw new RuntimeException(e);
+				}
+				if (tokens == null) IOUtils.closeQuietly(reader);
+				++row;
+			}
+			return tokens != null;
+		}
+
+		@Override
+		public Entity next()
+		{
+			if (tokens == null) throw new RuntimeException("Iterator does not have any more items");
+			MapEntity palgaSample = new MapEntity();
+			palgaSample.set(ATTR_ID, id++);
+			palgaSample.set(ATTR_EXCERPT_NR, Integer.valueOf(tokens[EXCERPT_NUM]));
+			palgaSample.set(ATTR_DIAGNOSE, toDiagnosis(tokens[DIAGNOSE_COLUMN], diagnosis, row));
+			palgaSample.set(ATTR_RETRIEVAL_TERM, toRetrievalTerm(tokens[RETRIEVAL_TERM_COLUMN], retrievalTerms, row));
+			palgaSample.set(ATTR_MATERIAAL, toMateriaal(tokens[MATERIAAL_COLUMN], materialMapping, materials, row));
+			palgaSample.set(ATTR_GESLACHT, toGender(tokens[GESLACHT_COLUMN], geslachtMapping, genders, row));
+			palgaSample.set(ATTR_LEEFTIJD, toAgeGroup(tokens[LEEFTIJD_COLUMN], ageGroupMapping, agegroups, row));
+			palgaSample.set(ATTR_JAAR, toYear(tokens[JAAR_COLUMN], row));
+			tokens = null;
+			return palgaSample;
+		}
+
+		@Override
+		public void remove()
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		private List<Entity> toDiagnosis(String token, Map<String, Entity> diagnosis, int row)
+		{
+			if (StringUtils.isBlank(token))
 			{
 				logger.warn("Palga-code column of row [" + row + "] is empty");
 			}
-			String[] diagnoseArray = diagnose.split(IN_COLUMN_SEPARATOR);
-			Map<String, List<Object>> disgnosisInfo = new HashMap<String, List<Object>>();
+			String[] diagnoseArray = token.split(IN_COLUMN_SEPARATOR);
+			List<Entity> diagnosisList = new ArrayList<Entity>(diagnoseArray.length);
 			for (String code : diagnoseArray)
 			{
 				if (StringUtils.isNotBlank(code))
 				{
-					Diagnosis d = diagnosis.get(code);
+					Entity d = diagnosis.get(code);
 					if (d != null)
 					{
-						String labelAttributeName = d.getEntityMetaData().getLabelAttribute().getName();
-						if (!disgnosisInfo.containsKey(labelAttributeName))
-						{
-							disgnosisInfo.put(labelAttributeName, new ArrayList<Object>());
-						}
-						disgnosisInfo.get(labelAttributeName).add(d.get(labelAttributeName));
+						// note: no dedup
+						diagnosisList.add(d);
 					}
 				}
 			}
-			diagnoses.add(disgnosisInfo);
-		}
-		if (!diagnoses.isEmpty())
-		{
-			sample.put("diagnose", diagnoses);
-		}
-		else
-		{
-			logger.warn("Missing PALGA codes on row [" + row + "]");
+			return diagnosisList;
 		}
 
-		// RetrievalTerms
-		List<Map<String, List<Object>>> retrivalTerms = new ArrayList<Map<String, List<Object>>>();
-		for (String[] eachRow : csvRows)
+		private List<Entity> toRetrievalTerm(String token, Map<String, Entity> retrievalTerms, int row)
 		{
-			String termIdentifiers = eachRow[RETRIEVAL_TERM_COLUMN];
-			String[] termIdentifiersArray = termIdentifiers.split(IN_COLUMN_SEPARATOR);
-			Map<String, List<Object>> retrivalTermInfo = new HashMap<String, List<Object>>();
-			for (String termIdentifier : termIdentifiersArray)
+			if (StringUtils.isBlank(token))
 			{
-				if (StringUtils.isNotBlank(termIdentifier))
-				{
-					RetrievalTerm term = retrievalTerms.get(termIdentifier);
-					if (term == null)
-					{
-						logger.warn("Unknown Retrievalterm [" + termIdentifier + "] on row [" + row + "]");
-					}
-
-					String labelAttributeName = term.getEntityMetaData().getLabelAttribute().getName();
-
-					if (!retrivalTermInfo.containsKey(labelAttributeName))
-					{
-						retrivalTermInfo.put(labelAttributeName, new ArrayList<Object>());
-					}
-					retrivalTermInfo.get(labelAttributeName).add(term.get(labelAttributeName));
-				}
+				logger.warn("Palga-code column of row [" + row + "] is empty");
 			}
-			retrivalTerms.add(retrivalTermInfo);
-		}
-		if (!retrivalTerms.isEmpty())
-		{
-			sample.put("retrievalTerm", retrivalTerms);
-		}
-
-		// Materials
-		String materialTypeCode = csvRow[MATERIAAL_COLUMN];
-		if (StringUtils.isBlank(materialTypeCode))
-		{
-			logger.warn("'Soort onderzoek' column of row [" + row + "] is empty");
-			return null;
-		}
-		String materialType = materialMapping.get(materialTypeCode);
-		if (materialType == null)
-		{
-			logger.warn("Unknown material [" + materialTypeCode + "] on row [" + row + "]");
-			return null;
-		}
-		Material material = materials.get(materialType);
-		if (material == null)
-		{
-			logger.warn("Unknown material [" + materialType + "] on row [" + row + "]");
-			return null;
-		}
-		else
-		{
-			sample.put("materiaal", material.getType());
-		}
-
-		// Year
-		String year = csvRow[JAAR_COLUMN];
-		if (StringUtils.isBlank(year))
-		{
-			logger.warn("'Jaar onderzoek' column of row [" + row + "] is empty");
-		}
-		if (!StringUtils.isNumeric(year))
-		{
-			logger.warn("Invalid year [" + year + "] on row [" + row + "]");
-			return null;
-		}
-		sample.put("jaar", Integer.valueOf(year));
-
-		// Gender
-		String genderCode = csvRow[GESLACHT_COLUMN];
-		if (StringUtils.isBlank(genderCode))
-		{
-			logger.warn("Geslacht column of row [" + row + "] is empty");
-			return null;
-		}
-		String genderStr = geslachtMapping.get(genderCode);
-		if (genderStr == null)
-		{
-			logger.warn("Unknown gender [" + genderCode + "] on row [" + row + "]");
-			return null;
-		}
-		Gender gender = genders.get(genderStr);
-		if (gender == null)
-		{
-			logger.warn("Unkown gender [" + genderStr + "] on row [" + row + "]");
-			return null;
-		}
-		else
-		{
-			sample.put("geslacht", gender.getGender());
-		}
-
-		// Agegroups
-		String agegroupCode = csvRow[LEEFTIJD_COLUMN];
-		if (StringUtils.isBlank(agegroupCode))
-		{
-			logger.warn("Leeftijdscategorie column of row [" + row + "] is empty");
-			return null;
-		}
-
-		Agegroup agegroup = agegroups.get(agegroupCode);
-		if (agegroup == null)
-		{
-			logger.warn("Unknown agegroup [" + agegroup + "] on row [" + row + "]");
-			return null;
-		}
-		sample.put("leeftijd", agegroup.getAgegroup());
-
-		return sample;
-	}
-
-	private Map<String, RetrievalTerm> getRetrievalTerms(EntityManager entityManager)
-	{
-		Map<String, RetrievalTerm> result = Maps.newHashMap();
-		List<RetrievalTerm> terms = entityManager.createQuery("SELECT r FROM RetrievalTerm r", RetrievalTerm.class)
-				.getResultList();
-
-		for (RetrievalTerm term : terms)
-		{
-			result.put(term.getIdentifier(), term);
-		}
-
-		return result;
-	}
-
-	private Map<String, Diagnosis> getDiagnosis(EntityManager entityManager)
-	{
-		Map<String, Diagnosis> result = Maps.newHashMap();
-		List<Diagnosis> diagnosis = entityManager.createQuery("SELECT d FROM Diagnosis d", Diagnosis.class)
-				.getResultList();
-
-		for (Diagnosis d : diagnosis)
-		{
-			result.put(d.getIdentifier(), d);
-		}
-
-		return result;
-	}
-
-	private Map<String, Material> getMaterials(EntityManager entityManager)
-	{
-		Map<String, Material> results = Maps.newHashMap();
-		List<Material> materials = entityManager.createQuery("SELECT m FROM Material m", Material.class)
-				.getResultList();
-
-		for (Material material : materials)
-		{
-			results.put(material.getType(), material);
-		}
-
-		return results;
-	}
-
-	private Map<String, Gender> getGenders(EntityManager entityManager)
-	{
-		Map<String, Gender> result = Maps.newHashMap();
-		List<Gender> genders = entityManager.createQuery("SELECT g FROM Gender g", Gender.class).getResultList();
-
-		for (Gender gender : genders)
-		{
-			result.put(gender.getGender(), gender);
-		}
-
-		return result;
-	}
-
-	private Map<String, Agegroup> getAgeGroups(EntityManager entityManager)
-	{
-		Map<String, Agegroup> result = Maps.newHashMap();
-		List<Agegroup> agegroups = entityManager.createQuery("SELECT a FROM Agegroup a", Agegroup.class)
-				.getResultList();
-
-		for (Agegroup agegroup : agegroups)
-		{
-			result.put(agegroup.getAgegroup(), agegroup);
-		}
-
-		return result;
-	}
-
-	private void createMappings(Client client) throws IOException
-	{
-		XContentBuilder jsonBuilder = XContentFactory.jsonBuilder().startObject().startObject(PalgaSample.ENTITY_NAME);
-		jsonBuilder.startObject("_source").field("enabled", false).endObject();
-		jsonBuilder.startObject("properties");
-
-		if (dataService.hasRepository(PalgaSample.ENTITY_NAME))
-		{
-			EntityMetaData entityMetaData = dataService.getEntityMetaData(PalgaSample.ENTITY_NAME);
-			for (AttributeMetaData attributeMetaData : entityMetaData.getAttributes())
+			String[] retrievalTermArray = token.split(IN_COLUMN_SEPARATOR);
+			List<Entity> retrievalTermList = new ArrayList<Entity>(retrievalTermArray.length);
+			for (String code : retrievalTermArray)
 			{
-				if (attributeMetaData.getDataType().getEnumType().toString().equalsIgnoreCase(MREF.toString()))
+				if (StringUtils.isNotBlank(code))
 				{
-					jsonBuilder.startObject(attributeMetaData.getName()).field("type", "nested")
-							.startObject("properties");
-
-					for (AttributeMetaData refEntityAttr : attributeMetaData.getRefEntity().getAttributes())
+					Entity retrievalTerm = retrievalTerms.get(code);
+					if (retrievalTerm != null)
 					{
-						if (refEntityAttr.isLabelAttribute())
-						{
-							jsonBuilder.startObject(refEntityAttr.getName()).field("type", "multi_field")
-									.startObject("fields").startObject(refEntityAttr.getName()).field("type", "string")
-									.endObject().startObject("sort").field("type", "string")
-									.field("index", "not_analyzed").endObject().endObject().endObject();
-						}
-						else
-						{
-							jsonBuilder.startObject(refEntityAttr.getName()).field("type", "string").endObject();
-						}
+						// note: no dedup
+						retrievalTermList.add(retrievalTerm);
 					}
-					jsonBuilder.endObject().endObject();
-				}
-				else
-				{
-					jsonBuilder.startObject(attributeMetaData.getName()).field("type", "multi_field")
-							.startObject("fields").startObject(attributeMetaData.getName()).field("type", "string")
-							.endObject().startObject("sort").field("type", "string").field("index", "not_analyzed")
-							.endObject().endObject().endObject();
 				}
 			}
+			return retrievalTermList;
 		}
-		else
+
+		private Entity toMateriaal(String token, Map<String, String> materialMapping, Map<String, Entity> materials,
+				int row)
 		{
-			throw new RuntimeException("The repository " + PalgaSample.ENTITY_NAME + " does not exist!");
+			if (StringUtils.isBlank(token))
+			{
+				logger.warn("'Soort onderzoek' column of row [" + row + "] is empty");
+				return null;
+			}
+			String mappedToken = materialMapping.get(token);
+			if (mappedToken == null)
+			{
+				logger.warn("Unknown material [" + token + "] on row [" + row + "]");
+				return null;
+			}
+			Entity material = materials.get(mappedToken);
+			if (material == null)
+			{
+				logger.warn("Unknown material [" + mappedToken + "] on row [" + row + "]");
+				return null;
+			}
+			return material;
 		}
 
-		jsonBuilder.endObject(); // properties
-		jsonBuilder.endObject(); // documentType
-		jsonBuilder.endObject(); // PalgaSample
-
-		logger.info("Going to create mapping [" + jsonBuilder.string() + "]");
-
-		PutMappingResponse response = client.admin().indices().preparePutMapping("molgenis").setType("PalgaSample")
-				.setSource(jsonBuilder).execute().actionGet();
-
-		if (!response.isAcknowledged())
+		private Entity toGender(String token, Map<String, String> geslachtMapping, Map<String, Entity> genders, int row)
 		{
-			throw new ElasticsearchException("Creation of mapping for documentType [PalgaSample] failed. Response="
-					+ response);
+			if (StringUtils.isBlank(token))
+			{
+				logger.warn("Geslacht column of row [" + row + "] is empty");
+				return null;
+			}
+			String mappedToken = geslachtMapping.get(token);
+			if (mappedToken == null)
+			{
+				logger.warn("Unknown gender [" + token + "] on row [" + row + "]");
+				return null;
+			}
+			Entity gender = genders.get(mappedToken);
+			if (gender == null)
+			{
+				logger.warn("Unkown gender [" + mappedToken + "] on row [" + row + "]");
+				return null;
+			}
+			return gender;
 		}
 
-		logger.info("Mapping for documentType [PalgaSample] created");
+		private Entity toAgeGroup(String token, Map<String, String> ageGroupMapping, Map<String, Entity> agegroups,
+				int row)
+		{
+			if (StringUtils.isBlank(token))
+			{
+				logger.warn("Leeftijdscategorie column of row [" + row + "] is empty");
+				return null;
+			}
+			String mappedToken = ageGroupMapping.get(token);
+			if (mappedToken == null)
+			{
+				logger.warn("Unknown gender [" + token + "] on row [" + row + "]");
+				return null;
+			}
+			Entity agegroup = agegroups.get(mappedToken);
+			if (agegroup == null)
+			{
+				logger.warn("Unknown agegroup [" + agegroup + "] on row [" + row + "]");
+				return null;
+			}
+			return agegroup;
+		}
+
+		private Integer toYear(String token, int row)
+		{
+			if (StringUtils.isBlank(token))
+			{
+				logger.warn("'Jaar onderzoek' column of row [" + row + "] is empty");
+			}
+			if (!StringUtils.isNumeric(token))
+			{
+				logger.warn("Invalid year [" + token + "] on row [" + row + "]");
+				return null;
+			}
+			return Integer.valueOf(token);
+		}
 	}
 }
