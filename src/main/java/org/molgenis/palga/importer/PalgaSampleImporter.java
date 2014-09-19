@@ -108,7 +108,8 @@ public class PalgaSampleImporter
 		final Map<String, Entity> agegroups = getAgeGroups();
 
 		elasticSearchService.delete(entityMetaData);
-		elasticSearchService.createMappings(entityMetaData, true, false, false); // FIXME set true to false
+		// for performance reasons: do not store palga sample entities in index, only store them
+		elasticSearchService.createMappings(entityMetaData, false, false, false);
 
 		ElasticsearchRepository elasticsearchRepository = new ElasticsearchRepository(entityMetaData,
 				elasticSearchService);
