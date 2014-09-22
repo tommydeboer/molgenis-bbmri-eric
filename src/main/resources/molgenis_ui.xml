@@ -2,7 +2,7 @@
 <molgenis label="Palga" name="palga">
 	<menu label="Home" name="main">
 		<plugin id="home" name="Home" url="home"/>
-		<plugin id="dataexplorer" name="Data Explorer" url="dataexplorer?dataset=PalgaSample&#038;wizard=true"/>
+		<plugin id="dataexplorer" name="PALGA Openbare Databank" url="dataexplorer?dataset=PalgaSample"/>
         <plugin id="importwizard" name="Import" url="importwizard" />
         <plugin id="palgaimport" name="Sample Import" url="palgaimport" />
 		<menu label="Admin" name="admin">
