@@ -385,7 +385,7 @@ public class PalgaSampleImporter
 			Entity agegroup = agegroups.get(mappedToken);
 			if (agegroup == null)
 			{
-				logger.warn("Unknown agegroup [" + agegroup + "] on row [" + row + "]");
+				logger.warn("Unknown agegroup [" + mappedToken + "] on row [" + row + "]");
 				return null;
 			}
 			return agegroup;
