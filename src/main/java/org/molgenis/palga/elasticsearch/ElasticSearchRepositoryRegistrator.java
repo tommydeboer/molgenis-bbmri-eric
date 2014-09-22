@@ -41,8 +41,8 @@ public class ElasticSearchRepositoryRegistrator implements ApplicationListener<C
 			// workaround for palga sample entities
 			Repository repository = dataService.getRepositoryByEntityName(ENTITY_NAME_PALGA_SAMPLE);
 			dataService.removeRepository(ENTITY_NAME_PALGA_SAMPLE);
-			dataService.addRepository(new ElasticsearchRepository(repository.getEntityMetaData(),
-					(org.molgenis.data.elasticsearch.SearchService) elasticSearchService));
+			dataService.addRepository(new ElasticsearchCacheRepositoryDecorator(new ElasticsearchRepository(repository
+					.getEntityMetaData(), (org.molgenis.data.elasticsearch.SearchService) elasticSearchService)));
 		}
 	}
 }
