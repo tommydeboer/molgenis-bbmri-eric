@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.molgenis.data.DataService;
+import org.molgenis.data.IndexedCrudRepositorySecurityDecorator;
 import org.molgenis.data.support.QueryImpl;
 import org.molgenis.dataexplorer.controller.DataExplorerController;
 import org.molgenis.framework.db.WebAppDatabasePopulatorService;
@@ -160,6 +161,10 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 				+ PalgaSampleImporter.ENTITY_NAME_PALGA_SAMPLE, PalgaSampleImporter.ATTR_EXCERPT_NR);
 
 		runtimePropertyMap.put(DataExplorerController.KEY_SHOW_WIZARD_ONINIT, String.valueOf(true));
+
+		// Aggregate anonymization threshold (defaults to 10)
+		runtimePropertyMap.put(IndexedCrudRepositorySecurityDecorator.SETTINGS_KEY_AGGREGATE_ANONYMIZATION_THRESHOLD,
+				Integer.toString(10));
 
 		runtimePropertyMap.put("i18nLocale", "palga");
 

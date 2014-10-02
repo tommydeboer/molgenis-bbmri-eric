@@ -21,9 +21,9 @@ import org.molgenis.data.EntityMetaData;
 import org.molgenis.data.elasticsearch.ElasticsearchRepository;
 import org.molgenis.data.elasticsearch.SearchService;
 import org.molgenis.data.support.MapEntity;
+import org.molgenis.palga.elasticsearch.ElasticSearchRepositoryRegistrator;
 import org.molgenis.security.runas.RunAsSystem;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -76,6 +76,9 @@ public class PalgaSampleImporter
 	@Autowired
 	private SearchService elasticSearchService;
 
+	@Autowired
+	private ElasticSearchRepositoryRegistrator elasticSearchRepositoryRegistrator;
+
 	public PalgaSampleImporter()
 	{
 		materialMapping.put("C", "Cytologie");
@@ -87,7 +90,6 @@ public class PalgaSampleImporter
 		ageGroupMapping.put(">50", "50+");
 	}
 
-	@Async
 	@RunAsSystem
 	public void importFile(final File file) throws InvalidFormatException, IOException
 	{
@@ -142,13 +144,7 @@ public class PalgaSampleImporter
 			logger.error("Exception importing palga sample file [" + fileName + "] ", t);
 		}
 
-		if (dataService.hasRepository(ENTITY_NAME_PALGA_SAMPLE))
-		{
-			dataService.removeRepository(ENTITY_NAME_PALGA_SAMPLE);
-		}
-
-		dataService.addRepository(elasticsearchRepository);
-
+		elasticSearchRepositoryRegistrator.registerElasticSearchRepository(elasticsearchRepository);
 	}
 
 	private Map<String, Entity> getRetrievalTerms()
