@@ -76,7 +76,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <pluginManagement>
+		<pluginManagement>
 			<plugins>
 				<!-- web server -->
 				<plugin>

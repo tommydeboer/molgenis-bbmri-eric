@@ -38,11 +38,6 @@ public class ElasticsearchCacheRepositoryDecorator implements CrudRepository, Ag
 		return elasticsearchRepository.iterator(clazz);
 	}
 
-	public int hashCode()
-	{
-		return elasticsearchRepository.hashCode();
-	}
-
 	public String getUrl()
 	{
 		return elasticsearchRepository.getUrl();
@@ -106,11 +101,6 @@ public class ElasticsearchCacheRepositoryDecorator implements CrudRepository, Ag
 	public Iterator<Entity> iterator()
 	{
 		return elasticsearchRepository.iterator();
-	}
-
-	public boolean equals(Object obj)
-	{
-		return elasticsearchRepository.equals(obj);
 	}
 
 	public void close() throws IOException
@@ -210,10 +200,5 @@ public class ElasticsearchCacheRepositoryDecorator implements CrudRepository, Ag
 	{
 		aggregateCache.invalidateAll();
 		elasticsearchRepository.deleteAll();
-	}
-
-	public String toString()
-	{
-		return elasticsearchRepository.toString();
 	}
 }
