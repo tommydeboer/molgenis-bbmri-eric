@@ -1,4 +1,13 @@
 /* Wrapper for page content to push down footer */
-#wrap {
+#plugin-container {
+	min-height: 665px;
     background-image: url('/img/palga.png');
+}
+
+.nav-tabs{
+    display:none;    
+}
+
+.alert {
+	display: none;
 }
