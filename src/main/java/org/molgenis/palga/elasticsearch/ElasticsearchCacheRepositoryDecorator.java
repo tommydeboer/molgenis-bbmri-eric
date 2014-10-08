@@ -207,4 +207,10 @@ public class ElasticsearchCacheRepositoryDecorator implements IndexedCrudReposit
 	{
 		elasticsearchRepository.rebuildIndex();
 	}
+
+	@Override
+	public void drop()
+	{
+		elasticsearchRepository.drop();
+	}
 }
