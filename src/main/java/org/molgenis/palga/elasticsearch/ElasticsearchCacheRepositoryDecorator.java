@@ -7,9 +7,9 @@ import java.util.concurrent.ExecutionException;
 import org.molgenis.data.AggregateQuery;
 import org.molgenis.data.AggregateResult;
 import org.molgenis.data.Aggregateable;
-import org.molgenis.data.CrudRepository;
 import org.molgenis.data.Entity;
 import org.molgenis.data.EntityMetaData;
+import org.molgenis.data.IndexedCrudRepository;
 import org.molgenis.data.Query;
 import org.molgenis.data.elasticsearch.ElasticsearchRepository;
 
@@ -17,7 +17,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-public class ElasticsearchCacheRepositoryDecorator implements CrudRepository, Aggregateable
+public class ElasticsearchCacheRepositoryDecorator implements IndexedCrudRepository, Aggregateable
 {
 	private final ElasticsearchRepository elasticsearchRepository;
 	private LoadingCache<AggregateQuery, AggregateResult> aggregateCache;
@@ -36,11 +36,6 @@ public class ElasticsearchCacheRepositoryDecorator implements CrudRepository, Ag
 	public <E extends Entity> Iterable<E> iterator(Class<E> clazz)
 	{
 		return elasticsearchRepository.iterator(clazz);
-	}
-
-	public int hashCode()
-	{
-		return elasticsearchRepository.hashCode();
 	}
 
 	public String getUrl()
@@ -106,11 +101,6 @@ public class ElasticsearchCacheRepositoryDecorator implements CrudRepository, Ag
 	public Iterator<Entity> iterator()
 	{
 		return elasticsearchRepository.iterator();
-	}
-
-	public boolean equals(Object obj)
-	{
-		return elasticsearchRepository.equals(obj);
 	}
 
 	public void close() throws IOException
@@ -212,8 +202,15 @@ public class ElasticsearchCacheRepositoryDecorator implements CrudRepository, Ag
 		elasticsearchRepository.deleteAll();
 	}
 
-	public String toString()
+	@Override
+	public void rebuildIndex()
 	{
-		return elasticsearchRepository.toString();
+		elasticsearchRepository.rebuildIndex();
+	}
+
+	@Override
+	public void drop()
+	{
+		elasticsearchRepository.drop();
 	}
 }

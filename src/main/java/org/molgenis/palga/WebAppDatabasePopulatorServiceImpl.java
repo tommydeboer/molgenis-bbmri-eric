@@ -162,21 +162,11 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 
 		runtimePropertyMap.put(DataExplorerController.KEY_SHOW_WIZARD_ONINIT, String.valueOf(true));
 
-		runtimePropertyMap.put("i18nLocale", "palga");
-
-		// Aggregate anonymization threshold (10)
+		// Aggregate anonymization threshold (defaults to 10)
 		runtimePropertyMap.put(IndexedCrudRepositorySecurityDecorator.SETTINGS_KEY_AGGREGATE_ANONYMIZATION_THRESHOLD,
 				Integer.toString(10));
 
-		// Annotators include files/tools
-		String molgenisHomeDir = System.getProperty("molgenis.home");
-
-		if (molgenisHomeDir == null)
-		{
-			throw new IllegalArgumentException("missing required java system property 'molgenis.home'");
-		}
-
-		if (!molgenisHomeDir.endsWith("/")) molgenisHomeDir = molgenisHomeDir + '/';
+		runtimePropertyMap.put("i18nLocale", "palga");
 
 		for (Entry<String, String> entry : runtimePropertyMap.entrySet())
 		{
