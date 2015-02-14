@@ -2,14 +2,23 @@
 <molgenis label="Palga" name="palga">
 	<menu label="Home" name="main">
 		<plugin id="home" name="Home" url="home"/>
-		<plugin id="dataexplorer" name="Zoekvraag PALGA Openbare Databank" url="dataexplorer?dataset=PalgaSample"/>
+		<plugin id="dataexplorer" name="Zoekvraag PALGA Openbare Databank" url="dataexplorer?entity=PalgaSample&amp;hideselect=true"/>
         <plugin id="importwizard" name="Import" url="importwizard" />
-        <plugin id="palgaimport" name="Sample Import" url="palgaimport" />
+        <menu label="Entities" name="entities">
+        	<plugin id="palga" name="Delete entities" url="palga" />
+           	<plugin id="form.Agegroup" name="Agegroups" url="form.agegroup"/>
+            <plugin id="form.DRTPWRK" name="Diagnosis" url="form.DRTPWRK"/>
+            <plugin id="form.Gender" name="Genders" url="form.Gender"/>
+            <plugin id="form.Material" name="Materials" url="form.Material"/>
+            <plugin id="form.RetrievalTerm" name="Retrievalterms" url="form.RetrievalTerm"/>
+        </menu>
 		<menu label="Admin" name="admin">
+			<plugin id="form.RuntimeProperty" name="Configuration" url="form.RuntimeProperty"/>
 	        <plugin id="permissionmanager" name="Permission Manager" url="permissionmanager"/>
 	        <plugin id="usermanager" name="User Manager" url="usermanager"/>
 	        <plugin id="indexmanager" name="Index Manager" url="indexmanager"/>
-            <plugin id="form.RuntimeProperty" name="Configuration" url="form.RuntimeProperty"/>
+	        <plugin id="menumanager" name="Menu Manager" url="menumanager"/>
+	        <plugin id="logmanager" name="Log manager" url="logmanager"/>
 		</menu>
 	    <plugin id="useraccount" name="Account" url="useraccount"/>
 	</menu>

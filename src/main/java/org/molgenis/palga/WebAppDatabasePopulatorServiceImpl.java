@@ -4,22 +4,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.molgenis.auth.GroupAuthority;
+import org.molgenis.auth.MolgenisGroup;
+import org.molgenis.auth.MolgenisUser;
+import org.molgenis.auth.UserAuthority;
 import org.molgenis.data.DataService;
 import org.molgenis.data.IndexedCrudRepositorySecurityDecorator;
 import org.molgenis.data.support.QueryImpl;
 import org.molgenis.dataexplorer.controller.DataExplorerController;
 import org.molgenis.framework.db.WebAppDatabasePopulatorService;
-import org.molgenis.omx.auth.GroupAuthority;
-import org.molgenis.omx.auth.MolgenisGroup;
-import org.molgenis.omx.auth.MolgenisUser;
-import org.molgenis.omx.auth.UserAuthority;
-import org.molgenis.omx.core.RuntimeProperty;
 import org.molgenis.palga.controller.HomeController;
-import org.molgenis.palga.importer.PalgaSampleImporter;
+import org.molgenis.palga.meta.AgegroupMetaData;
+import org.molgenis.palga.meta.DiagnosisMetaData;
+import org.molgenis.palga.meta.GenderMetaData;
+import org.molgenis.palga.meta.MaterialMetaData;
+import org.molgenis.palga.meta.PalgaSampleMetaData;
+import org.molgenis.palga.meta.RetrievaltermMetaData;
 import org.molgenis.security.MolgenisSecurityWebAppDatabasePopulatorService;
 import org.molgenis.security.core.utils.SecurityUtils;
 import org.molgenis.security.runas.RunAsSystem;
 import org.molgenis.security.user.UserAccountController;
+import org.molgenis.system.core.RuntimeProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,39 +90,38 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 
 		UserAuthority entityPaglasampleAuthority = new UserAuthority();
 		entityPaglasampleAuthority.setMolgenisUser(anonymousUser);
-		entityPaglasampleAuthority.setRole("ROLE_ENTITY_COUNT_"
-				+ PalgaSampleImporter.ENTITY_NAME_PALGA_SAMPLE.toUpperCase());
+		entityPaglasampleAuthority.setRole("ROLE_ENTITY_COUNT_" + PalgaSampleMetaData.INSTANCE.getName().toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, entityPaglasampleAuthority);
 
 		UserAuthority entityMaterialAuthority = new UserAuthority();
 		entityMaterialAuthority.setMolgenisUser(anonymousUser);
 		entityMaterialAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
-				+ PalgaSampleImporter.ENTITY_NAME_MATERIAL.toUpperCase());
+				+ MaterialMetaData.INSTANCE.getName().toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, entityMaterialAuthority);
 
 		UserAuthority entityDiagnosisAuthority = new UserAuthority();
 		entityDiagnosisAuthority.setMolgenisUser(anonymousUser);
 		entityDiagnosisAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
-				+ PalgaSampleImporter.ENTITY_NAME_DIAGNOSIS.toUpperCase());
+				+ DiagnosisMetaData.INSTANCE.getName().toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, entityDiagnosisAuthority);
 
 		UserAuthority entityRetrievalTermAuthority = new UserAuthority();
 		entityRetrievalTermAuthority.setMolgenisUser(anonymousUser);
 		entityRetrievalTermAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
-				+ PalgaSampleImporter.ENTITY_NAME_RETRIEVAL_TERM.toUpperCase());
+				+ RetrievaltermMetaData.INSTANCE.getName().toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, entityRetrievalTermAuthority);
 
 		UserAuthority entityAgegroupAuthority = new UserAuthority();
 		entityAgegroupAuthority.setMolgenisUser(anonymousUser);
 		entityAgegroupAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
-				+ PalgaSampleImporter.ENTITY_NAME_AGE_GROUP.toUpperCase());
+				+ AgegroupMetaData.INSTANCE.getName().toUpperCase());
 
 		dataService.add(UserAuthority.ENTITY_NAME, entityAgegroupAuthority);
 
 		UserAuthority entityGenderAuthority = new UserAuthority();
 		entityGenderAuthority.setMolgenisUser(anonymousUser);
 		entityGenderAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
-				+ PalgaSampleImporter.ENTITY_NAME_GENDER.toUpperCase());
+				+ GenderMetaData.INSTANCE.getName().toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, entityGenderAuthority);
 
 		UserAuthority entityRTPAuthority = new UserAuthority();
@@ -158,7 +162,7 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 
 		runtimePropertyMap.put(DataExplorerController.KEY_MOD_AGGREGATES_DISTINCT_HIDE, String.valueOf(true));
 		runtimePropertyMap.put(DataExplorerController.KEY_MOD_AGGREGATES_DISTINCT_OVERRIDE + "."
-				+ PalgaSampleImporter.ENTITY_NAME_PALGA_SAMPLE, PalgaSampleImporter.ATTR_EXCERPT_NR);
+				+ PalgaSampleMetaData.INSTANCE.getName(), PalgaSampleMetaData.ATTR_EXCERPT_NR);
 
 		runtimePropertyMap.put(DataExplorerController.KEY_SHOW_WIZARD_ONINIT, String.valueOf(true));
 
@@ -171,9 +175,7 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		for (Entry<String, String> entry : runtimePropertyMap.entrySet())
 		{
 			RuntimeProperty runtimeProperty = new RuntimeProperty();
-			String propertyKey = entry.getKey();
-			runtimeProperty.setIdentifier(RuntimeProperty.class.getSimpleName() + '_' + propertyKey);
-			runtimeProperty.setName(propertyKey);
+			runtimeProperty.setName(entry.getKey());
 			runtimeProperty.setValue(entry.getValue());
 			dataService.add(RuntimeProperty.ENTITY_NAME, runtimeProperty);
 		}
