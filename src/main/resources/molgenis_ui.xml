@@ -3,6 +3,7 @@
 	<menu label="Home" name="main">
 		<plugin id="home" name="Home" url="home"/>
 		<plugin id="dataexplorer" name="Zoekvraag PALGA Openbare Databank" url="dataexplorer?entity=PalgaSample&amp;hideselect=true"/>
+		<plugin id="feedback" name="Feedback" url="feedback" />
         <plugin id="importwizard" name="Import" url="importwizard" />
         <menu label="Entities" name="entities">
         	<plugin id="palga" name="Delete entities" url="palga" />

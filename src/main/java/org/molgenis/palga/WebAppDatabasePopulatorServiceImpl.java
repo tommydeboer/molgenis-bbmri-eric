@@ -25,7 +25,9 @@ import org.molgenis.security.core.utils.SecurityUtils;
 import org.molgenis.security.runas.RunAsSystem;
 import org.molgenis.security.user.UserAccountController;
 import org.molgenis.system.core.RuntimeProperty;
+import org.molgenis.ui.controller.FeedbackController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,9 +37,13 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 	static final String KEY_APP_HREF_CSS = "app.href.css";
 	static final String KEY_APP_NAME = "app.name";
 	static final String KEY_APP_HREF_LOGO = "app.href.logo";
+	static final String KEY_APP_HOME = "app.home";
 
 	private final DataService dataService;
 	private final MolgenisSecurityWebAppDatabasePopulatorService molgenisSecurityWebAppDatabasePopulatorService;
+
+	@Value("${palga.home.html}")
+	private String homePageHtml;
 
 	@Autowired
 	public WebAppDatabasePopulatorServiceImpl(DataService dataService,
@@ -87,6 +93,12 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		anonymousHomeAuthority.setMolgenisUser(anonymousUser);
 		anonymousHomeAuthority.setRole(SecurityUtils.AUTHORITY_PLUGIN_WRITE_PREFIX + HomeController.ID.toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, anonymousHomeAuthority);
+
+		UserAuthority anonymousFeedbackAuthority = new UserAuthority();
+		anonymousFeedbackAuthority.setMolgenisUser(anonymousUser);
+		anonymousFeedbackAuthority.setRole(SecurityUtils.AUTHORITY_PLUGIN_WRITE_PREFIX
+				+ FeedbackController.ID.toUpperCase());
+		dataService.add(UserAuthority.ENTITY_NAME, anonymousFeedbackAuthority);
 
 		UserAuthority entityPaglasampleAuthority = new UserAuthority();
 		entityPaglasampleAuthority.setMolgenisUser(anonymousUser);
@@ -171,6 +183,9 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 				Integer.toString(10));
 
 		runtimePropertyMap.put("i18nLocale", "palga");
+
+		// Homepage html
+		runtimePropertyMap.put(KEY_APP_HOME, homePageHtml);
 
 		for (Entry<String, String> entry : runtimePropertyMap.entrySet())
 		{
