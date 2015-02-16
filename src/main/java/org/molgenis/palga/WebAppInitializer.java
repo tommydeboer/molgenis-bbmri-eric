@@ -1,5 +1,8 @@
 package org.molgenis.palga;
 
+import java.util.EnumSet;
+
+import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
@@ -12,5 +15,8 @@ public class WebAppInitializer extends MolgenisWebAppInitializer implements WebA
 	public void onStartup(ServletContext servletContext) throws ServletException
 	{
 		super.onStartup(servletContext, WebAppConfig.class, false, Integer.MAX_VALUE);
+
+		servletContext.addFilter("IndexingActiveMessageFilter", new IndexingActiveMessageFilter())
+				.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/menu/main/dataexplorer");
 	}
 }
