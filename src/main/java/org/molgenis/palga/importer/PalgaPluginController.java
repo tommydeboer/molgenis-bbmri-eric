@@ -34,11 +34,20 @@ public class PalgaPluginController extends MolgenisPluginController
 	}
 
 	@RequestMapping(value = "/delete/{entity}", method = RequestMethod.GET)
-	public String importPalgaSampleFile(@PathVariable("entity") String entity, Model model)
+	public String deleteAllEntities(@PathVariable("entity") String entity, Model model)
 	{
 		if (StringUtils.isNotBlank(entity) && dataService.hasRepository(entity))
 		{
-			dataService.deleteAll(entity);
+			try
+			{
+				dataService.deleteAll(entity);
+				model.addAttribute("successMessage", String.format("Deleted all '%s' entities.", entity));
+			}
+			catch (Exception e)
+			{
+				model.addAttribute("errorMessage",
+						String.format("Error deleting all '%s' entities. %s", entity, e.getMessage()));
+			}
 		}
 
 		return showForm();
