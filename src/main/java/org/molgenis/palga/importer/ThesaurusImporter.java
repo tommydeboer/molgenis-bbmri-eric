@@ -1,7 +1,12 @@
 package org.molgenis.palga.importer;
 
+import static java.util.stream.StreamSupport.stream;
+
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,19 +16,24 @@ import org.molgenis.data.CrudRepository;
 import org.molgenis.data.DataService;
 import org.molgenis.data.DatabaseAction;
 import org.molgenis.data.Entity;
+import org.molgenis.data.EntityMetaData;
 import org.molgenis.data.MolgenisDataException;
 import org.molgenis.data.RepositoryCollection;
+import org.molgenis.data.importer.EntitiesValidationReportImpl;
+import org.molgenis.data.importer.ImportService;
 import org.molgenis.data.support.MapEntity;
 import org.molgenis.data.support.TransformedEntity;
+import org.molgenis.framework.db.EntitiesValidationReport;
 import org.molgenis.framework.db.EntityImportReport;
 import org.molgenis.palga.meta.DiagnosisMetaData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ThesaurusImporter extends AbstractImportService
+public class ThesaurusImporter implements ImportService
 {
 	private static final Logger LOG = LoggerFactory.getLogger(ThesaurusImporter.class);
 	private final DataService dataService;
@@ -31,8 +41,13 @@ public class ThesaurusImporter extends AbstractImportService
 	@Autowired
 	public ThesaurusImporter(DataService dataService)
 	{
-		super(DiagnosisMetaData.INSTANCE);
 		this.dataService = dataService;
+	}
+
+	@Override
+	public int getOrder()
+	{
+		return Ordered.HIGHEST_PRECEDENCE;
 	}
 
 	@Override
@@ -110,6 +125,73 @@ public class ThesaurusImporter extends AbstractImportService
 		LOG.info("Thesaurus import done.");
 
 		return report;
+	}
+
+	@Override
+	public EntitiesValidationReport validateImport(File file, RepositoryCollection source)
+	{
+		EntitiesValidationReport report = new EntitiesValidationReportImpl();
+		Iterator<String> it = source.getEntityNames().iterator();
+		if (it.hasNext())
+		{
+			String entityName = it.next();
+
+			EntityMetaData sourceEntityMetaData = source.getRepositoryByEntityName(entityName).getEntityMetaData();
+			List<String> sourceAttrs = stream(sourceEntityMetaData.getAtomicAttributes().spliterator(), false).map(
+					attr -> attr.getName().toLowerCase()).collect(Collectors.toList());
+
+			if (sourceEntityMetaData.getName().equalsIgnoreCase(entityName))
+			{
+				report.getSheetsImportable().put(entityName, true);
+
+				// All attributes
+				List<String> attributes = stream(DiagnosisMetaData.INSTANCE.getAtomicAttributes().spliterator(), false)
+						.map(attr -> attr.getName().toLowerCase()).collect(Collectors.toList());
+
+				// Missing required Attributes
+				List<String> missing = stream(DiagnosisMetaData.INSTANCE.getAtomicAttributes().spliterator(), false)
+						.filter(attr -> !attr.isNillable()).map(attr -> attr.getName())
+						.filter(attrName -> !sourceAttrs.contains(attrName.toLowerCase())).collect(Collectors.toList());
+				report.getFieldsRequired().put(entityName, missing);
+
+				// Available Attributes
+				List<String> availableAttributeNames = stream(sourceEntityMetaData.getAtomicAttributes().spliterator(),
+						false).map(attr -> attr.getName())
+						.filter(attrName -> attributes.contains(attrName.toLowerCase())).collect(Collectors.toList());
+				report.getFieldsImportable().put(entityName, availableAttributeNames);
+
+				// Not importable attributes
+				List<String> unknown = stream(sourceEntityMetaData.getAtomicAttributes().spliterator(), false)
+						.map(attr -> attr.getName()).filter(attrName -> !attributes.contains(attrName.toLowerCase()))
+						.collect(Collectors.toList());
+				report.getFieldsUnknown().put(entityName, unknown);
+			}
+		}
+
+		return report;
+	}
+
+	@Override
+	public boolean canImport(File file, RepositoryCollection source)
+	{
+		for (String name : source.getEntityNames())
+		{
+			if (name.equalsIgnoreCase(DiagnosisMetaData.INSTANCE.getName())) return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public List<DatabaseAction> getSupportedDatabaseActions()
+	{
+		return Arrays.asList(DatabaseAction.ADD, DatabaseAction.ADD_UPDATE_EXISTING, DatabaseAction.UPDATE);
+	}
+
+	@Override
+	public boolean getMustChangeEntityName()
+	{
+		return false;
 	}
 
 	// Concatenate description with the same code (DEPALCE)
