@@ -33,6 +33,7 @@ import org.molgenis.data.DatabaseAction;
 import org.molgenis.data.EntityMetaData;
 import org.molgenis.data.Repository;
 import org.molgenis.data.RepositoryCollection;
+import org.molgenis.data.elasticsearch.SearchService;
 import org.molgenis.data.elasticsearch.factory.EmbeddedElasticSearchServiceFactory;
 import org.molgenis.data.elasticsearch.index.EntityToSourceConverter;
 import org.molgenis.data.importer.EntitiesValidationReportImpl;
@@ -86,14 +87,16 @@ public class PalgaSampleImporter implements ImportService
 	private final DataService dataService;
 	private final EntityToSourceConverter entityToSourceConverter;
 	private final EmbeddedElasticSearchServiceFactory embeddedElasticSearchServiceFactory;
+	private final SearchService elasticSearchService;
 
 	@Autowired
 	public PalgaSampleImporter(DataService dataService, EntityToSourceConverter entityToSourceConverter,
-			EmbeddedElasticSearchServiceFactory embeddedElasticSearchServiceFactory)
+			EmbeddedElasticSearchServiceFactory embeddedElasticSearchServiceFactory, SearchService elasticSearchService)
 	{
 		this.dataService = dataService;
 		this.entityToSourceConverter = entityToSourceConverter;
 		this.embeddedElasticSearchServiceFactory = embeddedElasticSearchServiceFactory;
+		this.elasticSearchService = elasticSearchService;
 	}
 
 	@Override
@@ -170,7 +173,6 @@ public class PalgaSampleImporter implements ImportService
 				bulkProcessor.add(new IndexRequest(embeddedElasticSearchServiceFactory.getIndexName(),
 						PalgaSampleMetaData.INSTANCE.getName()).source(doc));
 			}
-
 		}
 		catch (IOException e)
 		{
@@ -180,7 +182,10 @@ public class PalgaSampleImporter implements ImportService
 		{
 			try
 			{
-				bulkProcessor.awaitClose(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+				if (!bulkProcessor.awaitClose(Long.MAX_VALUE, TimeUnit.NANOSECONDS))
+				{
+					LOG.warn("Not all ES bulk requests are completed");
+				}
 			}
 			catch (InterruptedException e)
 			{
@@ -189,6 +194,9 @@ public class PalgaSampleImporter implements ImportService
 
 			if (!inputFile.delete()) LOG.warn("Could not delete {}", inputFile.getAbsolutePath());
 		}
+
+		// Flush it, else we can get a corrupt index when we restart
+		elasticSearchService.flush();
 
 		report.addEntityCount(PalgaSampleMetaData.INSTANCE.getName(), count.get());
 
