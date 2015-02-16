@@ -10,6 +10,7 @@ import org.molgenis.auth.MolgenisUser;
 import org.molgenis.auth.UserAuthority;
 import org.molgenis.data.DataService;
 import org.molgenis.data.IndexedCrudRepositorySecurityDecorator;
+import org.molgenis.data.importer.ImportRun;
 import org.molgenis.data.support.QueryImpl;
 import org.molgenis.dataexplorer.controller.DataExplorerController;
 import org.molgenis.framework.db.WebAppDatabasePopulatorService;
@@ -127,7 +128,6 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		entityAgegroupAuthority.setMolgenisUser(anonymousUser);
 		entityAgegroupAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
 				+ AgegroupMetaData.INSTANCE.getName().toUpperCase());
-
 		dataService.add(UserAuthority.ENTITY_NAME, entityAgegroupAuthority);
 
 		UserAuthority entityGenderAuthority = new UserAuthority();
@@ -141,6 +141,12 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		entityRTPAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_READ_PREFIX
 				+ RuntimeProperty.ENTITY_NAME.toUpperCase());
 		dataService.add(UserAuthority.ENTITY_NAME, entityRTPAuthority);
+
+		UserAuthority entityImportRunAuthority = new UserAuthority();
+		entityImportRunAuthority.setMolgenisUser(anonymousUser);
+		entityImportRunAuthority.setRole(SecurityUtils.AUTHORITY_ENTITY_COUNT_PREFIX
+				+ ImportRun.ENTITY_NAME.toUpperCase());
+		dataService.add(UserAuthority.ENTITY_NAME, entityImportRunAuthority);
 
 		Map<String, String> runtimePropertyMap = new HashMap<String, String>();
 		runtimePropertyMap.put(KEY_APP_HREF_CSS, "palga.css");
