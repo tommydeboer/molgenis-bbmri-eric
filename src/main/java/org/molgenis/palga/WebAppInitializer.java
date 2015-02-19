@@ -11,10 +11,12 @@ import org.springframework.web.WebApplicationInitializer;
 
 public class WebAppInitializer extends MolgenisWebAppInitializer implements WebApplicationInitializer
 {
+	private static final int MAX_FILE_SIZE = 1024;
+
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException
 	{
-		super.onStartup(servletContext, WebAppConfig.class, false, Integer.MAX_VALUE);
+		super.onStartup(servletContext, WebAppConfig.class, false, MAX_FILE_SIZE);
 
 		servletContext.addFilter("IndexingActiveMessageFilter", new IndexingActiveMessageFilter())
 				.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/menu/main/dataexplorer");
