@@ -157,7 +157,7 @@ public class ElasticSearchRepositoryRegistrator implements ApplicationListener<C
 			{
 				try
 				{
-					elasticSearchService.createMappings(entityMetaData, false, true, false, true);
+					elasticSearchService.createMappings(entityMetaData, false, false, false, true);
 				}
 				catch (IOException e)
 				{
