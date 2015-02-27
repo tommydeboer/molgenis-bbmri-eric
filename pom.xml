@@ -48,24 +48,28 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-            </plugin>
-            <!-- web server -->
-			<plugin>
-                <groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-maven-plugin</artifactId>
-				<configuration>
-                	<stopPort>8079</stopPort>
-                    <stopKey>jetty-stop</stopKey>
-                    <reload>manual</reload>
-                    <systemProperties>
-						<systemProperty>
-							<name>molgenis.home</name>
-							<value>${user.home}${file.separator}.molgenis${file.separator}palga</value>
-						</systemProperty>
-					</systemProperties>
-            	</configuration>
-            </plugin>
-        </plugins>
+			</plugin>
+		</plugins>
+		<!-- web server -->
+		<pluginManagement>
+			<plugins>
+				<plugin>
+	                <groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-maven-plugin</artifactId>
+					<configuration>
+	                	<stopPort>8079</stopPort>
+	                    <stopKey>jetty-stop</stopKey>
+	                    <reload>manual</reload>
+	                    <systemProperties>
+							<systemProperty>
+								<name>molgenis.home</name>
+								<value>${user.home}${file.separator}.molgenis${file.separator}palga</value>
+							</systemProperty>
+						</systemProperties>
+	            	</configuration>
+	            </plugin>
+	        </plugins>
+        </pluginManagement>
     </build>
 
     <dependencies>
