@@ -1,4 +1,4 @@
-package org.molgenis.palga;
+package org.molgenis.app;
 
 import static org.molgenis.security.core.utils.SecurityUtils.getPluginReadAuthority;
 
@@ -34,38 +34,43 @@ public class WebAppSecurityConfig extends MolgenisWebAppSecurityConfig
 	@Autowired
 	private RoleVoter roleVoter;
 
+	// TODO automate URL authorization configuration (ticket #2133)
+	@Override
+	protected void configureUrlAuthorization(
+			ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry expressionInterceptUrlRegistry)
+	{
+		@SuppressWarnings("rawtypes")
+		List<AccessDecisionVoter> listOfVoters = new ArrayList<AccessDecisionVoter>();
+		listOfVoters.add(new WebExpressionVoter());
+		listOfVoters.add(new MolgenisAccessDecisionVoter());
+		expressionInterceptUrlRegistry.accessDecisionManager(new AffirmativeBased(listOfVoters));
 
+		expressionInterceptUrlRegistry.antMatchers("/").permitAll()
+		// DAS datasource uses the database, unauthenticated users can
+		// not see any data
+				.antMatchers("/das/**").permitAll()
+
+				.antMatchers("/myDas/**").permitAll()
+
+				.antMatchers("/annotators/**").authenticated()
+
+				.antMatchers("/diseasematcher/**").authenticated()
+
+				.antMatchers("/omim/**").authenticated()
+
+				.antMatchers("/phenotips/**").authenticated()
+
+				.antMatchers("/charts/**").authenticated();
+	}
 
 	@Override
 	protected List<GrantedAuthority> createAnonymousUserAuthorities()
 	{
-		String home = getPluginReadAuthority("home");
-        String dataExplorer = getPluginReadAuthority("Data Explorer");
-		return AuthorityUtils.createAuthorityList(home,dataExplorer);
+		String s = getPluginReadAuthority("home");
+		return AuthorityUtils.createAuthorityList(s);
 	}
 
-    // TODO automate URL authorization configuration (ticket #2133)
-    @Override
-    protected void configureUrlAuthorization(
-            ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry expressionInterceptUrlRegistry)
-    {
-        @SuppressWarnings("rawtypes")
-        List<AccessDecisionVoter> listOfVoters = new ArrayList<AccessDecisionVoter>();
-        listOfVoters.add(new WebExpressionVoter());
-        listOfVoters.add(new MolgenisAccessDecisionVoter());
-        expressionInterceptUrlRegistry.accessDecisionManager(new AffirmativeBased(listOfVoters));
-
-        expressionInterceptUrlRegistry.antMatchers("/").permitAll()
-                // DAS datasource uses the database, unauthenticated users can
-                // not see any data
-                .antMatchers("/das/**").permitAll()
-
-                .antMatchers("/myDas/**").permitAll()
-
-                .antMatchers("/charts/**").authenticated();
-    }
-
-    @Override
+	@Override
 	public RoleHierarchy roleHierarchy()
 	{
 		return new MolgenisRoleHierarchy();

@@ -1,6 +1,6 @@
-package org.molgenis.palga.controller;
+package org.molgenis.app.controller;
 
-import static org.molgenis.palga.controller.HomeController.URI;
+import static org.molgenis.app.controller.HomeController.URI;
 
 import org.molgenis.framework.ui.MolgenisPluginController;
 import org.molgenis.ui.controller.AbstractStaticContentController;
@@ -16,7 +16,7 @@ public class HomeController extends AbstractStaticContentController
 {
 	public static final String ID = "home";
 	public static final String URI = MolgenisPluginController.PLUGIN_URI_PREFIX + ID;
-	
+
 	public HomeController()
 	{
 		super(ID, URI);

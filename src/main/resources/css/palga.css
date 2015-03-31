@@ -1,9 +1,0 @@
-/* Wrapper for page content to push down footer */
-#plugin-container {
-	min-height: 665px;
-    background-image: url('/img/palga.png');
-}
-
-.nav-tabs{
-    display:none;    
-}

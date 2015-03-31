@@ -1,26 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<molgenis label="Palga" name="palga">
+<molgenis label="OMX" name="omx">
 	<menu label="Home" name="main">
 		<plugin id="home" name="Home" url="home"/>
-		<plugin id="dataexplorer" name="Zoekvraag PALGA Openbare Databank" url="dataexplorer?entity=PalgaSample&amp;hideselect=true"/>
-		<plugin id="feedback" name="Feedback" url="feedback" />
-        <plugin id="importwizard" name="Import" url="importwizard" />
-        <menu label="Entities" name="entities">
-        	<plugin id="palga" name="Delete entities" url="palga" />
-           	<plugin id="form.Agegroup" name="Agegroups" url="form.agegroup"/>
-            <plugin id="form.DRTPWRK" name="Diagnosis" url="form.DRTPWRK"/>
-            <plugin id="form.Gender" name="Genders" url="form.Gender"/>
-            <plugin id="form.Material" name="Materials" url="form.Material"/>
-            <plugin id="form.RetrievalTerm" name="Retrievalterms" url="form.RetrievalTerm"/>
-        </menu>
-		<menu label="Admin" name="admin">
-			<plugin id="form.RuntimeProperty" name="Configuration" url="form.RuntimeProperty"/>
-	        <plugin id="permissionmanager" name="Permission Manager" url="permissionmanager"/>
+        <plugin id="importwizard" name="Upload" url="importwizard"/>
+        <plugin id="catalogue" name="Catalogue" url="catalogue"/>
+		<plugin id="dataexplorer" name="Data Explorer" url="dataexplorer"/>
+		<plugin id="mappingservice" name="Mapping Service" url="mappingservice"/>
+        <menu label="Plugins" name="plugins">
+        	<plugin id="pathways" name="Pathways" url="pathways"/>
+            <plugin id="standardsregistry" name="Model registry" url="standardsregistry" />
+            <plugin id="geneticrepositorymerger" name="Merge Genetic Data" url="geneticrepositorymerger"/>
+            <plugin id="background" name="Background" url="background"/>
+            <plugin id="contact" name="Contact" url="contact"/>
+            <plugin id="gaflistimporter" name="GAF List Importer" url="gaflistimporter"/>
+            <plugin id="news" name="News" url="news"/>
+            <plugin id="references" name="References" url="references"/>
+            <plugin id="scripts" name="Scripts" url="scripts" />
+	    </menu>
+		<menu label="Entities" name ="entities">
+			<plugin id="form.entities" name="EntityMeta" url="form.entities?subForms=attributes.entity"/>
+        	<plugin id="form.RuntimeProperty" name="RuntimeProperty" url="form.RuntimeProperty"/>
+        	<plugin id="form.MolgenisUser" name="MolgenisUser" url="form.MolgenisUser"/>
+        	<plugin id="form.MolgenisGroup" name="MolgenisGroup" url="form.MolgenisGroup"/>
+        	<plugin id="form.MolgenisToken" name="Tokens" url="form.MolgenisToken"/>
+        	<plugin id="form.Script" name="Script" url="form.Script"/>
+        	<plugin id="form.ScriptParameter" name="ScriptParameter" url="form.ScriptParameter"/>
+        	<plugin id="form.FreemarkerTemplate" name="FreemarkerTemplate" url="form.FreemarkerTemplate"/>
+	    </menu>
+        <menu label="Admin" name="admin">
 	        <plugin id="usermanager" name="User Manager" url="usermanager"/>
-	        <plugin id="indexmanager" name="Index Manager" url="indexmanager"/>
-	        <plugin id="menumanager" name="Menu Manager" url="menumanager"/>
-	        <plugin id="logmanager" name="Log manager" url="logmanager"/>
+	        <plugin id="permissionmanager" name="Permission Manager" url="permissionmanager"/>
+        	<plugin id="menumanager" name="Menu Manager" url="menumanager"/>
+        	<plugin id="indexmanager" name="Index manager" url="indexmanager"/>
+        	<plugin id="logmanager" name="Log manager" url="logmanager"/>
 		</menu>
-	    <plugin id="useraccount" name="Account" url="useraccount"/>
+		<menu label="About" name="background">
+            <plugin id="feedback" name="Feedback" url="feedback"/>
+        </menu>
+		<plugin id="useraccount" name="Account" url="useraccount"/>
 	</menu>
 </molgenis>
