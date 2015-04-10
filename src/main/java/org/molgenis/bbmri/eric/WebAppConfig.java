@@ -111,7 +111,6 @@ public class WebAppConfig extends MolgenisWebAppConfig
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters)
 	{
 		super.configureMessageConverters(converters);
-		converters.add(new LdifHttpMessageConverter());
 	}
 
 	@Override
