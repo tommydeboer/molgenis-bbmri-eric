@@ -56,15 +56,9 @@ import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_SIZE;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_STANDALONE;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.DIAGNOSIS_AVAILABLE;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 
 import org.molgenis.data.DataService;
@@ -72,6 +66,9 @@ import org.molgenis.data.Entity;
 import org.molgenis.data.support.DefaultEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Translates BBMRI-NL sample collections to BBMRI-ERIC catalogue entries. Entries (biobanks) are stored in the
@@ -80,6 +77,7 @@ import org.slf4j.LoggerFactory;
  * @author tommy
  *
  */
+@Component
 public class NlToEricConverter
 {
 	private final DataService dataService;
@@ -167,12 +165,15 @@ public class NlToEricConverter
 		}
 	};
 
-	public NlToEricConverter(DataService dataService)
+	@Autowired
+	public NlToEricConverter(DataService dataService, @Value("${default_contact_email}") String defaultContactEmail)
 	{
 		if (dataService == null) throw new IllegalArgumentException("dataService is null");
+		if (defaultContactEmail == null) throw new RuntimeException(
+				"Property default_contact_email not set in molgenis-server.properties");
 
-		this.defaultContactEmail = getMolgenisServerProperties().getProperty(DEFAULT_CONTACT_EMAIL_PROP);
 		this.dataService = dataService;
+		this.defaultContactEmail = defaultContactEmail;
 	}
 
 	public void convertNlToEric()
@@ -345,32 +346,5 @@ public class NlToEricConverter
 				ericBiobank.set(map.getKey(), false);
 			}
 		}
-	}
-
-	public Properties getMolgenisServerProperties()
-	{
-		try (InputStream in = new FileInputStream(getMolgenisServerPropertiesFile()))
-		{
-			Properties p = new Properties();
-			p.load(in);
-
-			return p;
-		}
-		catch (IOException e)
-		{
-			throw new UncheckedIOException(e);
-		}
-	}
-
-	private File getMolgenisServerPropertiesFile()
-	{
-		// get molgenis home directory
-		String molgenisHomeDir = System.getProperty("molgenis.home");
-		if (molgenisHomeDir == null)
-		{
-			throw new IllegalArgumentException("missing required java system property 'molgenis.home'");
-		}
-
-		return new File(molgenisHomeDir, "molgenis-server.properties");
 	}
 }

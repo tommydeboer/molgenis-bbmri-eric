@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class EricController
 {
 	public static final String BASE_URI = "/bbmri";
+	private NlToEricConverter nlToEricConverter;
 
 	// MIME type for LDIF
 	public static final String APPLICATION_DIRECTORY_VALUE = "application/directory";
@@ -39,11 +40,13 @@ public class EricController
 	private final DataService dataService;
 
 	@Autowired
-	public EricController(DataService dataService)
+	public EricController(DataService dataService, NlToEricConverter nlToEricConverter)
 	{
 		if (dataService == null) throw new IllegalArgumentException("dataService is null");
+		if (nlToEricConverter == null) throw new IllegalArgumentException("nlToEricConverter is null");
 
 		this.dataService = dataService;
+		this.nlToEricConverter = nlToEricConverter;
 	}
 
 	@RequestMapping(value = "", method = GET, produces = APPLICATION_JSON_VALUE)
@@ -90,6 +93,6 @@ public class EricController
 	@ResponseBody
 	public void convert()
 	{
-		new NlToEricConverter(dataService).convertNlToEric();
+		nlToEricConverter.convertNlToEric();
 	}
 }
