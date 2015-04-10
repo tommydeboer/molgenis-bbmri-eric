@@ -23,7 +23,6 @@ import org.molgenis.data.version.v1_5.Step2;
 import org.molgenis.data.version.v1_5.Step3AddOrderColumnToMrefTables;
 import org.molgenis.data.version.v1_5.Step4;
 import org.molgenis.dataexplorer.freemarker.DataExplorerHyperlinkDirective;
-import org.molgenis.migrate.MysqlMigrate;
 import org.molgenis.system.core.FreemarkerTemplateRepository;
 import org.molgenis.ui.MolgenisWebAppConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +91,7 @@ public class WebAppConfig extends MolgenisWebAppConfig
 		};
 		localDataService.getMeta().setDefaultBackend(backend);
 
-		new MysqlMigrate(new JdbcTemplate(dataSource), "MySQL").migrate(localDataService.getMeta());
+		// new MysqlMigrate(new JdbcTemplate(dataSource), "MySQL").migrate(localDataService.getMeta());
 
 		for (EntityMetaData emd : localDataService.getMeta().getEntityMetaDatas())
 		{

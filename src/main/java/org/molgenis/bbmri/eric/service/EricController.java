@@ -32,6 +32,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class EricController
 {
 	public static final String BASE_URI = "/bbmri";
+
+	// MIME type for LDIF
 	public static final String APPLICATION_DIRECTORY_VALUE = "application/directory";
 
 	private final DataService dataService;

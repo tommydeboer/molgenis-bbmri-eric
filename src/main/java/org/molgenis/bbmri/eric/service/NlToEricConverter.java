@@ -56,11 +56,17 @@ import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_SIZE;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_STANDALONE;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.DIAGNOSIS_AVAILABLE;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
 
-import org.molgenis.bbmri.eric.model.CatalogueMetaData;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.support.DefaultEntity;
@@ -83,13 +89,15 @@ public class NlToEricConverter
 	private final String BBMRI_NL_SOURCE_ENTITY = "bbmri_nl_sample_collections";
 	private final String NL = "NL";
 	public static final String BBMRI_ERIC_CATALOGUE = "bbmri-eric_catalogue";
+	private static final String DEFAULT_CONTACT_EMAIL_PROP = "default_contact_email";
 
 	// mapping defaults
 	private final String DEFAULT_JURIDICAL_PERSON = "BBMRI-NL";
 	private final int DEFAULT_IT_STAFF_SIZE = 1;
 	private final String DEFAULT_DIAGNOSIS_AVAILABLE = "urn:miriam:icd:*";
+	// floor(log10(nr of samples). All NL biobanks have at least 500 samples (actual numbers are not available)
 	private final int DEFAULT_NR_OF_SAMPLES = (int) Math.floor(Math.log10(500));
-	private final String DEFAULT_CONTACT_EMAIL = "info@bbmri.nl";
+	private String defaultContactEmail;
 
 	// nl attribute names
 	private final String ATT_MATERIALS = "materials";
@@ -163,11 +171,15 @@ public class NlToEricConverter
 	{
 		if (dataService == null) throw new IllegalArgumentException("dataService is null");
 
+		this.defaultContactEmail = getMolgenisServerProperties().getProperty(DEFAULT_CONTACT_EMAIL_PROP);
 		this.dataService = dataService;
 	}
 
 	public void convertNlToEric()
 	{
+		if (defaultContactEmail == null) throw new RuntimeException(
+				"Please set default_contact_email in molgenis-server.properties");
+
 		LOG.info("Starting conversion of BBMRI-NL data to BBMRI-ERIC. BBMRI-NL entity = {}", BBMRI_NL_SOURCE_ENTITY);
 
 		Iterable<Entity> it = dataService.findAll(BBMRI_NL_SOURCE_ENTITY);
@@ -176,7 +188,8 @@ public class NlToEricConverter
 		int updates = 0;
 		for (Entity nlBiobank : it)
 		{
-			DefaultEntity ericBiobank = new DefaultEntity(new CatalogueMetaData(), dataService);
+			DefaultEntity ericBiobank = new DefaultEntity(dataService.getEntityMetaData(BBMRI_ERIC_CATALOGUE),
+					dataService);
 
 			// mapped attributes
 			ericBiobank.set(BIOBANK_ID, ericId((String) nlBiobank.getIdValue()));
@@ -196,7 +209,7 @@ public class NlToEricConverter
 			Entity person = nlBiobank.getEntities(ATT_CONTACT_PERSON).iterator().next();
 			if (person.get(ATT_EMAIL) == null)
 			{
-				ericBiobank.set(BIOBANK_CONTACT_EMAIL, DEFAULT_CONTACT_EMAIL);
+				ericBiobank.set(BIOBANK_CONTACT_EMAIL, defaultContactEmail);
 			}
 			else
 			{
@@ -233,8 +246,8 @@ public class NlToEricConverter
 			ericBiobank.set(BIOBANK_JURIDICAL_PERSON, DEFAULT_JURIDICAL_PERSON);
 
 			// rule based mappings
-			HashSet<String> types = new HashSet<>();
-			nlBiobank.getEntities(ATT_TYPE).forEach((type) -> types.add((String) type.getIdValue()));
+			Set<String> types = new HashSet<>();
+			nlBiobank.getEntities(ATT_TYPE).forEach((type) -> types.add(type.getIdValue().toString()));
 
 			if (types.contains("HOSPITAL"))
 			{
@@ -299,7 +312,7 @@ public class NlToEricConverter
 	 */
 	private String ericId(String id)
 	{
-		return new StringBuilder().append("bbmri-eric:ID:").append(NL).append("_").append(id).toString();
+		return new StringBuilder().append("bbmri-eric:ID:").append(NL).append('_').append(id).toString();
 	}
 
 	/**
@@ -318,7 +331,7 @@ public class NlToEricConverter
 	private void convertMref(Entity nlBiobank, DefaultEntity ericBiobank, HashMap<String, String> mapping,
 			String attribute)
 	{
-		HashSet<String> refValues = new HashSet<>();
+		Set<String> refValues = new HashSet<>();
 		nlBiobank.getEntities(attribute).forEach((e) -> refValues.add((String) e.getIdValue()));
 
 		for (Entry<String, String> map : mapping.entrySet())
@@ -332,5 +345,32 @@ public class NlToEricConverter
 				ericBiobank.set(map.getKey(), false);
 			}
 		}
+	}
+
+	public Properties getMolgenisServerProperties()
+	{
+		try (InputStream in = new FileInputStream(getMolgenisServerPropertiesFile()))
+		{
+			Properties p = new Properties();
+			p.load(in);
+
+			return p;
+		}
+		catch (IOException e)
+		{
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	private File getMolgenisServerPropertiesFile()
+	{
+		// get molgenis home directory
+		String molgenisHomeDir = System.getProperty("molgenis.home");
+		if (molgenisHomeDir == null)
+		{
+			throw new IllegalArgumentException("missing required java system property 'molgenis.home'");
+		}
+
+		return new File(molgenisHomeDir, "molgenis-server.properties");
 	}
 }
