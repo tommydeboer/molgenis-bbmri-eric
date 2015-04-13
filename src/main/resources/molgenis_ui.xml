@@ -3,18 +3,8 @@
 	<menu label="Home" name="main">
 		<plugin id="home" name="Home" url="home"/>
         <plugin id="importwizard" name="Upload" url="importwizard"/>
-        <plugin id="catalogue" name="Catalogue" url="catalogue"/>
 		<plugin id="dataexplorer" name="Data Explorer" url="dataexplorer"/>
-		<plugin id="mappingservice" name="Mapping Service" url="mappingservice"/>
         <menu label="Plugins" name="plugins">
-        	<plugin id="pathways" name="Pathways" url="pathways"/>
-            <plugin id="standardsregistry" name="Model registry" url="standardsregistry" />
-            <plugin id="geneticrepositorymerger" name="Merge Genetic Data" url="geneticrepositorymerger"/>
-            <plugin id="background" name="Background" url="background"/>
-            <plugin id="contact" name="Contact" url="contact"/>
-            <plugin id="gaflistimporter" name="GAF List Importer" url="gaflistimporter"/>
-            <plugin id="news" name="News" url="news"/>
-            <plugin id="references" name="References" url="references"/>
             <plugin id="scripts" name="Scripts" url="scripts" />
 	    </menu>
 		<menu label="Entities" name ="entities">

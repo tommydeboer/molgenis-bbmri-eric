@@ -23,6 +23,7 @@ import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_DATA_ACCES
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_DATA_ACCESS_FEE;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_DATA_ACCESS_JOINT_PROJECTS;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_DATA_ACCESS_URI;
+import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_DESCRIPTION;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_HIS_AVAILABLE;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_ID;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_IS_AVAILABLE;
@@ -54,6 +55,7 @@ import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_SAMPLE_ACC
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_SAMPLE_ACCESS_URI;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_SIZE;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_STANDALONE;
+import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_URL;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.DIAGNOSIS_AVAILABLE;
 
 import java.util.HashMap;
@@ -117,6 +119,8 @@ public class NlToEricConverter
 	private final String ATT_ZIP = "zip";
 	private final String ATT_CONTACT_PERSON = "contact_person";
 	private final String ATT_TYPE = "type";
+	private final String ATT_DESCRIPTION = "description";
+	private final String ATT_URL = "website";
 
 	private static final HashMap<String, String> materialMapping = new HashMap<String, String>()
 	{
@@ -204,6 +208,8 @@ public class NlToEricConverter
 			ericBiobank.set(BIOBANK_DATA_ACCESS_DESCRIPTION, nlBiobank.get(ATT_BIOBANK_DATA_ACCESS_DESCRIPTION));
 			ericBiobank.set(BIOBANK_SAMPLE_ACCESS_URI, nlBiobank.get(ATT_BIOBANK_SAMPLE_ACCESS_URI));
 			ericBiobank.set(BIOBANK_DATA_ACCESS_URI, nlBiobank.get(ATT_BIOBANK_DATA_ACCESS_URI));
+			ericBiobank.set(BIOBANK_DESCRIPTION, nlBiobank.get(ATT_DESCRIPTION));
+			ericBiobank.set(BIOBANK_URL, nlBiobank.get(ATT_URL));
 
 			// contact person (only use first)
 			Entity person = nlBiobank.getEntities(ATT_CONTACT_PERSON).iterator().next();
