@@ -12,4 +12,9 @@ public class BbmriEricDataResponse
 		this.biobanks = biobanks;
 	}
 
+	public List<Map<String, Object>> getBiobanks()
+	{
+		return biobanks;
+	}
+
 }

@@ -87,7 +87,6 @@ public class NlToEricConverter
 	private final String BBMRI_NL_SOURCE_ENTITY = "bbmri_nl_sample_collections";
 	private final String NL = "NL";
 	public static final String BBMRI_ERIC_CATALOGUE = "bbmri-eric_catalogue";
-	private static final String DEFAULT_CONTACT_EMAIL_PROP = "default_contact_email";
 
 	// mapping defaults
 	private final String DEFAULT_JURIDICAL_PERSON = "BBMRI-NL";
