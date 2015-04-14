@@ -66,11 +66,14 @@ import java.util.Set;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.support.DefaultEntity;
+import org.molgenis.security.runas.RunAsSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Translates BBMRI-NL sample collections to BBMRI-ERIC catalogue entries. Entries (biobanks) are stored in the
@@ -79,7 +82,7 @@ import org.springframework.stereotype.Component;
  * @author tommy
  *
  */
-@Component
+@Service
 public class NlToEricConverter
 {
 	private final DataService dataService;
@@ -179,6 +182,10 @@ public class NlToEricConverter
 		this.defaultContactEmail = defaultContactEmail;
 	}
 
+	// scheduled at midnight
+	@Scheduled(cron = "0 0 0 * * *")
+	@RunAsSystem
+	@Transactional
 	public void convertNlToEric()
 	{
 		if (defaultContactEmail == null) throw new RuntimeException(

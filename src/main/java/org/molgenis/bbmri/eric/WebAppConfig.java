@@ -33,6 +33,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
@@ -41,6 +42,7 @@ import freemarker.template.TemplateException;
 
 @Configuration
 @EnableTransactionManagement
+@EnableScheduling
 @EnableWebMvc
 @EnableAsync
 @ComponentScan("org.molgenis")
