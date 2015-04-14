@@ -1,5 +1,6 @@
 package org.molgenis.bbmri.eric.service;
 
+import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_ACRONYM;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_AVAILABLE_BIOLOGICAL_SAMPLES;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_AVAILABLE_FEMALE_SAMPLES_DATA;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_AVAILABLE_GENEALOGICAL_RECORDS;
@@ -121,6 +122,7 @@ public class NlToEricConverter
 	private final String ATT_TYPE = "type";
 	private final String ATT_DESCRIPTION = "description";
 	private final String ATT_URL = "website";
+	private final String ATT_ACRONYM = "acronym";
 
 	private static final HashMap<String, String> materialMapping = new HashMap<String, String>()
 	{
@@ -210,6 +212,7 @@ public class NlToEricConverter
 			ericBiobank.set(BIOBANK_DATA_ACCESS_URI, nlBiobank.get(ATT_BIOBANK_DATA_ACCESS_URI));
 			ericBiobank.set(BIOBANK_DESCRIPTION, nlBiobank.get(ATT_DESCRIPTION));
 			ericBiobank.set(BIOBANK_URL, nlBiobank.get(ATT_URL));
+			ericBiobank.set(BIOBANK_ACRONYM, nlBiobank.get(ATT_ACRONYM));
 
 			// contact person (only use first)
 			Entity person = nlBiobank.getEntities(ATT_CONTACT_PERSON).iterator().next();
