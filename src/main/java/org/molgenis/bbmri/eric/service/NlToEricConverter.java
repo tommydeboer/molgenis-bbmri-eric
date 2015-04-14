@@ -63,6 +63,7 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.molgenis.bbmri.eric.model.CatalogueMetaData;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.support.DefaultEntity;
@@ -91,7 +92,6 @@ public class NlToEricConverter
 
 	private final String BBMRI_NL_SOURCE_ENTITY = "bbmri_nl_sample_collections";
 	private final String NL = "NL";
-	public static final String BBMRI_ERIC_CATALOGUE = "bbmri-eric_catalogue";
 
 	// mapping defaults
 	private final String DEFAULT_JURIDICAL_PERSON = "BBMRI-NL";
@@ -199,8 +199,8 @@ public class NlToEricConverter
 		int updates = 0;
 		for (Entity nlBiobank : it)
 		{
-			DefaultEntity ericBiobank = new DefaultEntity(dataService.getEntityMetaData(BBMRI_ERIC_CATALOGUE),
-					dataService);
+			DefaultEntity ericBiobank = new DefaultEntity(
+					dataService.getEntityMetaData(CatalogueMetaData.FULLY_QUALIFIED_NAME), dataService);
 
 			// mapped attributes
 			ericBiobank.set(BIOBANK_ID, ericId((String) nlBiobank.getIdValue()));
@@ -302,14 +302,14 @@ public class NlToEricConverter
 			}
 
 			// add/update
-			if (dataService.findOne(BBMRI_ERIC_CATALOGUE, ericBiobank.getIdValue()) == null)
+			if (dataService.findOne(CatalogueMetaData.FULLY_QUALIFIED_NAME, ericBiobank.getIdValue()) == null)
 			{
-				dataService.add(BBMRI_ERIC_CATALOGUE, ericBiobank);
+				dataService.add(CatalogueMetaData.FULLY_QUALIFIED_NAME, ericBiobank);
 				adds++;
 			}
 			else
 			{
-				dataService.update(BBMRI_ERIC_CATALOGUE, ericBiobank);
+				dataService.update(CatalogueMetaData.FULLY_QUALIFIED_NAME, ericBiobank);
 				updates++;
 			}
 

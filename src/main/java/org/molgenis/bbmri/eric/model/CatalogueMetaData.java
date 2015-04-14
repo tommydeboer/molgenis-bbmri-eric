@@ -22,6 +22,7 @@ public class CatalogueMetaData extends DefaultEntityMetaData
 {
 	public static final EntityMetaData META_DATA = new CatalogueMetaData();
 	public static final String ENTITY_NAME = "catalogue";
+	public static final String FULLY_QUALIFIED_NAME = BbmriEricPackage.NAME + '_' + ENTITY_NAME;
 
 	public static final String BIOBANK_ID = "biobankID";
 	public static final String BIOBANK_NAME = "biobankName";

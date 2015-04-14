@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.molgenis.bbmri.eric.model.CatalogueMetaData;
 import org.molgenis.data.AttributeMetaData;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
@@ -33,6 +34,7 @@ public class EricController
 {
 	public static final String BASE_URI = "/bbmri";
 	private NlToEricConverter nlToEricConverter;
+	private EricDownloadService ericDownloadService;
 
 	// MIME type for LDIF
 	public static final String APPLICATION_DIRECTORY_VALUE = "application/directory";
@@ -40,13 +42,15 @@ public class EricController
 	private final DataService dataService;
 
 	@Autowired
-	public EricController(DataService dataService, NlToEricConverter nlToEricConverter)
+	public EricController(DataService dataService, NlToEricConverter nlToEricConverter,
+			EricDownloadService ericDownloadService)
 	{
 		if (dataService == null) throw new IllegalArgumentException("dataService is null");
 		if (nlToEricConverter == null) throw new IllegalArgumentException("nlToEricConverter is null");
 
 		this.dataService = dataService;
 		this.nlToEricConverter = nlToEricConverter;
+		this.ericDownloadService = ericDownloadService;
 	}
 
 	@RequestMapping(value = "", method = GET, produces = APPLICATION_JSON_VALUE)
@@ -69,7 +73,7 @@ public class EricController
 	public BbmriEricDataResponse getEricData(QueryImpl q)
 	{
 		Iterable<Entity> it = RunAsSystemProxy.runAsSystem(() -> dataService.findAll(
-				NlToEricConverter.BBMRI_ERIC_CATALOGUE, q));
+				CatalogueMetaData.FULLY_QUALIFIED_NAME, q));
 
 		List<Map<String, Object>> entities = new ArrayList<>();
 		for (Entity entity : it)
@@ -89,10 +93,20 @@ public class EricController
 	/**
 	 * TEMPORARY: remove when the nightly conversion is implemented
 	 */
-	@RequestMapping(value = "/convert", method = GET, produces = APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/convert", method = GET)
 	@ResponseBody
 	public void convert()
 	{
 		nlToEricConverter.convertNlToEric();
+	}
+
+	/**
+	 * TEMPORARY: remove when the nightly download is implemented
+	 */
+	@RequestMapping(value = "/download", method = GET)
+	@ResponseBody
+	public void downloadSources()
+	{
+		ericDownloadService.downloadSources();
 	}
 }

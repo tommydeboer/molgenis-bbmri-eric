@@ -7,6 +7,8 @@ public class BbmriEricPackage
 {
 
 	private static Package BBMRI_ERIC_PACKAGE;
+	public static final String NAME = "bbmri-eric";
+	public static final String DESCRIPTION = "Contains the BBMRI-ERIC catalogue model.";
 
 	private BbmriEricPackage()
 	{
@@ -17,7 +19,7 @@ public class BbmriEricPackage
 	{
 		if (BBMRI_ERIC_PACKAGE == null)
 		{
-			BBMRI_ERIC_PACKAGE = new PackageImpl("bbmri-eric", "Contains the BBMRI-ERIC catalogue model.");
+			BBMRI_ERIC_PACKAGE = new PackageImpl(NAME, DESCRIPTION);
 		}
 		return BBMRI_ERIC_PACKAGE;
 	}
