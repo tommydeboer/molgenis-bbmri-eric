@@ -96,6 +96,9 @@ public class CatalogueMetaData extends DefaultEntityMetaData
 	public static final String BIOBANK_DESCRIPTION = "biobankDescription";
 	public static final String BIOBANK_URL = "biobankURL";
 
+	public static final String BIOBANK_ACRONYM = "biobankAcronym";
+	public static final String BIOBANK_MATERIAL_STORED_RNA = "biobankMaterialStoredRNA";
+
 	public CatalogueMetaData()
 	{
 		super(ENTITY_NAME, BbmriEricPackage.getPackage());
@@ -174,5 +177,8 @@ public class CatalogueMetaData extends DefaultEntityMetaData
 		addAttribute(BIOBANK_STANDALONE).setDataType(BOOL).setNillable(false);
 		addAttribute(BIOBANK_DESCRIPTION).setDataType(TEXT).setNillable(true);
 		addAttribute(BIOBANK_URL).setDataType(HYPERLINK).setNillable(true);
+
+		addAttribute(BIOBANK_ACRONYM).setDataType(STRING).setNillable(true);
+		addAttribute(BIOBANK_MATERIAL_STORED_RNA).setDataType(BOOL).setNillable(false);
 	}
 }
