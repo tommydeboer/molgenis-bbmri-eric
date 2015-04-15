@@ -1,6 +1,7 @@
 package org.molgenis.bbmri.eric.service;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Map;
@@ -69,12 +70,12 @@ public class EricDownloadService
 		int sources = 0;
 		for (Entity source : it)
 		{
+			OutputStream out = new ByteArrayOutputStream();
 			try
 			{
 				LOG.info(String.format("Importing ERIC biobanks from %s", source.get(EricSourceMetaData.SOURCE)
 						.toString()));
 
-				OutputStream out = new ByteArrayOutputStream();
 				URL request = new URL(source.get(EricSourceMetaData.SOURCE).toString());
 				FileCopyUtils.copy(request.openStream(), out);
 				BbmriEricDataResponse bedr = gson.fromJson(out.toString(), BbmriEricDataResponse.class);
@@ -102,11 +103,22 @@ public class EricDownloadService
 				}
 				sources++;
 			}
-			catch (Exception e)
+			catch (Throwable t)
 			{
 				LOG.warn(String.format("Couldn't parse JSON from %s - Check if the URL or JSON is valid.",
 						source.get(EricSourceMetaData.SOURCE)));
-				LOG.warn(e.toString());
+				LOG.warn(t.toString());
+			}
+			finally
+			{
+				try
+				{
+					out.close();
+				}
+				catch (IOException e)
+				{
+					LOG.warn(e.toString());
+				}
 			}
 
 		}
