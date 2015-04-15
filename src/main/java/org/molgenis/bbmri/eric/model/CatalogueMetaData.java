@@ -22,6 +22,7 @@ public class CatalogueMetaData extends DefaultEntityMetaData
 {
 	public static final EntityMetaData META_DATA = new CatalogueMetaData();
 	public static final String ENTITY_NAME = "catalogue";
+	public static final String FULLY_QUALIFIED_NAME = BbmriEricPackage.NAME + '_' + ENTITY_NAME;
 
 	public static final String BIOBANK_ID = "biobankID";
 	public static final String BIOBANK_NAME = "biobankName";
@@ -92,6 +93,8 @@ public class CatalogueMetaData extends DefaultEntityMetaData
 	public static final String BIOBANK_POPULATION = "biobankPopulation";
 	public static final String BIOBANK_RESEARCH_STUDY = "biobankResearchStudy";
 	public static final String BIOBANK_STANDALONE = "biobankStandalone";
+	public static final String BIOBANK_DESCRIPTION = "biobankDescription";
+	public static final String BIOBANK_URL = "biobankURL";
 
 	public CatalogueMetaData()
 	{
@@ -169,5 +172,7 @@ public class CatalogueMetaData extends DefaultEntityMetaData
 		addAttribute(BIOBANK_POPULATION).setDataType(BOOL).setNillable(false);
 		addAttribute(BIOBANK_RESEARCH_STUDY).setDataType(BOOL).setNillable(false);
 		addAttribute(BIOBANK_STANDALONE).setDataType(BOOL).setNillable(false);
+		addAttribute(BIOBANK_DESCRIPTION).setDataType(TEXT).setNillable(true);
+		addAttribute(BIOBANK_URL).setDataType(HYPERLINK).setNillable(true);
 	}
 }

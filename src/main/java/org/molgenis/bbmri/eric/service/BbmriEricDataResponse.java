@@ -5,7 +5,12 @@ import java.util.Map;
 
 public class BbmriEricDataResponse
 {
-	private final List<Map<String, Object>> biobanks;
+	private List<Map<String, Object>> biobanks;
+
+	public BbmriEricDataResponse()
+	{
+
+	}
 
 	public BbmriEricDataResponse(List<Map<String, Object>> biobanks)
 	{
@@ -15,6 +20,11 @@ public class BbmriEricDataResponse
 	public List<Map<String, Object>> getBiobanks()
 	{
 		return biobanks;
+	}
+
+	public void setBiobanks(List<Map<String, Object>> biobanks)
+	{
+		this.biobanks = biobanks;
 	}
 
 }
