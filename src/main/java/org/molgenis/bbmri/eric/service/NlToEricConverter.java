@@ -40,6 +40,7 @@ import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_S
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_PATHOGEN;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_PBC;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_PLASMA;
+import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_RNA;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_SALIVA;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_SERUM;
 import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_TISSUE_CRYO;
@@ -142,6 +143,7 @@ public class NlToEricConverter
 			put(BIOBANK_MATERIAL_STORED_SALIVA, "SALIVA");
 			put(BIOBANK_MATERIAL_STORED_FAECES, "FECES");
 			put(BIOBANK_MATERIAL_STORED_PATHOGEN, "PATHOGEN");
+			put(BIOBANK_MATERIAL_STORED_RNA, "RNA");
 			put(BIOBANK_MATERIAL_STORED_OTHER, "OTHER");
 		}
 	};
