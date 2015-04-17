@@ -187,7 +187,7 @@ public class NlToEricConverter
 	}
 
 	// scheduled at midnight
-	@Scheduled(cron = "0 0 0 * * *")
+	@Scheduled(cron = "0 5 0 * * *")
 	@RunAsSystem
 	@Transactional
 	public void convertNlToEric()
