@@ -4,16 +4,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import org.molgenis.bbmri.eric.model.BbmriEricPackage;
 import org.molgenis.bbmri.eric.model.CatalogueMetaData;
 import org.molgenis.bbmri.eric.model.EricSourceMetaData;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
+import org.molgenis.data.QueryRule;
+import org.molgenis.data.QueryRule.Operator;
 import org.molgenis.data.support.DefaultEntity;
-import org.molgenis.security.runas.RunAsSystem;
+import org.molgenis.data.support.QueryImpl;
+import org.molgenis.security.core.runas.RunAsSystem;
+import org.molgenis.security.core.runas.RunAsSystemProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +41,6 @@ public class EricDownloadService
 {
 	private static final Logger LOG = LoggerFactory.getLogger(EricDownloadService.class);
 
-	private static final String ERIC_SOURCE_ENTITY = BbmriEricPackage.NAME + '_' + EricSourceMetaData.ENTITY_NAME;
-
 	private DataService dataService;
 	private Gson gson;
 
@@ -53,7 +56,7 @@ public class EricDownloadService
 	@Transactional
 	public void downloadSources()
 	{
-		Iterable<Entity> it = dataService.findAll(ERIC_SOURCE_ENTITY);
+		Iterable<Entity> it = dataService.findAll(CatalogueMetaData.FULLY_QUALIFIED_NAME);
 
 		if (!it.iterator().hasNext())
 		{
@@ -76,10 +79,33 @@ public class EricDownloadService
 				LOG.info(String.format("Importing ERIC biobanks from %s", source.get(EricSourceMetaData.SOURCE)
 						.toString()));
 
+				// get the JSON from this source
 				URL request = new URL(source.get(EricSourceMetaData.SOURCE).toString());
 				FileCopyUtils.copy(request.openStream(), out);
 				BbmriEricDataResponse bedr = gson.fromJson(out.toString(), BbmriEricDataResponse.class);
 
+				// we want to delete all old data of each node so find all nodes present in the JSON
+				Set<String> nodes = new HashSet<>();
+				if (bedr.getBiobanks().iterator().hasNext())
+				{
+					for (Map<String, Object> entry : bedr.getBiobanks())
+					{
+						nodes.add(entry.get(CatalogueMetaData.BIOBANK_COUNTRY).toString());
+					}
+				}
+
+				// delete entities for each node
+				for (String node : nodes)
+				{
+					QueryImpl q = new QueryImpl();
+					q.addRule(new QueryRule("biobankCountry", Operator.EQUALS, node.toUpperCase()));
+					Iterable<Entity> entitiesToDelete = RunAsSystemProxy.runAsSystem(() -> dataService.findAll(
+							CatalogueMetaData.FULLY_QUALIFIED_NAME, q));
+
+					dataService.delete(CatalogueMetaData.FULLY_QUALIFIED_NAME, entitiesToDelete);
+				}
+
+				// add new catalogue entities
 				for (Map<String, Object> biobank : bedr.getBiobanks())
 				{
 					DefaultEntity ericBiobank = new DefaultEntity(
@@ -87,18 +113,9 @@ public class EricDownloadService
 					for (Entry<String, Object> entry : biobank.entrySet())
 					{
 						ericBiobank.set(entry.getKey(), entry.getValue());
-					}
 
-					// add/update
-					if (dataService.findOne(CatalogueMetaData.FULLY_QUALIFIED_NAME, ericBiobank.getIdValue()) == null)
-					{
 						dataService.add(CatalogueMetaData.FULLY_QUALIFIED_NAME, ericBiobank);
 						adds++;
-					}
-					else
-					{
-						dataService.update(CatalogueMetaData.FULLY_QUALIFIED_NAME, ericBiobank);
-						updates++;
 					}
 				}
 				sources++;
@@ -123,7 +140,7 @@ public class EricDownloadService
 
 		}
 
-		LOG.info(String.format("Imported %s source(s). Added %s biobank(s). Updated %s biobank(s).",
-				Integer.toString(sources), Integer.toString(adds), Integer.toString(updates)));
+		LOG.info(String.format("Imported %s source(s). Added %s biobank(s).", Integer.toString(sources),
+				Integer.toString(adds), Integer.toString(updates)));
 	}
 }

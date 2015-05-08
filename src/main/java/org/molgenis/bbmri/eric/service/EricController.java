@@ -16,7 +16,7 @@ import org.molgenis.data.Entity;
 import org.molgenis.data.QueryRule;
 import org.molgenis.data.QueryRule.Operator;
 import org.molgenis.data.support.QueryImpl;
-import org.molgenis.security.runas.RunAsSystemProxy;
+import org.molgenis.security.core.runas.RunAsSystemProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;

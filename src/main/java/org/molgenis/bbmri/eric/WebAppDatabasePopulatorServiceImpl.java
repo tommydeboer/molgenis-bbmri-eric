@@ -18,7 +18,7 @@ import org.molgenis.dataexplorer.controller.DataExplorerController;
 import org.molgenis.framework.db.WebAppDatabasePopulatorService;
 import org.molgenis.security.MolgenisSecurityWebAppDatabasePopulatorService;
 import org.molgenis.security.account.AccountService;
-import org.molgenis.security.runas.RunAsSystem;
+import org.molgenis.security.core.runas.RunAsSystem;
 import org.molgenis.system.core.RuntimeProperty;
 import org.molgenis.ui.MolgenisInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
