@@ -1,7 +1,6 @@
 package org.molgenis.bbmri.eric.service;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -74,8 +73,8 @@ public class EricDownloadService
 		int sources = 0;
 		for (Entity source : it)
 		{
-			OutputStream out = new ByteArrayOutputStream();
-			try
+
+			try (OutputStream out = new ByteArrayOutputStream();)
 			{
 				LOG.info(String.format("Importing ERIC biobanks from %s", source.get(EricSourceMetaData.SOURCE)
 						.toString()));
@@ -141,17 +140,6 @@ public class EricDownloadService
 			{
 				LOG.warn(String.format("Couldn't import JSON from %s ", source.get(EricSourceMetaData.SOURCE)));
 				LOG.warn(t.toString());
-			}
-			finally
-			{
-				try
-				{
-					out.close();
-				}
-				catch (IOException e)
-				{
-					LOG.warn(e.toString());
-				}
 			}
 
 		}
