@@ -141,9 +141,8 @@ public class EricDownloadService
 				LOG.warn(String.format("Couldn't import JSON from %s ", source.get(EricSourceMetaData.SOURCE)));
 				LOG.warn(t.toString());
 			}
-
 		}
 
-		LOG.info(String.format("Imported %s source(s). Added %s biobank(s).", Integer.toString(sources)));
+		LOG.info(String.format("Imported %s source(s).", Integer.toString(sources)));
 	}
 }
