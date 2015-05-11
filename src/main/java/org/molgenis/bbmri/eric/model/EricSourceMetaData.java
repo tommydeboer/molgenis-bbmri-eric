@@ -18,6 +18,7 @@ public class EricSourceMetaData extends DefaultEntityMetaData
 
 	public static final String ID = "id";
 	public static final String SOURCE = "source";
+	public static final String FULLY_QUALIFIED_NAME = BbmriEricPackage.NAME + '_' + ENTITY_NAME;
 
 	public EricSourceMetaData()
 	{

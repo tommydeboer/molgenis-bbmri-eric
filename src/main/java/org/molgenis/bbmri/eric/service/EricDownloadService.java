@@ -4,7 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 
 /**
  * Service that downloads JSON objects from ERIC sources every midnight. The biobanks are added to the BBMRI ERIC
@@ -56,7 +59,7 @@ public class EricDownloadService
 	@Transactional
 	public void downloadSources()
 	{
-		Iterable<Entity> it = dataService.findAll(CatalogueMetaData.FULLY_QUALIFIED_NAME);
+		Iterable<Entity> it = dataService.findAll(EricSourceMetaData.FULLY_QUALIFIED_NAME);
 
 		if (!it.iterator().hasNext())
 		{
@@ -68,8 +71,6 @@ public class EricDownloadService
 			LOG.info("Starting biobanks import of external ERIC sources.");
 		}
 
-		int adds = 0;
-		int updates = 0;
 		int sources = 0;
 		for (Entity source : it)
 		{
@@ -94,6 +95,7 @@ public class EricDownloadService
 					}
 				}
 
+				LOG.info(String.format("Deleting old biobanks for nodes: %s", nodes.toString()));
 				// delete entities for each node
 				for (String node : nodes)
 				{
@@ -106,24 +108,38 @@ public class EricDownloadService
 				}
 
 				// add new catalogue entities
+				List<Entity> biobanksToAdd = new ArrayList<>();
 				for (Map<String, Object> biobank : bedr.getBiobanks())
 				{
 					DefaultEntity ericBiobank = new DefaultEntity(
 							dataService.getEntityMetaData(CatalogueMetaData.FULLY_QUALIFIED_NAME), dataService);
 					for (Entry<String, Object> entry : biobank.entrySet())
 					{
-						ericBiobank.set(entry.getKey(), entry.getValue());
+						if (entry.getValue() instanceof Map)
+						{
+							@SuppressWarnings("unchecked")
+							LinkedTreeMap<String, Object> compoundEntries = (LinkedTreeMap<String, Object>) entry
+									.getValue();
 
-						dataService.add(CatalogueMetaData.FULLY_QUALIFIED_NAME, ericBiobank);
-						adds++;
+							for (Entry<String, Object> compoundEntry : compoundEntries.entrySet())
+							{
+								ericBiobank.set(compoundEntry.getKey(), compoundEntry.getValue());
+							}
+						}
+						else
+						{
+							ericBiobank.set(entry.getKey(), entry.getValue());
+						}
+
 					}
+					biobanksToAdd.add(ericBiobank);
 				}
+				dataService.add(CatalogueMetaData.FULLY_QUALIFIED_NAME, biobanksToAdd);
 				sources++;
 			}
 			catch (Throwable t)
 			{
-				LOG.warn(String.format("Couldn't parse JSON from %s - Check if the URL or JSON is valid.",
-						source.get(EricSourceMetaData.SOURCE)));
+				LOG.warn(String.format("Couldn't import JSON from %s ", source.get(EricSourceMetaData.SOURCE)));
 				LOG.warn(t.toString());
 			}
 			finally
@@ -140,7 +156,6 @@ public class EricDownloadService
 
 		}
 
-		LOG.info(String.format("Imported %s source(s). Added %s biobank(s).", Integer.toString(sources),
-				Integer.toString(adds), Integer.toString(updates)));
+		LOG.info(String.format("Imported %s source(s). Added %s biobank(s).", Integer.toString(sources)));
 	}
 }
