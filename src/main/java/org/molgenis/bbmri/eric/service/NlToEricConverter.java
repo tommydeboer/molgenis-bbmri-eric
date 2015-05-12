@@ -68,8 +68,12 @@ import java.util.Set;
 import org.molgenis.bbmri.eric.model.CatalogueMetaData;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
+import org.molgenis.data.QueryRule;
+import org.molgenis.data.QueryRule.Operator;
 import org.molgenis.data.support.DefaultEntity;
-import org.molgenis.security.runas.RunAsSystem;
+import org.molgenis.data.support.QueryImpl;
+import org.molgenis.security.core.runas.RunAsSystem;
+import org.molgenis.security.core.runas.RunAsSystemProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,7 +190,7 @@ public class NlToEricConverter
 		this.defaultContactEmail = defaultContactEmail;
 	}
 
-	// scheduled at midnight
+	// scheduled at midnight-ish
 	@Scheduled(cron = "0 5 0 * * *")
 	@RunAsSystem
 	@Transactional
@@ -195,12 +199,21 @@ public class NlToEricConverter
 		if (defaultContactEmail == null) throw new RuntimeException(
 				"Please set default_contact_email in molgenis-server.properties");
 
+		// delete old NL nodes
+		LOG.info("Deleting old NL catalogue nodes");
+
+		QueryImpl q = new QueryImpl();
+		q.addRule(new QueryRule("biobankCountry", Operator.EQUALS, NL));
+		Iterable<Entity> entitiesToDelete = RunAsSystemProxy.runAsSystem(() -> dataService.findAll(
+				CatalogueMetaData.FULLY_QUALIFIED_NAME, q));
+
+		dataService.delete(CatalogueMetaData.FULLY_QUALIFIED_NAME, entitiesToDelete);
+
 		LOG.info("Starting conversion of BBMRI-NL data to BBMRI-ERIC. BBMRI-NL entity = {}", BBMRI_NL_SOURCE_ENTITY);
 
 		Iterable<Entity> it = dataService.findAll(BBMRI_NL_SOURCE_ENTITY);
 
 		int adds = 0;
-		int updates = 0;
 		for (Entity nlBiobank : it)
 		{
 			DefaultEntity ericBiobank = new DefaultEntity(
@@ -306,21 +319,11 @@ public class NlToEricConverter
 				ericBiobank.set(BIOBANK_STANDALONE, false);
 			}
 
-			// add/update
-			if (dataService.findOne(CatalogueMetaData.FULLY_QUALIFIED_NAME, ericBiobank.getIdValue()) == null)
-			{
-				dataService.add(CatalogueMetaData.FULLY_QUALIFIED_NAME, ericBiobank);
-				adds++;
-			}
-			else
-			{
-				dataService.update(CatalogueMetaData.FULLY_QUALIFIED_NAME, ericBiobank);
-				updates++;
-			}
+			dataService.add(CatalogueMetaData.FULLY_QUALIFIED_NAME, ericBiobank);
+			adds++;
 
 		}
-		LOG.info(String.format("Added %s biobanks. Updated %s biobanks.", Integer.toString(adds),
-				Integer.toString(updates)));
+		LOG.info(String.format("Added %s NL biobanks.", Integer.toString(adds)));
 	}
 
 	/**

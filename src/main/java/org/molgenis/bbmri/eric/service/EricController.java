@@ -16,7 +16,7 @@ import org.molgenis.data.Entity;
 import org.molgenis.data.QueryRule;
 import org.molgenis.data.QueryRule.Operator;
 import org.molgenis.data.support.QueryImpl;
-import org.molgenis.security.runas.RunAsSystemProxy;
+import org.molgenis.security.core.runas.RunAsSystemProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -75,15 +75,34 @@ public class EricController
 		Iterable<Entity> it = RunAsSystemProxy.runAsSystem(() -> dataService.findAll(
 				CatalogueMetaData.FULLY_QUALIFIED_NAME, q));
 
+		// workaround for not being able to get all compound attributes from an entity
+		String[] compounds =
+		{ CatalogueMetaData.BIOBANK_TYPE, CatalogueMetaData.BIOBANK_DONORS,
+				CatalogueMetaData.BIOBANK_DATA_AVAILABILITY, CatalogueMetaData.BIOBANK_MATERIAL,
+				CatalogueMetaData.BIOBANK_SAMPLE_ACCESS, CatalogueMetaData.BIOBANK_DATA_ACCESS,
+				CatalogueMetaData.BIOBANK_IT, CatalogueMetaData.BIOBANK_CONTACT };
+
 		List<Map<String, Object>> entities = new ArrayList<>();
 		for (Entity entity : it)
 		{
 			Map<String, Object> entityMap = new LinkedHashMap<>();
 
-			for (AttributeMetaData attr : entity.getEntityMetaData().getAtomicAttributes())
+			// non compound attributes
+			for (AttributeMetaData attr : entity.getEntityMetaData().getAttributes())
 			{
 				entityMap.put(attr.getName(), entity.getString(attr.getName()));
 			}
+
+			for (String compound : compounds)
+			{
+				Map<String, Object> compoundMap = new LinkedHashMap<>();
+
+				entity.getEntityMetaData().getAttribute(compound).getAttributeParts()
+						.forEach(attr -> compoundMap.put(attr.getName(), entity.getString(attr.getName())));
+
+				entityMap.put(compound, compoundMap);
+			}
+
 			entities.add(entityMap);
 		}
 
