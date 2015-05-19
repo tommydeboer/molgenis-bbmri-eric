@@ -9,12 +9,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.molgenis.MolgenisFieldTypes;
 import org.molgenis.bbmri.eric.model.CatalogueMetaData;
 import org.molgenis.data.AttributeMetaData;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
-import org.molgenis.data.QueryRule;
-import org.molgenis.data.QueryRule.Operator;
+import org.molgenis.data.Query;
 import org.molgenis.data.support.QueryImpl;
 import org.molgenis.security.core.runas.RunAsSystemProxy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,43 +64,37 @@ public class EricController
 	@ResponseBody
 	public BbmriEricDataResponse retrieveBbmriDataAsJson(@PathVariable("node") String node)
 	{
-		QueryImpl q = new QueryImpl();
-		q.addRule(new QueryRule("biobankCountry", Operator.EQUALS, node.toUpperCase()));
+		Query q = new QueryImpl().eq("biobankCountry", node.toUpperCase());
 
 		return getEricData(q);
 	}
 
-	public BbmriEricDataResponse getEricData(QueryImpl q)
+	public BbmriEricDataResponse getEricData(Query q)
 	{
 		Iterable<Entity> it = RunAsSystemProxy.runAsSystem(() -> dataService.findAll(
 				CatalogueMetaData.FULLY_QUALIFIED_NAME, q));
-
-		// workaround for not being able to get all compound attributes from an entity
-		String[] compounds =
-		{ CatalogueMetaData.BIOBANK_TYPE, CatalogueMetaData.BIOBANK_DONORS,
-				CatalogueMetaData.BIOBANK_DATA_AVAILABILITY, CatalogueMetaData.BIOBANK_MATERIAL,
-				CatalogueMetaData.BIOBANK_SAMPLE_ACCESS, CatalogueMetaData.BIOBANK_DATA_ACCESS,
-				CatalogueMetaData.BIOBANK_IT, CatalogueMetaData.BIOBANK_CONTACT };
 
 		List<Map<String, Object>> entities = new ArrayList<>();
 		for (Entity entity : it)
 		{
 			Map<String, Object> entityMap = new LinkedHashMap<>();
 
-			// non compound attributes
 			for (AttributeMetaData attr : entity.getEntityMetaData().getAttributes())
 			{
-				entityMap.put(attr.getName(), entity.getString(attr.getName()));
-			}
 
-			for (String compound : compounds)
-			{
-				Map<String, Object> compoundMap = new LinkedHashMap<>();
-
-				entity.getEntityMetaData().getAttribute(compound).getAttributeParts()
-						.forEach(attr -> compoundMap.put(attr.getName(), entity.getString(attr.getName())));
-
-				entityMap.put(compound, compoundMap);
+				if (attr.getDataType().equals(MolgenisFieldTypes.COMPOUND))
+				{
+					Map<String, Object> compoundMap = new LinkedHashMap<>();
+					for (AttributeMetaData innerAttr : attr.getAttributeParts())
+					{
+						compoundMap.put(innerAttr.getName(), entity.getString(innerAttr.getName()));
+					}
+					entityMap.put(attr.getName(), compoundMap);
+				}
+				else
+				{
+					entityMap.put(attr.getName(), entity.getString(attr.getName()));
+				}
 			}
 
 			entities.add(entityMap);
@@ -109,9 +103,6 @@ public class EricController
 		return new BbmriEricDataResponse(entities);
 	}
 
-	/**
-	 * TEMPORARY: remove when the nightly conversion is implemented
-	 */
 	@RequestMapping(value = "/convert", method = GET)
 	@ResponseBody
 	public void convert()
@@ -119,9 +110,6 @@ public class EricController
 		nlToEricConverter.convertNlToEric();
 	}
 
-	/**
-	 * TEMPORARY: remove when the nightly download is implemented
-	 */
 	@RequestMapping(value = "/download", method = GET)
 	@ResponseBody
 	public void downloadSources()
