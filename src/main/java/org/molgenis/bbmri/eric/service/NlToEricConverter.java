@@ -68,8 +68,7 @@ import java.util.Set;
 import org.molgenis.bbmri.eric.model.CatalogueMetaData;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
-import org.molgenis.data.QueryRule;
-import org.molgenis.data.QueryRule.Operator;
+import org.molgenis.data.Query;
 import org.molgenis.data.support.DefaultEntity;
 import org.molgenis.data.support.QueryImpl;
 import org.molgenis.security.core.runas.RunAsSystem;
@@ -202,8 +201,7 @@ public class NlToEricConverter
 		// delete old NL nodes
 		LOG.info("Deleting old NL catalogue nodes");
 
-		QueryImpl q = new QueryImpl();
-		q.addRule(new QueryRule("biobankCountry", Operator.EQUALS, NL));
+		Query q = new QueryImpl().eq("biobankCountry", NL);
 		Iterable<Entity> entitiesToDelete = RunAsSystemProxy.runAsSystem(() -> dataService.findAll(
 				CatalogueMetaData.FULLY_QUALIFIED_NAME, q));
 

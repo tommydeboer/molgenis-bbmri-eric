@@ -14,8 +14,7 @@ import org.molgenis.bbmri.eric.model.CatalogueMetaData;
 import org.molgenis.bbmri.eric.model.EricSourceMetaData;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
-import org.molgenis.data.QueryRule;
-import org.molgenis.data.QueryRule.Operator;
+import org.molgenis.data.Query;
 import org.molgenis.data.support.DefaultEntity;
 import org.molgenis.data.support.QueryImpl;
 import org.molgenis.security.core.runas.RunAsSystem;
@@ -98,8 +97,7 @@ public class EricDownloadService
 				// delete entities for each node
 				for (String node : nodes)
 				{
-					QueryImpl q = new QueryImpl();
-					q.addRule(new QueryRule("biobankCountry", Operator.EQUALS, node.toUpperCase()));
+					Query q = new QueryImpl().eq("biobankCountry", node.toUpperCase());
 					Iterable<Entity> entitiesToDelete = RunAsSystemProxy.runAsSystem(() -> dataService.findAll(
 							CatalogueMetaData.FULLY_QUALIFIED_NAME, q));
 
@@ -143,6 +141,6 @@ public class EricDownloadService
 			}
 		}
 
-		LOG.info(String.format("Imported %s source(s).", Integer.toString(sources)));
+		LOG.info(String.format("Imported %d source(s).", sources));
 	}
 }
