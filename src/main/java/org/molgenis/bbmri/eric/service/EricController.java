@@ -53,7 +53,7 @@ public class EricController
 		this.ericDownloadService = ericDownloadService;
 	}
 
-	@RequestMapping(value = "", method = GET, produces = APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/all", method = GET, produces = APPLICATION_JSON_VALUE)
 	@ResponseBody
 	public BbmriEricDataResponse retrieveAllNodes()
 	{
