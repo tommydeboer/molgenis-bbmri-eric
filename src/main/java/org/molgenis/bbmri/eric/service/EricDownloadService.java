@@ -57,12 +57,21 @@ public class EricDownloadService
 	@Transactional
 	public void downloadSources()
 	{
+		downloadSources();
+	}
+
+	@RunAsSystem
+	@Transactional
+	public DownloadReport downloadSourcesOnDemand()
+	{
+		DownloadReport downloadReport = new DownloadReport();
+
 		Iterable<Entity> it = dataService.findAll(EricSourceMetaData.FULLY_QUALIFIED_NAME);
 
 		if (!it.iterator().hasNext())
 		{
 			LOG.info("No ERIC sources to download.");
-			return;
+			return downloadReport;
 		}
 		else
 		{
@@ -72,14 +81,16 @@ public class EricDownloadService
 		int sources = 0;
 		for (Entity source : it)
 		{
+			DownloadSourceReport downloadSourceReport = new DownloadSourceReport();
+			String sourceUrl = source.get(EricSourceMetaData.SOURCE).toString();
+			downloadSourceReport.setSource(sourceUrl);
 
 			try (OutputStream out = new ByteArrayOutputStream();)
 			{
-				LOG.info(String.format("Importing ERIC biobanks from %s", source.get(EricSourceMetaData.SOURCE)
-						.toString()));
+				LOG.info(String.format("Importing ERIC biobanks from %s", sourceUrl));
 
 				// get the JSON from this source
-				URL request = new URL(source.get(EricSourceMetaData.SOURCE).toString());
+				URL request = new URL(sourceUrl);
 				FileCopyUtils.copy(request.openStream(), out);
 				BbmriEricDataResponse bedr = gson.fromJson(out.toString(), BbmriEricDataResponse.class);
 
@@ -133,14 +144,91 @@ public class EricDownloadService
 				}
 				dataService.add(CatalogueMetaData.FULLY_QUALIFIED_NAME, biobanksToAdd);
 				sources++;
+
+				downloadSourceReport.setStatus(DownloadSourceReport.Status.SUCCESS);
 			}
 			catch (Throwable t)
 			{
 				LOG.warn(String.format("Couldn't import JSON from %s ", source.get(EricSourceMetaData.SOURCE)));
 				LOG.warn(t.toString());
+				downloadSourceReport.setStatus(DownloadSourceReport.Status.ERROR);
 			}
+			downloadReport.addSourceReport(downloadSourceReport);
 		}
 
 		LOG.info(String.format("Imported %d source(s).", sources));
+		return downloadReport;
+	}
+
+	public static class DownloadSourceReport
+	{
+		public enum Status
+		{
+			UNKNOWN, SUCCESS, ERROR
+		}
+
+		private String source;
+		private Status status;
+		private String message;
+
+		public DownloadSourceReport()
+		{
+			this.status = Status.UNKNOWN;
+		}
+
+		public String getSource()
+		{
+			return source;
+		}
+
+		public void setSource(String source)
+		{
+			this.source = source;
+		}
+
+		public Status getStatus()
+		{
+			return status;
+		}
+
+		public void setStatus(Status status)
+		{
+			this.status = status;
+		}
+
+		public String getMessage()
+		{
+			return message;
+		}
+
+		public void setMessage(String message)
+		{
+			this.message = message;
+		}
+	}
+
+	public static class DownloadReport
+	{
+		private List<DownloadSourceReport> reports;
+
+		public DownloadReport()
+		{
+			this.reports = new ArrayList<DownloadSourceReport>();
+		}
+
+		private void addSourceReport(DownloadSourceReport sourceReport)
+		{
+			this.reports.add(sourceReport);
+		}
+
+		public List<DownloadSourceReport> getReports()
+		{
+			return reports;
+		}
+
+		public void setReports(List<DownloadSourceReport> reports)
+		{
+			this.reports = reports;
+		}
 	}
 }
