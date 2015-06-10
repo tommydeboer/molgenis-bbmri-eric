@@ -1,6 +1,6 @@
-package org.molgenis.bbmri.eric.service;
+package org.molgenis.bbmri.eric.controller;
 
-import static org.molgenis.bbmri.eric.service.EricController.BASE_URI;
+import static org.molgenis.bbmri.eric.controller.EricController.BASE_URI;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -11,6 +11,9 @@ import java.util.Map;
 
 import org.molgenis.MolgenisFieldTypes;
 import org.molgenis.bbmri.eric.model.CatalogueMetaData;
+import org.molgenis.bbmri.eric.service.BbmriEricDataResponse;
+import org.molgenis.bbmri.eric.service.EricDownloadService;
+import org.molgenis.bbmri.eric.service.NlToEricConverter;
 import org.molgenis.data.AttributeMetaData;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
@@ -108,12 +111,5 @@ public class EricController
 	public void convert()
 	{
 		nlToEricConverter.convertNlToEric();
-	}
-
-	@RequestMapping(value = "/download", method = GET)
-	@ResponseBody
-	public void downloadSources()
-	{
-		ericDownloadService.downloadSources();
 	}
 }
