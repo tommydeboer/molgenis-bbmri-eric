@@ -14,21 +14,25 @@
 			onClick : function() {
 				$('#download-result-container').empty();
 				$.post(molgenis.getContextUrl() + '/download').done(function(data) {
-					var items = [];
-					items.push('<table class="table table-striped">');
-					items.push('<thead>');
-					items.push('<th>Source</th><th>Status</th><th>Message</th>');
-					items.push('</thead>');
-					items.push('<tbody>');
-					$.each(data.reports, function(i, report) {
-						items.push('<tr>');
-						items.push('<td>' + report.source + '</td><td>' + report.status + '</td><td>' + (report.message ? report.message : '') + '</td>');
-						items.push('</tr>');
-					});
-					items.push('</tbody>');
-					items.push('</table>');
+					if(data.reports && data.reports.length > 0) {
+						var items = [];
+						items.push('<table class="table table-striped">');
+						items.push('<thead>');
+						items.push('<th>Source</th><th>Status</th><th>Message</th>');
+						items.push('</thead>');
+						items.push('<tbody>');
+						$.each(data.reports, function(i, report) {
+							items.push('<tr>');
+							items.push('<td>' + report.source + '</td><td>' + report.status + '</td><td>' + (report.message ? report.message : '') + '</td>');
+							items.push('</tr>');
+						});
+						items.push('</tbody>');
+						items.push('</table>');
+						$('#download-result-container').html(items.join(''));
+					} else {
+						$('#download-result-container').html('<strong>No sources to download, please configure sources before downloading.</strong>');	
+					}
 					
-					$('#download-result-container').html(items.join(''));
 				});
 			},
 		}, 'Download'), $('#download-btn-container')[0]);
