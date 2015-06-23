@@ -21,6 +21,9 @@ public class StaffSizeMetaData extends DefaultEntityMetaData
 	{
 		super(ENTITY_NAME, BbmriEricPackage.getPackage());
 
+		setLabel("IT Staff size");
+		setDescription("Size of the biobank staff");
+
 		addAttribute(ID).setIdAttribute(true).setDataType(INT).setNillable(false).setLabel("ID").setDescription("ID");
 		addAttribute(LABEL).setDataType(STRING).setNillable(false).setLabelAttribute(true).setLabel("Label")
 				.setDescription("Label");

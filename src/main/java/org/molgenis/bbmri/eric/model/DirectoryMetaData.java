@@ -118,11 +118,14 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 	{
 		super(ENTITY_NAME, BbmriEricPackage.getPackage());
 
+		setLabel("Biobank Directory");
+		setDescription("BBMRI-ERIC Biobank Directory");
+
 		addAttribute(BIOBANK_ID).setDataType(STRING).setNillable(false).setIdAttribute(true).setLabel("ID")
 				.setDescription("Unique ID of the biobank within BBMRI ERIC");
 		addAttribute(BIOBANK_NAME).setDataType(STRING).setNillable(false).setLabelAttribute(true)
 				.setLookupAttribute(true).setLabel("Name").setDescription("Name of the biobank");
-		addAttribute(BIOBANK_JURIDICAL_PERSON).setDataType(STRING).setNillable(false).setLabel("Juridical Person")
+		addAttribute(BIOBANK_JURIDICAL_PERSON).setDataType(STRING).setNillable(false).setLabel("Organisation")
 				.setDescription("Juristic person that hosts the biobank");
 		addAttribute(BIOBANK_COUNTRY).setDataType(STRING).setNillable(false).setAggregateable(true).setLabel("Country")
 				.setDescription("Country of residence of the biobank");
@@ -159,7 +162,7 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 		type.add(new DefaultAttributeMetaData(BIOBANK_STANDALONE).setDataType(BOOL).setNillable(false)
 				.setAggregateable(true).setLabel("Stand-alone collection")
 				.setDescription("Standalone collection standing outside of a biobank"));
-		addAttribute(BIOBANK_TYPE).setDataType(COMPOUND).setAttributesMetaData(type);
+		addAttribute(BIOBANK_TYPE).setDataType(COMPOUND).setLabel("Biobank type").setAttributesMetaData(type);
 
 		// Biobank Donors Compound
 		List<AttributeMetaData> donor = Lists.newArrayList();
@@ -169,7 +172,7 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 		donor.add(new DefaultAttributeMetaData(BIOBANK_AVAILABLE_FEMALE_SAMPLES_DATA).setDataType(BOOL)
 				.setNillable(true).setAggregateable(true).setLabel("Female")
 				.setDescription("Denotes whether samples/data of male patients/donors are available"));
-		addAttribute(BIOBANK_DONORS).setDataType(COMPOUND).setAttributesMetaData(donor);
+		addAttribute(BIOBANK_DONORS).setDataType(COMPOUND).setLabel("Donors").setAttributesMetaData(donor);
 
 		// Biobank Data Availability Compound
 		List<AttributeMetaData> data = Lists.newArrayList();
@@ -198,7 +201,8 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 				.setDescription("Are there physiological/biochemical measurements available?"));
 		data.add(new DefaultAttributeMetaData(BIOBANK_AVAILABLE_OTHER).setDataType(BOOL).setNillable(true)
 				.setAggregateable(true).setLabel("Other").setDescription("Are there other data or measures available?"));
-		addAttribute(BIOBANK_DATA_AVAILABILITY).setDataType(COMPOUND).setAttributesMetaData(data);
+		addAttribute(BIOBANK_DATA_AVAILABILITY).setDataType(COMPOUND).setLabel("Available data")
+				.setAttributesMetaData(data);
 
 		// Biobank Material Compound
 		List<AttributeMetaData> material = Lists.newArrayList();
@@ -243,7 +247,8 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 				.setDescription("Are pathogens collected?"));
 		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_OTHER).setDataType(BOOL).setNillable(false)
 				.setAggregateable(true).setLabel("Other").setDescription("Are other types of material collected?"));
-		addAttribute(BIOBANK_MATERIAL).setDataType(COMPOUND).setAttributesMetaData(material);
+		addAttribute(BIOBANK_MATERIAL).setDataType(COMPOUND).setLabel("Material collected")
+				.setAttributesMetaData(material);
 
 		// Biobank Sample Access Compound
 		List<AttributeMetaData> sample = Lists.newArrayList();
@@ -257,7 +262,8 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 				.setLabel("Description").setDescription("Short description of access rules"));
 		sample.add(new DefaultAttributeMetaData(BIOBANK_SAMPLE_ACCESS_URI).setDataType(HYPERLINK).setNillable(true)
 				.setLabel("Link to Access Policy").setDescription("Website describing access policy for the samples"));
-		addAttribute(BIOBANK_SAMPLE_ACCESS).setDataType(COMPOUND).setAttributesMetaData(sample);
+		addAttribute(BIOBANK_SAMPLE_ACCESS).setDataType(COMPOUND).setLabel("Sample access policy")
+				.setAttributesMetaData(sample);
 
 		// Biobank Data Access Compound
 		List<AttributeMetaData> dataAccess = Lists.newArrayList();
@@ -271,7 +277,8 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 				.setNillable(true).setLabel("Description").setDescription("Short description of access rules"));
 		dataAccess.add(new DefaultAttributeMetaData(BIOBANK_DATA_ACCESS_URI).setDataType(HYPERLINK).setNillable(true)
 				.setLabel("Link to Access Policy").setDescription("Website describing access policy for the data"));
-		addAttribute(BIOBANK_DATA_ACCESS).setDataType(COMPOUND).setAttributesMetaData(dataAccess);
+		addAttribute(BIOBANK_DATA_ACCESS).setDataType(COMPOUND).setLabel("Data access policy")
+				.setAttributesMetaData(dataAccess);
 
 		// Biobank IT Compound
 		List<AttributeMetaData> it = Lists.newArrayList();
@@ -279,7 +286,7 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 				.setAggregateable(true).setLabel("IT support available")
 				.setDescription("Is IT support available at the biobank?"));
 		it.add(new DefaultAttributeMetaData(BIOBANK_IT_STAFF_SIZE).setDataType(CATEGORICAL)
-				.setRefEntity(new BiobankSizeMetaData()).setNillable(true).setLabel("IT staff size")
+				.setRefEntity(new BiobankSizeMetaData()).setNillable(false).setLabel("IT staff size")
 				.setDescription("Size of the biobank dedicated IT staff measured as 2^n"));
 		it.add(new DefaultAttributeMetaData(BIOBANK_IS_AVAILABLE).setDataType(BOOL).setNillable(true)
 				.setAggregateable(true).setLabel("Computer-based Information System")
@@ -291,7 +298,7 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 				.setLabel("Connection to hospital information system")
 				.setDescription(
 						"Does the biobank have an on-line or off-line connection to a Hospital Information System (HIS)?"));
-		addAttribute(BIOBANK_IT).setDataType(COMPOUND).setAttributesMetaData(it);
+		addAttribute(BIOBANK_IT).setDataType(COMPOUND).setLabel("Biobank IT infrastructure").setAttributesMetaData(it);
 
 		// Biobank Contact Compound
 		List<AttributeMetaData> contact = Lists.newArrayList();
@@ -307,24 +314,23 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 				.setLabel("Address").setDescription("Contact address"));
 		contact.add(new DefaultAttributeMetaData(BIOBANK_CONTACT_CITY).setDataType(STRING).setNillable(true)
 				.setLabel("City").setDescription("Contact city"));
-		contact.add(new DefaultAttributeMetaData(BIOBANK_CONTACT_ZIP).setDataType(BOOL).setNillable(true)
-				.setAggregateable(true).setLabel("Postal code").setDescription("Contact postal code"));
+		contact.add(new DefaultAttributeMetaData(BIOBANK_CONTACT_ZIP).setDataType(STRING).setNillable(true)
+				.setLabel("Postal code").setDescription("Contact postal code"));
 		contact.add(new DefaultAttributeMetaData(BIOBANK_CONTACT_COUNTRY).setDataType(STRING).setNillable(false)
 				.setLabel("Country").setDescription("Country"));
 		contact.add(new DefaultAttributeMetaData(BIOBANK_CONTACT_LATITUDE)
-				.setDataType(BOOL)
+				.setDataType(STRING)
 				.setNillable(true)
-				.setAggregateable(true)
 				.setLabel("Latitude")
 				.setDescription(
 						"Latitute of the biobank in the WGS84 system (the one used by GPS), positive is northern hemisphere"));
 		contact.add(new DefaultAttributeMetaData(BIOBANK_CONTACT_LONGITUDE)
-				.setDataType(BOOL)
+				.setDataType(STRING)
 				.setNillable(true)
-				.setAggregateable(true)
 				.setLabel("Longitude")
 				.setDescription(
 						"Longitude of the biobank in the WGS84 system (the one used by GPS), positive is to the East of Greenwich"));
-		addAttribute(BIOBANK_CONTACT).setDataType(COMPOUND).setAttributesMetaData(contact);
+		addAttribute(BIOBANK_CONTACT).setDataType(COMPOUND).setLabel("Contact information")
+				.setAttributesMetaData(contact);
 	}
 }

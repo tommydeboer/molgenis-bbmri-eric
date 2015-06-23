@@ -8,7 +8,7 @@ public class BbmriEricPackage
 
 	private static Package BBMRI_ERIC_PACKAGE;
 	public static final String NAME = "bbmri_eric";
-	public static final String DESCRIPTION = "Contains the BBMRI-ERIC directory model.";
+	public static final String DESCRIPTION = "BBMRI-ERIC directory";
 
 	private BbmriEricPackage()
 	{

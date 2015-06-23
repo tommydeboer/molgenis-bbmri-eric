@@ -21,6 +21,9 @@ public class BiobankSizeMetaData extends DefaultEntityMetaData
 	{
 		super(ENTITY_NAME, BbmriEricPackage.getPackage());
 
+		setLabel("Biobank size");
+		setDescription("Size of the biobank collection");
+
 		addAttribute(ID).setIdAttribute(true).setDataType(INT).setNillable(false).setLabel("ID").setDescription("ID");
 		addAttribute(LABEL).setDataType(STRING).setNillable(false).setLabelAttribute(true).setLabel("Label")
 				.setDescription("Label");
