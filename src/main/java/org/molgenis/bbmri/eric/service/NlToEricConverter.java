@@ -1,71 +1,71 @@
 package org.molgenis.bbmri.eric.service;
 
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_ACRONYM;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_AVAILABLE_BIOLOGICAL_SAMPLES;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_AVAILABLE_FEMALE_SAMPLES_DATA;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_AVAILABLE_GENEALOGICAL_RECORDS;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_AVAILABLE_IMAGING_DATA;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_AVAILABLE_MALE_SAMPLES_DATA;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_AVAILABLE_MEDICAL_RECORDS;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_AVAILABLE_NATIONAL_REGISTRIES;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_AVAILABLE_OTHER;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_AVAILABLE_PHYSIO_BIOCHEM_MEASUREMENTS;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_AVAILABLE_SURVEY_DATA;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_CLINICAL;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_CONTACT_CITY;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_CONTACT_COUNTRY;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_CONTACT_EMAIL;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_CONTACT_FIRST_NAME;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_CONTACT_LAST_NAME;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_CONTACT_PHONE;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_CONTACT_ZIP;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_COUNTRY;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_DATA_ACCESS_DESCRIPTION;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_DATA_ACCESS_FEE;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_DATA_ACCESS_JOINT_PROJECTS;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_DATA_ACCESS_URI;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_DESCRIPTION;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_HIS_AVAILABLE;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_ID;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_IS_AVAILABLE;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_IT_STAFF_SIZE;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_IT_SUPPORT_AVAILABLE;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_JURIDICAL_PERSON;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_CDNA_MRNA;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_CELL_LINES;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_DNA;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_FAECES;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_MICRO_RNA;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_OTHER;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_PATHOGEN;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_PBC;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_PLASMA;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_RNA;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_SALIVA;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_SERUM;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_TISSUE_CRYO;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_TISSUE_PARAFFIN;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_URINE;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_MATERIAL_STORED_WHOLE_BLOOD;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_NAME;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_PARTNER_CHARTER_SIGNED;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_POPULATION;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_RESEARCH_STUDY;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_SAMPLE_ACCESS_DESCRIPTION;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_SAMPLE_ACCESS_FEE;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_SAMPLE_ACCESS_JOINT_PROJECTS;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_SAMPLE_ACCESS_URI;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_SIZE;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_STANDALONE;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.BIOBANK_URL;
-import static org.molgenis.bbmri.eric.model.CatalogueMetaData.DIAGNOSIS_AVAILABLE;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_ACRONYM;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_AVAILABLE_BIOLOGICAL_SAMPLES;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_AVAILABLE_FEMALE_SAMPLES_DATA;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_AVAILABLE_GENEALOGICAL_RECORDS;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_AVAILABLE_IMAGING_DATA;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_AVAILABLE_MALE_SAMPLES_DATA;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_AVAILABLE_MEDICAL_RECORDS;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_AVAILABLE_NATIONAL_REGISTRIES;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_AVAILABLE_OTHER;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_AVAILABLE_PHYSIO_BIOCHEM_MEASUREMENTS;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_AVAILABLE_SURVEY_DATA;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_CLINICAL;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_CONTACT_CITY;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_CONTACT_COUNTRY;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_CONTACT_EMAIL;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_CONTACT_FIRST_NAME;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_CONTACT_LAST_NAME;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_CONTACT_PHONE;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_CONTACT_ZIP;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_COUNTRY;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_DATA_ACCESS_DESCRIPTION;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_DATA_ACCESS_FEE;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_DATA_ACCESS_JOINT_PROJECTS;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_DATA_ACCESS_URI;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_DESCRIPTION;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_HIS_AVAILABLE;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_ID;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_IS_AVAILABLE;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_IT_STAFF_SIZE;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_IT_SUPPORT_AVAILABLE;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_JURIDICAL_PERSON;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_CDNA_MRNA;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_CELL_LINES;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_DNA;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_FAECES;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_MICRO_RNA;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_OTHER;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_PATHOGEN;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_PBC;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_PLASMA;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_RNA;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_SALIVA;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_SERUM;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_TISSUE_CRYO;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_TISSUE_PARAFFIN;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_URINE;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_WHOLE_BLOOD;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_NAME;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_PARTNER_CHARTER_SIGNED;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_POPULATION;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_RESEARCH_STUDY;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_SAMPLE_ACCESS_DESCRIPTION;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_SAMPLE_ACCESS_FEE;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_SAMPLE_ACCESS_JOINT_PROJECTS;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_SAMPLE_ACCESS_URI;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_SIZE;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_STANDALONE;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_URL;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.DIAGNOSIS_AVAILABLE;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.molgenis.bbmri.eric.model.CatalogueMetaData;
+import org.molgenis.bbmri.eric.model.DirectoryMetaData;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.Query;
@@ -203,9 +203,9 @@ public class NlToEricConverter
 
 		Query q = new QueryImpl().eq("biobankCountry", NL);
 		Iterable<Entity> entitiesToDelete = RunAsSystemProxy.runAsSystem(() -> dataService.findAll(
-				CatalogueMetaData.FULLY_QUALIFIED_NAME, q));
+				DirectoryMetaData.FULLY_QUALIFIED_NAME, q));
 
-		dataService.delete(CatalogueMetaData.FULLY_QUALIFIED_NAME, entitiesToDelete);
+		dataService.delete(DirectoryMetaData.FULLY_QUALIFIED_NAME, entitiesToDelete);
 
 		LOG.info("Starting conversion of BBMRI-NL data to BBMRI-ERIC. BBMRI-NL entity = {}", BBMRI_NL_SOURCE_ENTITY);
 
@@ -215,7 +215,7 @@ public class NlToEricConverter
 		for (Entity nlBiobank : it)
 		{
 			DefaultEntity ericBiobank = new DefaultEntity(
-					dataService.getEntityMetaData(CatalogueMetaData.FULLY_QUALIFIED_NAME), dataService);
+					dataService.getEntityMetaData(DirectoryMetaData.FULLY_QUALIFIED_NAME), dataService);
 
 			// mapped attributes
 			ericBiobank.set(BIOBANK_ID, ericId((String) nlBiobank.getIdValue()));
@@ -317,7 +317,7 @@ public class NlToEricConverter
 				ericBiobank.set(BIOBANK_STANDALONE, false);
 			}
 
-			dataService.add(CatalogueMetaData.FULLY_QUALIFIED_NAME, ericBiobank);
+			dataService.add(DirectoryMetaData.FULLY_QUALIFIED_NAME, ericBiobank);
 			adds++;
 
 		}

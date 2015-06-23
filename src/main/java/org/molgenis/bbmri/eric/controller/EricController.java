@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.molgenis.MolgenisFieldTypes;
-import org.molgenis.bbmri.eric.model.CatalogueMetaData;
+import org.molgenis.bbmri.eric.model.DirectoryMetaData;
 import org.molgenis.bbmri.eric.service.BbmriEricDataResponse;
 import org.molgenis.bbmri.eric.service.EricDownloadService;
 import org.molgenis.bbmri.eric.service.NlToEricConverter;
@@ -75,7 +75,7 @@ public class EricController
 	public BbmriEricDataResponse getEricData(Query q)
 	{
 		Iterable<Entity> it = RunAsSystemProxy.runAsSystem(() -> dataService.findAll(
-				CatalogueMetaData.FULLY_QUALIFIED_NAME, q));
+				DirectoryMetaData.FULLY_QUALIFIED_NAME, q));
 
 		List<Map<String, Object>> entities = new ArrayList<>();
 		for (Entity entity : it)

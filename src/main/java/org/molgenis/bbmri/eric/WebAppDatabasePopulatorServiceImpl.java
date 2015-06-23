@@ -7,11 +7,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.elasticsearch.common.collect.Maps;
 import org.molgenis.auth.MolgenisUser;
 import org.molgenis.bbmri.eric.controller.HomeController;
 import org.molgenis.bbmri.eric.model.BbmriEricPackage;
+import org.molgenis.bbmri.eric.model.BiobankSizeMetaData;
+import org.molgenis.bbmri.eric.model.StaffSizeMetaData;
 import org.molgenis.data.DataService;
+import org.molgenis.data.Entity;
 import org.molgenis.data.IndexedCrudRepositorySecurityDecorator;
+import org.molgenis.data.support.DefaultEntity;
 import org.molgenis.data.support.GenomeConfig;
 import org.molgenis.data.support.QueryImpl;
 import org.molgenis.dataexplorer.controller.DataExplorerController;
@@ -132,6 +137,44 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 
 		// BBMRI-ERIC specific population
 		dataService.getMeta().addPackage(BbmriEricPackage.getPackage());
+
+		// populate the staffsize categorical
+		HashMap<String, String> staffSizes = Maps.newHashMap();
+		staffSizes.put("0", "N/A");
+		staffSizes.put("1", "1-2 FTE");
+		staffSizes.put("2", "2-4 FTE");
+		staffSizes.put("3", "5-8 FTE");
+		staffSizes.put("4", "9-16 FTE");
+		staffSizes.put("5", "17-32 FTE");
+		staffSizes.put("6", "33-64 FTE");
+
+		for (Entry<String, String> size : staffSizes.entrySet())
+		{
+			Entity e = new DefaultEntity(new StaffSizeMetaData(), dataService);
+			e.set(StaffSizeMetaData.ID, size.getKey());
+			e.set(StaffSizeMetaData.LABEL, size.getValue());
+			dataService.add(StaffSizeMetaData.FULLY_QUALIFIED_NAME, e);
+		}
+
+		// populate the biobank size categorical
+		HashMap<String, String> biobankSizes = Maps.newHashMap();
+		biobankSizes.put("0", "N/A");
+		biobankSizes.put("1", "10-99 samples");
+		biobankSizes.put("2", "100-999 samples");
+		biobankSizes.put("3", "1,000-9,999 samples");
+		biobankSizes.put("4", "10,000-99,999 samples");
+		biobankSizes.put("5", "100,000-999,999 samples");
+		biobankSizes.put("6", "1,000,000-9,999,999 samples");
+		biobankSizes.put("7", "10,000,000-99,999,999 samples");
+
+		for (Entry<String, String> size : biobankSizes.entrySet())
+		{
+			Entity e = new DefaultEntity(new BiobankSizeMetaData(), dataService);
+			e.set(StaffSizeMetaData.ID, size.getKey());
+			e.set(StaffSizeMetaData.LABEL, size.getValue());
+			dataService.add(BiobankSizeMetaData.FULLY_QUALIFIED_NAME, e);
+		}
+
 	}
 
 	@Override
