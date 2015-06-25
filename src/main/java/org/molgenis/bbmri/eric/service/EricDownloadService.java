@@ -131,12 +131,31 @@ public class EricDownloadService
 
 							for (Entry<String, Object> compoundEntry : compoundEntries.entrySet())
 							{
-								ericBiobank.set(compoundEntry.getKey(), compoundEntry.getValue());
+								String key = compoundEntry.getKey();
+								if (key.equals(DirectoryMetaData.BIOBANK_IT_STAFF_SIZE)
+										|| key.equals(DirectoryMetaData.BIOBANK_SIZE))
+								{
+									ericBiobank.set(key, new Double((double) compoundEntry.getValue()).intValue());
+								}
+								else
+								{
+									ericBiobank.set(key, compoundEntry.getValue());
+								}
 							}
 						}
 						else
 						{
-							ericBiobank.set(entry.getKey(), entry.getValue());
+
+							String key = entry.getKey();
+							if (key.equals(DirectoryMetaData.BIOBANK_IT_STAFF_SIZE)
+									|| key.equals(DirectoryMetaData.BIOBANK_SIZE))
+							{
+								ericBiobank.set(key, new Double((double) entry.getValue()).intValue());
+							}
+							else
+							{
+								ericBiobank.set(key, entry.getValue());
+							}
 						}
 
 					}

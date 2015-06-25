@@ -136,7 +136,7 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 		addAttribute(BIOBANK_PARTNER_CHARTER_SIGNED).setDataType(BOOL).setNillable(false).setAggregateable(true)
 				.setLabel("Partner Charter signed")
 				.setDescription("Has the biobank signed the BBMRI-ERIC Partner Charter?");
-		addAttribute(BIOBANK_SIZE).setDataType(CATEGORICAL).setRefEntity(new StaffSizeMetaData()).setNillable(false)
+		addAttribute(BIOBANK_SIZE).setDataType(CATEGORICAL).setRefEntity(new BiobankSizeMetaData()).setNillable(false)
 				.setLabel("Size").setDescription("Size of the biobank measured as 10^n samples");
 		addAttribute(DIAGNOSIS_AVAILABLE)
 				.setDataType(STRING)
@@ -146,7 +146,8 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 						"Diagnosis available in the biobank, with the ontology prefix, possibly using * and ? wildcards, and prefix notation to denote diagnosis nomenclature");
 
 		// TODO
-		addAttribute(BIOBANK_ACRONYM).setDataType(STRING).setNillable(true).setLabel("").setDescription("");
+		addAttribute(BIOBANK_ACRONYM).setDataType(STRING).setNillable(true).setLabel("Acronym")
+				.setDescription("Textual string of short name in use for the biobank");
 
 		// Biobank Type Compound
 		List<AttributeMetaData> type = Lists.newArrayList();
@@ -286,7 +287,7 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 				.setAggregateable(true).setLabel("IT support available")
 				.setDescription("Is IT support available at the biobank?"));
 		it.add(new DefaultAttributeMetaData(BIOBANK_IT_STAFF_SIZE).setDataType(CATEGORICAL)
-				.setRefEntity(new BiobankSizeMetaData()).setNillable(false).setLabel("IT staff size")
+				.setRefEntity(new StaffSizeMetaData()).setNillable(false).setLabel("IT staff size")
 				.setDescription("Size of the biobank dedicated IT staff measured as 2^n"));
 		it.add(new DefaultAttributeMetaData(BIOBANK_IS_AVAILABLE).setDataType(BOOL).setNillable(true)
 				.setAggregateable(true).setLabel("Computer-based Information System")

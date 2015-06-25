@@ -90,13 +90,27 @@ public class EricController
 					Map<String, Object> compoundMap = new LinkedHashMap<>();
 					for (AttributeMetaData innerAttr : attr.getAttributeParts())
 					{
-						compoundMap.put(innerAttr.getName(), entity.getString(innerAttr.getName()));
+						if (innerAttr.getDataType().equals(MolgenisFieldTypes.CATEGORICAL))
+						{
+							compoundMap.put(innerAttr.getName(), entity.getEntity(innerAttr.getName()).getIdValue());
+						}
+						else
+						{
+							compoundMap.put(innerAttr.getName(), entity.getString(innerAttr.getName()));
+						}
 					}
 					entityMap.put(attr.getName(), compoundMap);
 				}
 				else
 				{
-					entityMap.put(attr.getName(), entity.getString(attr.getName()));
+					if (attr.getDataType().equals(MolgenisFieldTypes.CATEGORICAL))
+					{
+						entityMap.put(attr.getName(), entity.getEntity(attr.getName()).getIdValue());
+					}
+					else
+					{
+						entityMap.put(attr.getName(), entity.getString(attr.getName()));
+					}
 				}
 			}
 
