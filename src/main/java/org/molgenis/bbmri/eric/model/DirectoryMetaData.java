@@ -145,7 +145,6 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 				.setDescription(
 						"Diagnosis available in the biobank, with the ontology prefix, possibly using * and ? wildcards, and prefix notation to denote diagnosis nomenclature");
 
-		// TODO
 		addAttribute(BIOBANK_ACRONYM).setDataType(STRING).setNillable(true).setLabel("Acronym")
 				.setDescription("Textual string of short name in use for the biobank");
 
