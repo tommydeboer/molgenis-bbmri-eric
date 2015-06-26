@@ -139,7 +139,7 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		dataService.getMeta().addPackage(BbmriEricPackage.getPackage());
 
 		// populate the staffsize categorical
-		HashMap<String, String> staffSizes = Maps.newHashMap();
+		Map<String, String> staffSizes = Maps.newHashMap();
 		staffSizes.put("0", "N/A");
 		staffSizes.put("1", "1-2 FTE");
 		staffSizes.put("2", "2-4 FTE");
@@ -157,7 +157,7 @@ public class WebAppDatabasePopulatorServiceImpl implements WebAppDatabasePopulat
 		}
 
 		// populate the biobank size categorical
-		HashMap<String, String> biobankSizes = Maps.newHashMap();
+		Map<String, String> biobankSizes = Maps.newHashMap();
 		biobankSizes.put("0", "N/A");
 		biobankSizes.put("1", "10-99 samples");
 		biobankSizes.put("2", "100-999 samples");

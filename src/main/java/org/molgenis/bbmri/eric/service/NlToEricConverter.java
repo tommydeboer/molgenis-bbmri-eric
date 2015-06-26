@@ -102,7 +102,9 @@ public class NlToEricConverter
 	private final String DEFAULT_JURIDICAL_PERSON = "BBMRI-NL";
 	private final int DEFAULT_IT_STAFF_SIZE = 1;
 	private final String DEFAULT_DIAGNOSIS_AVAILABLE = "urn:miriam:icd:*";
+
 	// floor(log10(nr of samples). All NL biobanks have at least 500 samples (actual numbers are not available)
+	// floor(log10(500)) = 2
 	private final int DEFAULT_NR_OF_SAMPLES = 2;
 	private String defaultContactEmail;
 

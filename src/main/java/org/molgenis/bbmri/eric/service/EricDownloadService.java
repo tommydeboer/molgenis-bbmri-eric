@@ -135,7 +135,7 @@ public class EricDownloadService
 								if (key.equals(DirectoryMetaData.BIOBANK_IT_STAFF_SIZE)
 										|| key.equals(DirectoryMetaData.BIOBANK_SIZE))
 								{
-									ericBiobank.set(key, new Double((double) compoundEntry.getValue()).intValue());
+									ericBiobank.set(key, Double.valueOf((double) compoundEntry.getValue()).intValue());
 								}
 								else
 								{
