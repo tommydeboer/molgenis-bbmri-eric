@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.molgenis.bbmri.eric.model.CatalogueMetaData;
+import org.molgenis.bbmri.eric.model.DirectoryMetaData;
 import org.molgenis.bbmri.eric.model.EricSourceMetaData;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
@@ -100,7 +100,7 @@ public class EricDownloadService
 				{
 					for (Map<String, Object> entry : bedr.getBiobanks())
 					{
-						nodes.add(entry.get(CatalogueMetaData.BIOBANK_COUNTRY).toString());
+						nodes.add(entry.get(DirectoryMetaData.BIOBANK_COUNTRY).toString());
 					}
 				}
 
@@ -110,9 +110,9 @@ public class EricDownloadService
 				{
 					Query q = new QueryImpl().eq("biobankCountry", node.toUpperCase());
 					Iterable<Entity> entitiesToDelete = RunAsSystemProxy.runAsSystem(() -> dataService.findAll(
-							CatalogueMetaData.FULLY_QUALIFIED_NAME, q));
+							DirectoryMetaData.FULLY_QUALIFIED_NAME, q));
 
-					dataService.delete(CatalogueMetaData.FULLY_QUALIFIED_NAME, entitiesToDelete);
+					dataService.delete(DirectoryMetaData.FULLY_QUALIFIED_NAME, entitiesToDelete);
 				}
 
 				// add new catalogue entities
@@ -120,7 +120,7 @@ public class EricDownloadService
 				for (Map<String, Object> biobank : bedr.getBiobanks())
 				{
 					DefaultEntity ericBiobank = new DefaultEntity(
-							dataService.getEntityMetaData(CatalogueMetaData.FULLY_QUALIFIED_NAME), dataService);
+							dataService.getEntityMetaData(DirectoryMetaData.FULLY_QUALIFIED_NAME), dataService);
 					for (Entry<String, Object> entry : biobank.entrySet())
 					{
 						if (entry.getValue() instanceof Map)
@@ -131,18 +131,37 @@ public class EricDownloadService
 
 							for (Entry<String, Object> compoundEntry : compoundEntries.entrySet())
 							{
-								ericBiobank.set(compoundEntry.getKey(), compoundEntry.getValue());
+								String key = compoundEntry.getKey();
+								if (key.equals(DirectoryMetaData.BIOBANK_IT_STAFF_SIZE)
+										|| key.equals(DirectoryMetaData.BIOBANK_SIZE))
+								{
+									ericBiobank.set(key, Double.valueOf((double) compoundEntry.getValue()).intValue());
+								}
+								else
+								{
+									ericBiobank.set(key, compoundEntry.getValue());
+								}
 							}
 						}
 						else
 						{
-							ericBiobank.set(entry.getKey(), entry.getValue());
+
+							String key = entry.getKey();
+							if (key.equals(DirectoryMetaData.BIOBANK_IT_STAFF_SIZE)
+									|| key.equals(DirectoryMetaData.BIOBANK_SIZE))
+							{
+								ericBiobank.set(key, Double.valueOf((double) entry.getValue()).intValue());
+							}
+							else
+							{
+								ericBiobank.set(key, entry.getValue());
+							}
 						}
 
 					}
 					biobanksToAdd.add(ericBiobank);
 				}
-				dataService.add(CatalogueMetaData.FULLY_QUALIFIED_NAME, biobanksToAdd);
+				dataService.add(DirectoryMetaData.FULLY_QUALIFIED_NAME, biobanksToAdd);
 				sources++;
 
 				downloadSourceReport.setStatus(DownloadSourceReport.Status.SUCCESS);
