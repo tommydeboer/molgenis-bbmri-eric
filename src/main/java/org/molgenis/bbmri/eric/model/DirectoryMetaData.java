@@ -18,7 +18,7 @@ import org.molgenis.data.support.DefaultEntityMetaData;
 import org.springframework.stereotype.Component;
 
 /**
- * BBMRI-ERIC model v2
+ * BBMRI-ERIC model v3
  * 
  * @author tommy
  *
@@ -30,89 +30,86 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 	public static final String ENTITY_NAME = "directory";
 	public static final String FULLY_QUALIFIED_NAME = BbmriEricPackage.NAME + '_' + ENTITY_NAME;
 
-	public static final String BIOBANK_ID = "biobankID";
-	public static final String BIOBANK_NAME = "biobankName";
-	public static final String BIOBANK_JURIDICAL_PERSON = "biobankJuridicalPerson";
-	public static final String BIOBANK_COUNTRY = "biobankCountry";
-	public static final String BIOBANK_SIZE = "biobankSize";
+	public static final String BIOBANK_ID = "ID";
+	public static final String BIOBANK_NAME = "name";
+	public static final String BIOBANK_JURIDICAL_PERSON = "juridicalPerson";
+	public static final String BIOBANK_COUNTRY = "country";
+	public static final String BIOBANK_SIZE = "size";
 
-	public static final String BIOBANK_MATERIAL_STORED_DNA = "biobankMaterialStoredDNA";
-	public static final String BIOBANK_MATERIAL_STORED_CDNA_MRNA = "biobankMaterialStoredcDNAmRNA";
-	public static final String BIOBANK_MATERIAL_STORED_MICRO_RNA = "biobankMaterialStoredmicroRNA";
-	public static final String BIOBANK_MATERIAL_STORED_WHOLE_BLOOD = "biobankMaterialStoredWholeBlood";
-	public static final String BIOBANK_MATERIAL_STORED_PBC = "biobankMaterialStoredPBC";
+	public static final String BIOBANK_MATERIAL_STORED_DNA = "materialStoredDNA";
+	public static final String BIOBANK_MATERIAL_STORED_BLOOD = "materialStoredBlood";
 
-	public static final String BIOBANK_MATERIAL_STORED_PLASMA = "biobankMaterialStoredPlasma";
-	public static final String BIOBANK_MATERIAL_STORED_SERUM = "biobankMaterialStoredSerum";
-	public static final String BIOBANK_MATERIAL_STORED_TISSUE_CRYO = "biobankMaterialStoredTissueCryo";
-	public static final String BIOBANK_MATERIAL_STORED_TISSUE_PARAFFIN = "biobankMaterialStoredTissueParaffin";
-	public static final String BIOBANK_MATERIAL_STORED_CELL_LINES = "biobankMaterialStoredCellLines";
+	public static final String BIOBANK_MATERIAL_STORED_PLASMA = "materialStoredPlasma";
+	public static final String BIOBANK_MATERIAL_STORED_SERUM = "materialStoredSerum";
+	public static final String BIOBANK_MATERIAL_STORED_TISSUE_FROZEN = "materialStoredTissueFrozen";
+	public static final String BIOBANK_MATERIAL_STORED_TISSUE_FFPE = "materialStoredTissueFFPE";
+	public static final String BIOBANK_MATERIAL_STORED_IMMORTALIZED_CELL_LINES = "materialStoredImmortCellLines";
 
-	public static final String BIOBANK_MATERIAL_STORED_URINE = "biobankMaterialStoredUrine";
-	public static final String BIOBANK_MATERIAL_STORED_SALIVA = "biobankMaterialStoredSaliva";
-	public static final String BIOBANK_MATERIAL_STORED_FAECES = "biobankMaterialStoredFaeces";
-	public static final String BIOBANK_MATERIAL_STORED_PATHOGEN = "biobankMaterialStoredPathogen";
-	public static final String BIOBANK_MATERIAL_STORED_OTHER = "biobankMaterialStoredOther";
+	public static final String BIOBANK_MATERIAL_STORED_URINE = "materialStoredUrine";
+	public static final String BIOBANK_MATERIAL_STORED_SALIVA = "materialStoredSaliva";
+	public static final String BIOBANK_MATERIAL_STORED_FAECES = "materialStoredFaeces";
+	public static final String BIOBANK_MATERIAL_STORED_ISOLATED_PATHOGEN = "materialStoredIsolatedPathogen";
+	public static final String BIOBANK_MATERIAL_STORED_OTHER = "materialStoredOther";
 
-	public static final String BIOBANK_PARTNER_CHARTER_SIGNED = "biobankPartnerCharterSigned";
-	public static final String BIOBANK_SAMPLE_ACCESS_FEE = "biobankSampleAccessFee";
-	public static final String BIOBANK_SAMPLE_ACCESS_JOINT_PROJECTS = "biobankSampleAccessJointProjects";
-	public static final String BIOBANK_SAMPLE_ACCESS_DESCRIPTION = "biobankSampleAccessDescription";
-	public static final String BIOBANK_DATA_ACCESS_FEE = "biobankDataAccessFee";
+	public static final String BIOBANK_PARTNER_CHARTER_SIGNED = "partnerCharterSigned";
+	public static final String BIOBANK_SAMPLE_ACCESS_FEE = "sampleAccessFee";
+	public static final String BIOBANK_SAMPLE_ACCESS_JOINT_PROJECTS = "sampleAccessJointProjects";
+	public static final String BIOBANK_SAMPLE_ACCESS_DESCRIPTION = "sampleAccessDescription";
+	public static final String BIOBANK_DATA_ACCESS_FEE = "dataAccessFee";
 
-	public static final String BIOBANK_DATA_ACCESS_JOINT_PROJECTS = "biobankDataAccessJointProjects";
-	public static final String BIOBANK_DATA_ACCESS_DESCRIPTION = "biobankDataAccessDescription";
-	public static final String BIOBANK_SAMPLE_ACCESS_URI = "biobankSampleAccessURI";
-	public static final String BIOBANK_DATA_ACCESS_URI = "biobankDataAccessURI";
-	public static final String BIOBANK_AVAILABLE_MALE_SAMPLES_DATA = "biobankAvailableMaleSamplesData";
+	public static final String BIOBANK_DATA_ACCESS_JOINT_PROJECTS = "dataAccessJointProjects";
+	public static final String BIOBANK_DATA_ACCESS_DESCRIPTION = "dataAccessDescription";
+	public static final String BIOBANK_SAMPLE_ACCESS_URI = "sampleAccessURI";
+	public static final String BIOBANK_DATA_ACCESS_URI = "dataAccessURI";
+	public static final String BIOBANK_AVAILABLE_MALE_SAMPLES_DATA = "availableMaleSamplesData";
 
-	public static final String BIOBANK_AVAILABLE_FEMALE_SAMPLES_DATA = "biobankAvailableFemaleSamplesData";
-	public static final String BIOBANK_AVAILABLE_BIOLOGICAL_SAMPLES = "biobankAvailableBiologicalSamples";
-	public static final String BIOBANK_AVAILABLE_SURVEY_DATA = "biobankAvailableSurveyData";
-	public static final String BIOBANK_AVAILABLE_IMAGING_DATA = "biobankAvailableImagingData";
-	public static final String BIOBANK_AVAILABLE_MEDICAL_RECORDS = "biobankAvailableMedicalRecords";
+	public static final String BIOBANK_AVAILABLE_FEMALE_SAMPLES_DATA = "availableFemaleSamplesData";
+	public static final String BIOBANK_AVAILABLE_BIOLOGICAL_SAMPLES = "availableBiologicalSamples";
+	public static final String BIOBANK_AVAILABLE_SURVEY_DATA = "availableSurveyData";
+	public static final String BIOBANK_AVAILABLE_IMAGING_DATA = "availableImagingData";
+	public static final String BIOBANK_AVAILABLE_MEDICAL_RECORDS = "availableMedicalRecords";
 
-	public static final String BIOBANK_AVAILABLE_NATIONAL_REGISTRIES = "biobankAvailableNationalRegistries";
-	public static final String BIOBANK_AVAILABLE_GENEALOGICAL_RECORDS = "biobankAvailableGenealogicalRecords";
-	public static final String BIOBANK_AVAILABLE_PHYSIO_BIOCHEM_MEASUREMENTS = "biobankAvailablePhysioBiochemMeasurements";
-	public static final String BIOBANK_AVAILABLE_OTHER = "biobankAvailableOther";
-	public static final String BIOBANK_IT_SUPPORT_AVAILABLE = "biobankITSupportAvailable";
+	public static final String BIOBANK_AVAILABLE_NATIONAL_REGISTRIES = "availableNationalRegistries";
+	public static final String BIOBANK_AVAILABLE_GENEALOGICAL_RECORDS = "availableGenealogicalRecords";
+	public static final String BIOBANK_AVAILABLE_PHYSIO_BIOCHEM_MEASUREMENTS = "availablePhysioBiochemMeas";
+	public static final String BIOBANK_AVAILABLE_OTHER = "availableOther";
+	public static final String BIOBANK_IT_SUPPORT_AVAILABLE = "ITSupportAvailable";
 
-	public static final String BIOBANK_IT_STAFF_SIZE = "biobankITStaffSize";
-	public static final String BIOBANK_IS_AVAILABLE = "biobankISAvailable";
-	public static final String BIOBANK_HIS_AVAILABLE = "biobankHISAvailable";
+	public static final String BIOBANK_IT_STAFF_SIZE = "ITStaffSize";
+	public static final String BIOBANK_IS_AVAILABLE = "ISAvailable";
+	public static final String BIOBANK_HIS_AVAILABLE = "HISAvailable";
 	public static final String DIAGNOSIS_AVAILABLE = "diagnosisAvailable";
-	public static final String BIOBANK_CONTACT_EMAIL = "biobankContactEmail";
+	public static final String BIOBANK_CONTACT_EMAIL = "contactEmail";
 
-	public static final String BIOBANK_CONTACT_COUNTRY = "biobankContactCountry";
-	public static final String BIOBANK_CONTACT_FIRST_NAME = "biobankContactFirstName";
-	public static final String BIOBANK_CONTACT_LAST_NAME = "biobankContactLastName";
-	public static final String BIOBANK_CONTACT_PHONE = "biobankContactPhone";
-	public static final String BIOBANK_CONTACT_ADDRESS = "biobankContactAddress";
+	public static final String BIOBANK_CONTACT_COUNTRY = "contactCountry";
+	public static final String BIOBANK_CONTACT_FIRST_NAME = "contactFirstName";
+	public static final String BIOBANK_CONTACT_LAST_NAME = "contactLastName";
+	public static final String BIOBANK_CONTACT_PHONE = "contactPhone";
+	public static final String BIOBANK_CONTACT_ADDRESS = "contactAddress";
 
-	public static final String BIOBANK_CONTACT_CITY = "biobankContactCity";
-	public static final String BIOBANK_CONTACT_ZIP = "biobankContactZIP";
-	public static final String BIOBANK_CONTACT_LATITUDE = "biobankContactLatitude";
-	public static final String BIOBANK_CONTACT_LONGITUDE = "biobankContactLongitude";
-	public static final String BIOBANK_CLINICAL = "biobankClinical";
+	public static final String BIOBANK_CONTACT_CITY = "contactCity";
+	public static final String BIOBANK_CONTACT_ZIP = "contactZIP";
+	public static final String BIOBANK_CONTACT_LATITUDE = "contactLatitude";
+	public static final String BIOBANK_CONTACT_LONGITUDE = "contactLongitude";
+	public static final String BIOBANK_CLINICAL = "clinical";
 
-	public static final String BIOBANK_POPULATION = "biobankPopulation";
-	public static final String BIOBANK_RESEARCH_STUDY = "biobankResearchStudy";
-	public static final String BIOBANK_STANDALONE = "biobankStandalone";
-	public static final String BIOBANK_DESCRIPTION = "biobankDescription";
-	public static final String BIOBANK_URL = "biobankURL";
+	public static final String BIOBANK_POPULATION = "population";
+	public static final String BIOBANK_RESEARCH_STUDY = "researchStudy";
+	public static final String BIOBANK_STANDALONE = "standalone";
+	public static final String BIOBANK_DESCRIPTION = "description";
+	public static final String BIOBANK_URL = "URL";
 
-	public static final String BIOBANK_ACRONYM = "biobankAcronym";
-	public static final String BIOBANK_MATERIAL_STORED_RNA = "biobankMaterialStoredRNA";
-	public static final String BIOBANK_TYPE = "biobankType";
-	public static final String BIOBANK_DONORS = "biobankDonors";
-	public static final String BIOBANK_DATA_AVAILABILITY = "biobankDataAvailability";
+	public static final String BIOBANK_ACRONYM = "acronym";
+	public static final String BIOBANK_MATERIAL_STORED_RNA = "materialStoredRNA";
+	public static final String BIOBANK_TYPE = "type";
+	public static final String BIOBANK_DONORS = "donors";
+	public static final String BIOBANK_DATA_AVAILABILITY = "dataAvailability";
 
-	public static final String BIOBANK_MATERIAL = "biobankMaterial";
-	public static final String BIOBANK_SAMPLE_ACCESS = "biobankSampleAccess";
-	public static final String BIOBANK_DATA_ACCESS = "biobankDataAccess";
-	public static final String BIOBANK_IT = "biobankIT";
-	public static final String BIOBANK_CONTACT = "biobankContact";
+	public static final String BIOBANK_MATERIAL = "material";
+	public static final String BIOBANK_SAMPLE_ACCESS = "sampleAccess";
+	public static final String BIOBANK_DATA_ACCESS = "dataAccess";
+	public static final String BIOBANK_IT = "IT";
+	public static final String BIOBANK_CONTACT = "contact";
 
 	public DirectoryMetaData()
 	{
@@ -210,29 +207,20 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 				.setAggregateable(true).setLabel("DNA").setDescription("Is DNA collected?"));
 		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_RNA).setDataType(BOOL).setNillable(false)
 				.setAggregateable(true).setLabel("RNA").setDescription("Is RNA collected?"));
-		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_CDNA_MRNA).setDataType(BOOL)
-				.setNillable(false).setAggregateable(true).setLabel("cDNA/mRNA")
-				.setDescription("Is cDNA/mRNA collected?"));
-		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_MICRO_RNA).setDataType(BOOL)
-				.setNillable(false).setAggregateable(true).setLabel("microRNA")
-				.setDescription("Is microRNA collected?"));
-		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_WHOLE_BLOOD).setDataType(BOOL)
-				.setNillable(false).setAggregateable(true).setLabel("Whole Blood")
-				.setDescription("Is whole blood collected?"));
-		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_PBC).setDataType(BOOL).setNillable(false)
-				.setLabel("Peripheral Blood Cells").setDescription("Are peripheral blood cells collected?"));
+		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_BLOOD).setDataType(BOOL).setNillable(false)
+				.setAggregateable(true).setLabel("Whole Blood").setDescription("Is blood collected?"));
 
 		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_PLASMA).setDataType(BOOL).setNillable(false)
 				.setAggregateable(true).setLabel("Plasma").setDescription("Is plasma collected?"));
 		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_SERUM).setDataType(BOOL).setNillable(false)
 				.setAggregateable(true).setLabel("Serum").setDescription("Is serum collected?"));
-		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_TISSUE_CRYO).setDataType(BOOL)
+		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_TISSUE_FROZEN).setDataType(BOOL)
 				.setNillable(false).setAggregateable(true).setLabel("Tissue cryo-preserved")
 				.setDescription("Is cryo-preserved tissue collected?"));
-		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_TISSUE_PARAFFIN).setDataType(BOOL)
+		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_TISSUE_FFPE).setDataType(BOOL)
 				.setNillable(false).setAggregateable(true).setLabel("Tissue FPPE")
 				.setDescription("Is paraffin preserved tissue collected?"));
-		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_CELL_LINES).setDataType(BOOL)
+		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_IMMORTALIZED_CELL_LINES).setDataType(BOOL)
 				.setNillable(false).setAggregateable(true).setLabel("Cell lines")
 				.setDescription("Are cell lines collected?"));
 
@@ -242,7 +230,7 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 				.setAggregateable(true).setLabel("Saliva").setDescription("Is saliva collected?"));
 		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_FAECES).setDataType(BOOL).setNillable(false)
 				.setAggregateable(true).setLabel("Faeces").setDescription("Is faeces collected?"));
-		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_PATHOGEN).setDataType(BOOL)
+		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_ISOLATED_PATHOGEN).setDataType(BOOL)
 				.setNillable(false).setAggregateable(true).setLabel("Pathogen")
 				.setDescription("Are pathogens collected?"));
 		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_OTHER).setDataType(BOOL).setNillable(false)
