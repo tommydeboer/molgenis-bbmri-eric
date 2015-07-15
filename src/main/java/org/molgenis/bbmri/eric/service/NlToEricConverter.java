@@ -31,22 +31,19 @@ import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_IS_AVAILAB
 import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_IT_STAFF_SIZE;
 import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_IT_SUPPORT_AVAILABLE;
 import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_JURIDICAL_PERSON;
-import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_CDNA_MRNA;
-import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_CELL_LINES;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_BLOOD;
 import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_DNA;
 import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_FAECES;
-import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_MICRO_RNA;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_IMMORTALIZED_CELL_LINES;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_ISOLATED_PATHOGEN;
 import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_OTHER;
-import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_PATHOGEN;
-import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_PBC;
 import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_PLASMA;
 import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_RNA;
 import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_SALIVA;
 import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_SERUM;
-import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_TISSUE_CRYO;
-import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_TISSUE_PARAFFIN;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_TISSUE_FFPE;
+import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_TISSUE_FROZEN;
 import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_URINE;
-import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_MATERIAL_STORED_WHOLE_BLOOD;
 import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_NAME;
 import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_PARTNER_CHARTER_SIGNED;
 import static org.molgenis.bbmri.eric.model.DirectoryMetaData.BIOBANK_POPULATION;
@@ -133,26 +130,65 @@ public class NlToEricConverter
 	private final String ATT_URL = "website";
 	private final String ATT_ACRONYM = "acronym";
 
+	// private static final HashMap<String, String> materialMapping = new HashMap<String, String>()
+	// {
+	// private static final long serialVersionUID = 1L;
+	// {
+	// put(BIOBANK_MATERIAL_STORED_DNA, "DNA");
+	// put(BIOBANK_MATERIAL_STORED_CDNA_MRNA, "CDNA");
+	// put(BIOBANK_MATERIAL_STORED_MICRO_RNA, "MICRO_RNA");
+	// put(BIOBANK_MATERIAL_STORED_WHOLE_BLOOD, "WHOLE_BLOOD");
+	// put(BIOBANK_MATERIAL_STORED_PBC, "PERIPHERAL_BLOOD_CELLS");
+	// put(BIOBANK_MATERIAL_STORED_PLASMA, "PLASMA");
+	// put(BIOBANK_MATERIAL_STORED_SERUM, "SERUM");
+	// put(BIOBANK_MATERIAL_STORED_TISSUE_FROZEN, "TISSUE_FROZEN");
+	// put(BIOBANK_MATERIAL_STORED_TISSUE_FFPE, "TISSUE_PARAFFIN_EMBEDDED");
+	// put(BIOBANK_MATERIAL_STORED_IMMORTALIZED_CELL_LINES, "CELL_LINES");
+	// put(BIOBANK_MATERIAL_STORED_URINE, "URINE");
+	// put(BIOBANK_MATERIAL_STORED_SALIVA, "SALIVA");
+	// put(BIOBANK_MATERIAL_STORED_FAECES, "FECES");
+	// put(BIOBANK_MATERIAL_STORED_ISOLATED_PATHOGEN, "PATHOGEN");
+	// put(BIOBANK_MATERIAL_STORED_RNA, "RNA");
+	// put(BIOBANK_MATERIAL_STORED_OTHER, "OTHER");
+	// }
+	// };
+
 	private static final HashMap<String, String> materialMapping = new HashMap<String, String>()
 	{
 		private static final long serialVersionUID = 1L;
 		{
-			put(BIOBANK_MATERIAL_STORED_DNA, "DNA");
-			put(BIOBANK_MATERIAL_STORED_CDNA_MRNA, "CDNA");
-			put(BIOBANK_MATERIAL_STORED_MICRO_RNA, "MICRO_RNA");
-			put(BIOBANK_MATERIAL_STORED_WHOLE_BLOOD, "WHOLE_BLOOD");
-			put(BIOBANK_MATERIAL_STORED_PBC, "PERIPHERAL_BLOOD_CELLS");
-			put(BIOBANK_MATERIAL_STORED_PLASMA, "PLASMA");
-			put(BIOBANK_MATERIAL_STORED_SERUM, "SERUM");
-			put(BIOBANK_MATERIAL_STORED_TISSUE_CRYO, "TISSUE_FROZEN");
-			put(BIOBANK_MATERIAL_STORED_TISSUE_PARAFFIN, "TISSUE_PARAFFIN_EMBEDDED");
-			put(BIOBANK_MATERIAL_STORED_CELL_LINES, "CELL_LINES");
-			put(BIOBANK_MATERIAL_STORED_URINE, "URINE");
-			put(BIOBANK_MATERIAL_STORED_SALIVA, "SALIVA");
-			put(BIOBANK_MATERIAL_STORED_FAECES, "FECES");
-			put(BIOBANK_MATERIAL_STORED_PATHOGEN, "PATHOGEN");
-			put(BIOBANK_MATERIAL_STORED_RNA, "RNA");
-			put(BIOBANK_MATERIAL_STORED_OTHER, "OTHER");
+			// old miabis format
+			put("DNA", BIOBANK_MATERIAL_STORED_DNA);
+			put("CDNA", BIOBANK_MATERIAL_STORED_RNA);
+			put("MICRO_RNA", BIOBANK_MATERIAL_STORED_RNA);
+			put("WHOLE_BLOOD", BIOBANK_MATERIAL_STORED_BLOOD);
+			put("PERIPHERAL_BLOOD_CELLS", BIOBANK_MATERIAL_STORED_BLOOD);
+			put("PLASMA", BIOBANK_MATERIAL_STORED_PLASMA);
+			put("SERUM", BIOBANK_MATERIAL_STORED_SERUM);
+			put("TISSUE_FROZEN", BIOBANK_MATERIAL_STORED_TISSUE_FROZEN);
+			put("TISSUE_PARAFFIN_EMBEDDED", BIOBANK_MATERIAL_STORED_TISSUE_FFPE);
+			put("CELL_LINES", BIOBANK_MATERIAL_STORED_IMMORTALIZED_CELL_LINES);
+			put("URINE", BIOBANK_MATERIAL_STORED_URINE);
+			put("SALIVA", BIOBANK_MATERIAL_STORED_SALIVA);
+			put("FECES", BIOBANK_MATERIAL_STORED_FAECES);
+			put("PATHOGEN", BIOBANK_MATERIAL_STORED_ISOLATED_PATHOGEN);
+			put("RNA", BIOBANK_MATERIAL_STORED_RNA);
+			put("OTHER", BIOBANK_MATERIAL_STORED_OTHER);
+
+			// new miabis format (uses ERIC classification):
+			put(BIOBANK_MATERIAL_STORED_DNA, BIOBANK_MATERIAL_STORED_DNA);
+			put(BIOBANK_MATERIAL_STORED_RNA, BIOBANK_MATERIAL_STORED_RNA);
+			put(BIOBANK_MATERIAL_STORED_BLOOD, BIOBANK_MATERIAL_STORED_BLOOD);
+			put(BIOBANK_MATERIAL_STORED_PLASMA, BIOBANK_MATERIAL_STORED_PLASMA);
+			put(BIOBANK_MATERIAL_STORED_SERUM, BIOBANK_MATERIAL_STORED_SERUM);
+			put(BIOBANK_MATERIAL_STORED_TISSUE_FROZEN, BIOBANK_MATERIAL_STORED_TISSUE_FROZEN);
+			put(BIOBANK_MATERIAL_STORED_TISSUE_FFPE, BIOBANK_MATERIAL_STORED_TISSUE_FFPE);
+			put(BIOBANK_MATERIAL_STORED_IMMORTALIZED_CELL_LINES, BIOBANK_MATERIAL_STORED_IMMORTALIZED_CELL_LINES);
+			put(BIOBANK_MATERIAL_STORED_URINE, BIOBANK_MATERIAL_STORED_URINE);
+			put(BIOBANK_MATERIAL_STORED_SALIVA, BIOBANK_MATERIAL_STORED_SALIVA);
+			put(BIOBANK_MATERIAL_STORED_FAECES, BIOBANK_MATERIAL_STORED_FAECES);
+			put(BIOBANK_MATERIAL_STORED_ISOLATED_PATHOGEN, BIOBANK_MATERIAL_STORED_ISOLATED_PATHOGEN);
+			put(BIOBANK_MATERIAL_STORED_OTHER, BIOBANK_MATERIAL_STORED_OTHER);
 		}
 	};
 
@@ -160,8 +196,8 @@ public class NlToEricConverter
 	{
 		private static final long serialVersionUID = 1L;
 		{
-			put(BIOBANK_AVAILABLE_MALE_SAMPLES_DATA, "MALE");
-			put(BIOBANK_AVAILABLE_FEMALE_SAMPLES_DATA, "FEMALE");
+			put("MALE", BIOBANK_AVAILABLE_MALE_SAMPLES_DATA);
+			put("FEMALE", BIOBANK_AVAILABLE_FEMALE_SAMPLES_DATA);
 		}
 	};
 
@@ -169,14 +205,14 @@ public class NlToEricConverter
 	{
 		private static final long serialVersionUID = 1L;
 		{
-			put(BIOBANK_AVAILABLE_BIOLOGICAL_SAMPLES, "BIOLOGICAL_SAMPLES");
-			put(BIOBANK_AVAILABLE_SURVEY_DATA, "SURVEY_DATA");
-			put(BIOBANK_AVAILABLE_IMAGING_DATA, "IMAGING_DATA");
-			put(BIOBANK_AVAILABLE_MEDICAL_RECORDS, "MEDICAL_RECORDS");
-			put(BIOBANK_AVAILABLE_NATIONAL_REGISTRIES, "NATIONAL_REGISTRIES");
-			put(BIOBANK_AVAILABLE_GENEALOGICAL_RECORDS, "GENEALOGICAL_RECORDS");
-			put(BIOBANK_AVAILABLE_PHYSIO_BIOCHEM_MEASUREMENTS, "PHYSIOLOGICAL_BIOCHEMICAL_MEASUREMENTS");
-			put(BIOBANK_AVAILABLE_OTHER, "OTHER");
+			put("BIOLOGICAL_SAMPLES", BIOBANK_AVAILABLE_BIOLOGICAL_SAMPLES);
+			put("SURVEY_DATA", BIOBANK_AVAILABLE_SURVEY_DATA);
+			put("IMAGING_DATA", BIOBANK_AVAILABLE_IMAGING_DATA);
+			put("MEDICAL_RECORDS", BIOBANK_AVAILABLE_MEDICAL_RECORDS);
+			put("NATIONAL_REGISTRIES", BIOBANK_AVAILABLE_NATIONAL_REGISTRIES);
+			put("GENEALOGICAL_RECORDS", BIOBANK_AVAILABLE_GENEALOGICAL_RECORDS);
+			put("PHYSIOLOGICAL_BIOCHEMICAL_MEASUREMENTS", BIOBANK_AVAILABLE_PHYSIO_BIOCHEM_MEASUREMENTS);
+			put("OTHER", BIOBANK_AVAILABLE_OTHER);
 		}
 	};
 
@@ -357,13 +393,18 @@ public class NlToEricConverter
 
 		for (Entry<String, String> map : mapping.entrySet())
 		{
-			if (refValues.contains(map.getValue()))
+			if (refValues.contains(map.getKey()))
 			{
-				ericBiobank.set(map.getKey(), true);
+				ericBiobank.set(map.getValue(), true);
 			}
 			else
 			{
-				ericBiobank.set(map.getKey(), false);
+				// some NL terms are coalesced into one ERIC term. if one of these is encountered, the ERIC term will
+				// also be true
+				if (!(ericBiobank.getBoolean(map.getValue()) != null && ericBiobank.getBoolean(map.getValue()) == true))
+				{
+					ericBiobank.set(map.getKey(), false);
+				}
 			}
 		}
 	}
