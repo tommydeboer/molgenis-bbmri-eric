@@ -195,7 +195,7 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 				.setDescription("Are there genealogical records available?"));
 		data.add(new DefaultAttributeMetaData(BIOBANK_AVAILABLE_PHYSIO_BIOCHEM_MEASUREMENTS).setDataType(BOOL)
 				.setNillable(true).setAggregateable(true).setLabel("Physiological/Biochemical Measurements")
-				.setDescription("Are there physiological/biochemical measurements available?"));
+				.setDescription("Are there physiological/biochemical measurements?"));
 		data.add(new DefaultAttributeMetaData(BIOBANK_AVAILABLE_OTHER).setDataType(BOOL).setNillable(true)
 				.setAggregateable(true).setLabel("Other").setDescription("Are there other data or measures available?"));
 		addAttribute(BIOBANK_DATA_AVAILABILITY).setDataType(COMPOUND).setLabel("Available data")
@@ -208,21 +208,22 @@ public class DirectoryMetaData extends DefaultEntityMetaData
 		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_RNA).setDataType(BOOL).setNillable(false)
 				.setAggregateable(true).setLabel("RNA").setDescription("Is RNA collected?"));
 		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_BLOOD).setDataType(BOOL).setNillable(false)
-				.setAggregateable(true).setLabel("Whole Blood").setDescription("Is blood collected?"));
+				.setAggregateable(true).setLabel("Blood (whole blood or blood isolates)")
+				.setDescription("Is blood collected?"));
 
 		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_PLASMA).setDataType(BOOL).setNillable(false)
 				.setAggregateable(true).setLabel("Plasma").setDescription("Is plasma collected?"));
 		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_SERUM).setDataType(BOOL).setNillable(false)
 				.setAggregateable(true).setLabel("Serum").setDescription("Is serum collected?"));
 		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_TISSUE_FROZEN).setDataType(BOOL)
-				.setNillable(false).setAggregateable(true).setLabel("Tissue cryo-preserved")
-				.setDescription("Is cryo-preserved tissue collected?"));
+				.setNillable(false).setAggregateable(true).setLabel("Tissue Fresh Frozen")
+				.setDescription("Is tissue collected (preserved as frozen material)?"));
 		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_TISSUE_FFPE).setDataType(BOOL)
 				.setNillable(false).setAggregateable(true).setLabel("Tissue FPPE")
-				.setDescription("Is paraffin preserved tissue collected?"));
+				.setDescription("Is tissue collected (preserved as FFPE blocks)?"));
 		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_IMMORTALIZED_CELL_LINES).setDataType(BOOL)
-				.setNillable(false).setAggregateable(true).setLabel("Cell lines")
-				.setDescription("Are cell lines collected?"));
+				.setNillable(false).setAggregateable(true).setLabel("Immortalized Cell lines")
+				.setDescription("Are any immortalized cell lines collected?"));
 
 		material.add(new DefaultAttributeMetaData(BIOBANK_MATERIAL_STORED_URINE).setDataType(BOOL).setNillable(false)
 				.setAggregateable(true).setLabel("Urine").setDescription("Is urine collected?"));
