@@ -67,7 +67,7 @@ public class EricController
 	@ResponseBody
 	public BbmriEricDataResponse retrieveBbmriDataAsJson(@PathVariable("node") String node)
 	{
-		Query q = new QueryImpl().eq("biobankCountry", node.toUpperCase());
+		Query q = new QueryImpl().eq(DirectoryMetaData.BIOBANK_COUNTRY, node.toUpperCase());
 
 		return getEricData(q);
 	}

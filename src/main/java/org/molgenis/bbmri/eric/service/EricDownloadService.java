@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 
 import com.google.gson.Gson;
@@ -54,14 +53,12 @@ public class EricDownloadService
 
 	@Scheduled(cron = "0 0 0 * * *")
 	@RunAsSystem
-	@Transactional
 	public void downloadSources()
 	{
-		downloadSources();
+		downloadSourcesOnDemand();
 	}
 
 	@RunAsSystem
-	@Transactional
 	public DownloadReport downloadSourcesOnDemand()
 	{
 		DownloadReport downloadReport = new DownloadReport();
@@ -108,11 +105,12 @@ public class EricDownloadService
 				// delete entities for each node
 				for (String node : nodes)
 				{
-					Query q = new QueryImpl().eq("biobankCountry", node.toUpperCase());
+					Query q = new QueryImpl().eq(DirectoryMetaData.BIOBANK_COUNTRY, node.toUpperCase());
 					Iterable<Entity> entitiesToDelete = RunAsSystemProxy.runAsSystem(() -> dataService.findAll(
 							DirectoryMetaData.FULLY_QUALIFIED_NAME, q));
 
 					dataService.delete(DirectoryMetaData.FULLY_QUALIFIED_NAME, entitiesToDelete);
+
 				}
 
 				// add new catalogue entities

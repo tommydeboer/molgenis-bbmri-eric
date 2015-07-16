@@ -109,14 +109,14 @@ public class NlToEricConverter
 	private final String ATT_MATERIALS = "materials";
 	private final String ATT_SEX = "sex";
 	private final String ATT_DATA_CATEGORIES = "data_categories";
-	private final String ATT_BIOBANK_SAMPLE_ACCESS_FEE = "biobankSampleAccessFee";
-	private final String ATT_BIOBANK_SAMPLE_ACCESS_JOINT_PROJECTS = "biobankSampleAccessJointProjects";
-	private final String ATT_BIOBANK_SAMPLE_ACCESS_DESCRIPTION = "biobankSampleAccessDescription";
-	private final String ATT_BIOBANK_DATA_ACCESS_FEE = "biobankDataAccessFee";
-	private final String ATT_BIOBANK_DATA_ACCESS_JOINT_PROJECTS = "biobankDataAccessJointProjects";
-	private final String ATT_BIOBANK_DATA_ACCESS_DESCRIPTION = "biobankDataAccessDescription";
-	private final String ATT_BIOBANK_SAMPLE_ACCESS_URI = "biobankSampleAccessURI";
-	private final String ATT_BIOBANK_DATA_ACCESS_URI = "biobankDataAccessURI";
+	private final String ATT_BIOBANK_SAMPLE_ACCESS_FEE = "sampleAccessFee";
+	private final String ATT_BIOBANK_SAMPLE_ACCESS_JOINT_PROJECTS = "sampleAccessJointProjects";
+	private final String ATT_BIOBANK_SAMPLE_ACCESS_DESCRIPTION = "sampleAccessDescription";
+	private final String ATT_BIOBANK_DATA_ACCESS_FEE = "dataAccessFee";
+	private final String ATT_BIOBANK_DATA_ACCESS_JOINT_PROJECTS = "dataAccessJointProjects";
+	private final String ATT_BIOBANK_DATA_ACCESS_DESCRIPTION = "dataAccessDescription";
+	private final String ATT_BIOBANK_SAMPLE_ACCESS_URI = "sampleAccessURI";
+	private final String ATT_BIOBANK_DATA_ACCESS_URI = "dataAccessURI";
 	private final String ATT_EMAIL = "email";
 	private final String ATT_COUNTRY = "country";
 	private final String ATT_FIRST_NAME = "first_name";
@@ -196,8 +196,13 @@ public class NlToEricConverter
 	{
 		private static final long serialVersionUID = 1L;
 		{
+			// old miabis format
 			put("MALE", BIOBANK_AVAILABLE_MALE_SAMPLES_DATA);
 			put("FEMALE", BIOBANK_AVAILABLE_FEMALE_SAMPLES_DATA);
+
+			// new miabis format (uses ERIC classification):
+			put(BIOBANK_AVAILABLE_MALE_SAMPLES_DATA, BIOBANK_AVAILABLE_MALE_SAMPLES_DATA);
+			put(BIOBANK_AVAILABLE_FEMALE_SAMPLES_DATA, BIOBANK_AVAILABLE_FEMALE_SAMPLES_DATA);
 		}
 	};
 
@@ -205,6 +210,7 @@ public class NlToEricConverter
 	{
 		private static final long serialVersionUID = 1L;
 		{
+			// old miabis format
 			put("BIOLOGICAL_SAMPLES", BIOBANK_AVAILABLE_BIOLOGICAL_SAMPLES);
 			put("SURVEY_DATA", BIOBANK_AVAILABLE_SURVEY_DATA);
 			put("IMAGING_DATA", BIOBANK_AVAILABLE_IMAGING_DATA);
@@ -213,6 +219,16 @@ public class NlToEricConverter
 			put("GENEALOGICAL_RECORDS", BIOBANK_AVAILABLE_GENEALOGICAL_RECORDS);
 			put("PHYSIOLOGICAL_BIOCHEMICAL_MEASUREMENTS", BIOBANK_AVAILABLE_PHYSIO_BIOCHEM_MEASUREMENTS);
 			put("OTHER", BIOBANK_AVAILABLE_OTHER);
+
+			// new miabis format (uses ERIC classification
+			put(BIOBANK_AVAILABLE_BIOLOGICAL_SAMPLES, BIOBANK_AVAILABLE_BIOLOGICAL_SAMPLES);
+			put(BIOBANK_AVAILABLE_SURVEY_DATA, BIOBANK_AVAILABLE_SURVEY_DATA);
+			put(BIOBANK_AVAILABLE_IMAGING_DATA, BIOBANK_AVAILABLE_IMAGING_DATA);
+			put(BIOBANK_AVAILABLE_MEDICAL_RECORDS, BIOBANK_AVAILABLE_MEDICAL_RECORDS);
+			put(BIOBANK_AVAILABLE_NATIONAL_REGISTRIES, BIOBANK_AVAILABLE_NATIONAL_REGISTRIES);
+			put(BIOBANK_AVAILABLE_GENEALOGICAL_RECORDS, BIOBANK_AVAILABLE_GENEALOGICAL_RECORDS);
+			put(BIOBANK_AVAILABLE_PHYSIO_BIOCHEM_MEASUREMENTS, BIOBANK_AVAILABLE_PHYSIO_BIOCHEM_MEASUREMENTS);
+			put(BIOBANK_AVAILABLE_OTHER, BIOBANK_AVAILABLE_OTHER);
 		}
 	};
 
@@ -239,7 +255,7 @@ public class NlToEricConverter
 		// delete old NL nodes
 		LOG.info("Deleting old NL catalogue nodes");
 
-		Query q = new QueryImpl().eq("biobankCountry", NL);
+		Query q = new QueryImpl().eq(DirectoryMetaData.BIOBANK_COUNTRY, NL);
 		Iterable<Entity> entitiesToDelete = RunAsSystemProxy.runAsSystem(() -> dataService.findAll(
 				DirectoryMetaData.FULLY_QUALIFIED_NAME, q));
 
@@ -399,11 +415,10 @@ public class NlToEricConverter
 			}
 			else
 			{
-				// some NL terms are coalesced into one ERIC term. if one of these is encountered, the ERIC term will
-				// also be true
+				// some NL terms are coalesced into one ERIC term. don't set it to false if it is already true
 				if (!(ericBiobank.getBoolean(map.getValue()) != null && ericBiobank.getBoolean(map.getValue()) == true))
 				{
-					ericBiobank.set(map.getKey(), false);
+					ericBiobank.set(map.getValue(), false);
 				}
 			}
 		}
