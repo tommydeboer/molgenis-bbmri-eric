@@ -130,29 +130,6 @@ public class NlToEricConverter
 	private final String ATT_URL = "website";
 	private final String ATT_ACRONYM = "acronym";
 
-	// private static final HashMap<String, String> materialMapping = new HashMap<String, String>()
-	// {
-	// private static final long serialVersionUID = 1L;
-	// {
-	// put(BIOBANK_MATERIAL_STORED_DNA, "DNA");
-	// put(BIOBANK_MATERIAL_STORED_CDNA_MRNA, "CDNA");
-	// put(BIOBANK_MATERIAL_STORED_MICRO_RNA, "MICRO_RNA");
-	// put(BIOBANK_MATERIAL_STORED_WHOLE_BLOOD, "WHOLE_BLOOD");
-	// put(BIOBANK_MATERIAL_STORED_PBC, "PERIPHERAL_BLOOD_CELLS");
-	// put(BIOBANK_MATERIAL_STORED_PLASMA, "PLASMA");
-	// put(BIOBANK_MATERIAL_STORED_SERUM, "SERUM");
-	// put(BIOBANK_MATERIAL_STORED_TISSUE_FROZEN, "TISSUE_FROZEN");
-	// put(BIOBANK_MATERIAL_STORED_TISSUE_FFPE, "TISSUE_PARAFFIN_EMBEDDED");
-	// put(BIOBANK_MATERIAL_STORED_IMMORTALIZED_CELL_LINES, "CELL_LINES");
-	// put(BIOBANK_MATERIAL_STORED_URINE, "URINE");
-	// put(BIOBANK_MATERIAL_STORED_SALIVA, "SALIVA");
-	// put(BIOBANK_MATERIAL_STORED_FAECES, "FECES");
-	// put(BIOBANK_MATERIAL_STORED_ISOLATED_PATHOGEN, "PATHOGEN");
-	// put(BIOBANK_MATERIAL_STORED_RNA, "RNA");
-	// put(BIOBANK_MATERIAL_STORED_OTHER, "OTHER");
-	// }
-	// };
-
 	private static final HashMap<String, String> materialMapping = new HashMap<String, String>()
 	{
 		private static final long serialVersionUID = 1L;
