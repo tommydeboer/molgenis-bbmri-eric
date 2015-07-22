@@ -11,7 +11,7 @@
         </div>
         <div id="download-result-container">
         </div>
-        <p>Adds and/or updates the BBMRI-ERIC catalogue with data from the configured <a href="/menu/entities/form.bbmri-eric_EricSource">BBMRI-ERIC sources</a>.</p> 
+        <p>Adds and/or updates the BBMRI-ERIC catalogue with data from the configured <a href="/menu/main/dataexplorer?entity=bbmri_eric_EricSource">BBMRI-ERIC sources</a>.</p> 
         <div id="download-btn-container">
         </div>
     </div>

@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.molgenis</groupId>
 		<artifactId>molgenis</artifactId>
-		<version>1.7.0</version>
+		<version>1.8.1</version>
 	</parent>
 	<artifactId>molgenis-bbmri-eric</artifactId>
 	<packaging>war</packaging>
@@ -231,11 +231,6 @@
 		<dependency>
 			<groupId>org.molgenis</groupId>
 			<artifactId>molgenis-data-import</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.molgenis</groupId>
-			<artifactId>molgenis-catalogue</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
