@@ -22,8 +22,9 @@ import org.molgenis.security.core.runas.RunAsSystemProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;
 
 import com.google.gson.Gson;
@@ -36,7 +37,8 @@ import com.google.gson.internal.LinkedTreeMap;
  * @author tommy
  *
  */
-@Service
+@EnableScheduling
+@Component
 public class EricDownloadService
 {
 	private static final Logger LOG = LoggerFactory.getLogger(EricDownloadService.class);
@@ -60,6 +62,11 @@ public class EricDownloadService
 
 	@RunAsSystem
 	public DownloadReport downloadSourcesOnDemand()
+	{
+		return RunAsSystemProxy.runAsSystem(this::downloadSourcesInternal);
+	}
+
+	public DownloadReport downloadSourcesInternal()
 	{
 		DownloadReport downloadReport = new DownloadReport();
 
@@ -106,8 +113,7 @@ public class EricDownloadService
 				for (String node : nodes)
 				{
 					Query q = new QueryImpl().eq(DirectoryMetaData.BIOBANK_COUNTRY, node.toUpperCase());
-					Iterable<Entity> entitiesToDelete = RunAsSystemProxy.runAsSystem(() -> dataService.findAll(
-							DirectoryMetaData.FULLY_QUALIFIED_NAME, q));
+					Iterable<Entity> entitiesToDelete = dataService.findAll(DirectoryMetaData.FULLY_QUALIFIED_NAME, q);
 
 					dataService.delete(DirectoryMetaData.FULLY_QUALIFIED_NAME, entitiesToDelete);
 
