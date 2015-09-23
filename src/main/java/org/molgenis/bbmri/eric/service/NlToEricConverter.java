@@ -226,6 +226,12 @@ public class NlToEricConverter
 	@Transactional
 	public void convertNlToEric()
 	{
+		if (!dataService.hasRepository(BBMRI_NL_SOURCE_ENTITY))
+		{
+			LOG.warn("BBMRI-NL entity not found, skipping conversion to BBMRI-ERIC.");
+			return;
+		}
+
 		if (defaultContactEmail == null) throw new RuntimeException(
 				"Please set default_contact_email in molgenis-server.properties");
 
