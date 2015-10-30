@@ -4,7 +4,7 @@ import static org.molgenis.bbmri.eric.controller.EricDirectoryManagerController.
 
 import org.molgenis.bbmri.eric.service.EricDownloadService;
 import org.molgenis.bbmri.eric.service.EricDownloadService.DownloadReport;
-import org.molgenis.framework.ui.MolgenisPluginController;
+import org.molgenis.ui.MolgenisPluginController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
