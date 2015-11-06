@@ -12,8 +12,7 @@ import java.util.Map;
 import org.molgenis.MolgenisFieldTypes;
 import org.molgenis.bbmri.eric.model.DirectoryMetaData;
 import org.molgenis.bbmri.eric.service.BbmriEricDataResponse;
-import org.molgenis.bbmri.eric.service.EricDownloadService;
-import org.molgenis.bbmri.eric.service.NlToEricConverter;
+import org.molgenis.bbmri.eric.service.NlToEricConverter2;
 import org.molgenis.data.AttributeMetaData;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
@@ -26,18 +25,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-/**
- * 
- * @author tommy
- *
- */
 @Controller
 @RequestMapping(BASE_URI)
 public class EricController
 {
 	public static final String BASE_URI = "/bbmri";
-	private NlToEricConverter nlToEricConverter;
-	private EricDownloadService ericDownloadService;
+	private NlToEricConverter2 nlToEricConverter;
 
 	// MIME type for LDIF
 	public static final String APPLICATION_DIRECTORY_VALUE = "application/directory";
@@ -45,15 +38,13 @@ public class EricController
 	private final DataService dataService;
 
 	@Autowired
-	public EricController(DataService dataService, NlToEricConverter nlToEricConverter,
-			EricDownloadService ericDownloadService)
+	public EricController(DataService dataService, NlToEricConverter2 nlToEricConverter)
 	{
 		if (dataService == null) throw new IllegalArgumentException("dataService is null");
 		if (nlToEricConverter == null) throw new IllegalArgumentException("nlToEricConverter is null");
 
 		this.dataService = dataService;
 		this.nlToEricConverter = nlToEricConverter;
-		this.ericDownloadService = ericDownloadService;
 	}
 
 	@RequestMapping(value = "/all", method = GET, produces = APPLICATION_JSON_VALUE)
@@ -74,8 +65,8 @@ public class EricController
 
 	public BbmriEricDataResponse getEricData(Query q)
 	{
-		Iterable<Entity> it = RunAsSystemProxy.runAsSystem(() -> dataService.findAll(
-				DirectoryMetaData.FULLY_QUALIFIED_NAME, q));
+		Iterable<Entity> it = RunAsSystemProxy
+				.runAsSystem(() -> dataService.findAll(DirectoryMetaData.FULLY_QUALIFIED_NAME, q));
 
 		List<Map<String, Object>> entities = new ArrayList<>();
 		for (Entity entity : it)
