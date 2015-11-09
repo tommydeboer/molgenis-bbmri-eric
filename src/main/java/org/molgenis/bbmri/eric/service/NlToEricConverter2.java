@@ -49,9 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.collect.Lists;
 
 /**
- * Translates BBMRI-NL sample collections to BBMRI-ERIC catalogue entries.
- * 
- * @author tommy
+ * Translates BBMRI-NL Sample Collections and Biobanks to BBMRI-ERIC collections and biobanks.
  */
 @Service
 public class NlToEricConverter2
@@ -66,6 +64,9 @@ public class NlToEricConverter2
 
 	private final String defaultContactEmail;
 
+	/**
+	 * Constructor.
+	 */
 	@Autowired
 	public NlToEricConverter2(DataService dataService, @Value("${default_contact_email}") String defaultContactEmail)
 	{
@@ -74,7 +75,13 @@ public class NlToEricConverter2
 		this.dataService = requireNonNull(dataService, "dataService is null");
 	}
 
-	// scheduled at midnight-ish
+	/**
+	 * Converts the BBMRI-NL Sample Collections and Biobanks entities. New entities are added, old entities are updated.
+	 * It is also detected when a Collection, Biobank or Person was removed so it can be removed from the corresponding
+	 * BBMRI-ERIC entities.
+	 * 
+	 * Executed around every midnight.
+	 */
 	@Scheduled(cron = "0 5 0 * * *")
 	@Transactional
 	@RunAsSystem
@@ -106,7 +113,7 @@ public class NlToEricConverter2
 			EntityMetaData ericBiobanksMeta = dataService.getEntityMetaData(ERIC_BIOBANKS);
 			for (Entity nlBiobank : nlBiobanks)
 			{
-				Entity ericBiobank = toEricBiobanks(nlBiobank, ericBiobanksMeta);
+				Entity ericBiobank = toEricBiobank(nlBiobank, ericBiobanksMeta);
 
 				if (dataService.findOne(ERIC_BIOBANKS, ericBiobank.getIdValue().toString()) == null)
 				{
@@ -127,6 +134,9 @@ public class NlToEricConverter2
 				collectionCount));
 	}
 
+	/**
+	 * Maps a BBMRI-NL Sample Collections entity to a BBMRI-ERIC collections entity
+	 */
 	private Entity toEricCollection(Entity nlSampleCollection, EntityMetaData ericCollectionsMeta)
 	{
 		Entity ericCollection = new MapEntity(ericCollectionsMeta);
@@ -177,7 +187,10 @@ public class NlToEricConverter2
 		return ericCollection;
 	}
 
-	private Entity toEricBiobanks(Entity nlBiobank, EntityMetaData ericBiobanksMeta)
+	/**
+	 * Maps a BBMRI-NL Biobank entity to a BBMRI-ERIC biobank entity
+	 */
+	private Entity toEricBiobank(Entity nlBiobank, EntityMetaData ericBiobanksMeta)
 	{
 		Entity ericBiobank = new MapEntity(ericBiobanksMeta);
 
@@ -229,6 +242,9 @@ public class NlToEricConverter2
 		return ericBiobank;
 	}
 
+	/**
+	 * Maps an mref or categorical_mref of BBMRI-NL to an mref or categorical_mref of BBMRI-ERIC.
+	 */
 	private Iterable<Entity> toEricRefEntities(String refEntityName, Iterable<Entity> nlEntities)
 	{
 		List<Object> ids = Lists.newArrayList();
@@ -236,11 +252,17 @@ public class NlToEricConverter2
 		return dataService.findAll(refEntityName, ids);
 	}
 
+	/**
+	 * Returns the name or "N/A" as null flavor
+	 */
 	private String toEricName(String name)
 	{
 		return name == null ? "N/A" : name;
 	}
 
+	/**
+	 * Maps xref or categoricals from BBMRI-NL to BBMRI-ERIC.
+	 */
 	private Entity toEricRefEntity(String refEntityName, Entity nlEntity, boolean nillable)
 	{
 		if (!nillable) requireNonNull(nlEntity);
@@ -248,6 +270,9 @@ public class NlToEricConverter2
 		return dataService.findOne(refEntityName, nlEntity.getIdValue().toString());
 	}
 
+	/**
+	 * Maps BBMRI-NL Persons to BBMRI-ERIC contacts. New contacts get added, existing contacts get updated.
+	 */
 	private Entity toEricContact(Entity nlContactPerson)
 	{
 		Entity ericContact = new MapEntity(dataService.getEntityMetaData(ERIC_CONTACTS));
@@ -278,6 +303,13 @@ public class NlToEricConverter2
 		return ericContact;
 	}
 
+	// TODO contact ID
+	private String toContactId(String id)
+	{
+		return null;
+	}
+
+	// TODO figure out identifier method
 	/**
 	 * Generates BBMRI ERIC identifier.
 	 * 
@@ -300,6 +332,9 @@ public class NlToEricConverter2
 		return new StringBuilder().append("bbmri-eric:ID:").append("nl").append('_').append(id).toString();
 	}
 
+	/**
+	 * Returns the order of magnitude of a number
+	 */
 	private int toOrderOfMagnitude(int numberOfDonors)
 	{
 		requireNonNull(numberOfDonors);
