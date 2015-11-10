@@ -24,7 +24,6 @@ import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.LONGITUDE;
 import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.MATERIALS;
 import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.NAME;
 import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.NUMBER_OF_DONORS;
-import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.REF_PERSONS;
 import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.SAMPLE_COLLECTIONS_ENTITY;
 import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.SEX;
 import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.TYPE;
@@ -196,8 +195,7 @@ public class NlToEricConverter2
 
 		// TODO decide what to do when null
 		Iterator<Entity> contacts = nlBiobank.getEntities("contact_person").iterator();
-		ericBiobank.set("contact", contacts.hasNext() ? toEricContact(contacts.next())
-				: toEricContact(dataService.findOne(REF_PERSONS, "504")));
+		ericBiobank.set("contact", contacts.hasNext() ? toEricContact(contacts.next()) : getDummyContact());
 
 		ericBiobank.set("contact_priority", 0);
 		ericBiobank.set("latitude", nlBiobank.getString(LATITUDE));
@@ -218,7 +216,6 @@ public class NlToEricConverter2
 		}
 		else
 		{
-			// TODO decide defaults
 			name = "N/A";
 			country = dataService.findOne("eu_bbmri_eric_countries", "NL");
 		}
@@ -290,6 +287,37 @@ public class NlToEricConverter2
 		ericContact.set("city", nlContactPerson.getString("city"));
 		ericContact.set("country",
 				toEricRefEntity("eu_bbmri_eric_countries", nlContactPerson.getEntity("country"), false));
+
+		if (dataService.findOne(ERIC_CONTACTS, ericContact.getIdValue().toString()) == null)
+		{
+			dataService.add(ERIC_CONTACTS, ericContact);
+		}
+		else
+		{
+			dataService.update(ERIC_CONTACTS, ericContact);
+		}
+
+		return ericContact;
+	}
+
+	/**
+	 * Returns a dummy contact. Needed because not all NL biobank entities are guaranteed to have a contact person, but
+	 * is is a required field in the ERIC model.
+	 */
+	private Entity getDummyContact()
+	{
+		Entity ericContact = new MapEntity(dataService.getEntityMetaData(ERIC_CONTACTS));
+
+		String na = "N/A";
+		ericContact.set("id", "N/A");
+		ericContact.set("first_name", na);
+		ericContact.set("last_name", na);
+		ericContact.set("phone", na);
+		ericContact.set("email", defaultContactEmail);
+		ericContact.set("address", na);
+		ericContact.set("zip", na);
+		ericContact.set("city", na);
+		ericContact.set("country", dataService.findOne("eu_bbmri_eric_countries", "NL"));
 
 		if (dataService.findOne(ERIC_CONTACTS, ericContact.getIdValue().toString()) == null)
 		{
