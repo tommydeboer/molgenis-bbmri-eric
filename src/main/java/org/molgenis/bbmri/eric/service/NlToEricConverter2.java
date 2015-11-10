@@ -5,7 +5,7 @@ import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.ACRONYM;
 import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.AGE_HIGH;
 import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.AGE_LOW;
 import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.AGE_UNIT;
-import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.BIOBANKS_ENTITY;
+import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.BIOBANKS;
 import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.BIOBANK_DATA_ACCESS_DESCRIPTION;
 import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.BIOBANK_DATA_ACCESS_FEE;
 import static org.molgenis.bbmri.eric.model.BbmriNlCheatSheet.BIOBANK_DATA_ACCESS_JOINT_PROJECTS;
@@ -86,57 +86,72 @@ public class NlToEricConverter2
 	@RunAsSystem
 	public void convertNlToEric()
 	{
-		int collectionCount = 0;
-		int biobankCount = 0;
+		int collectionsAdded = 0;
+		int collectionsUpdated = 0;
+		int biobanksAdded = 0;
+		int biobanksUpdated = 0;
 		try
 		{
 			LOG.info("Start mapping BBMRI-NL data to BBMRI-ERIC schema");
 			Iterable<Entity> nlSampleCollections = dataService.findAll(SAMPLE_COLLECTIONS_ENTITY);
+			EntityMetaData ericBiobanksMeta = dataService.getEntityMetaData(ERIC_BIOBANKS);
 			EntityMetaData ericCollectionsMeta = dataService.getEntityMetaData(ERIC_COLLECTIONS);
+
 			for (Entity nlSampleCollection : nlSampleCollections)
 			{
-				Entity ericCollection = toEricCollection(nlSampleCollection, ericCollectionsMeta);
+				Entity ericCollection = toEricCollection(nlSampleCollection, ericCollectionsMeta, ericBiobanksMeta);
 
 				if (dataService.findOne(ERIC_COLLECTIONS, ericCollection.getIdValue().toString()) == null)
 				{
 					dataService.add(ERIC_COLLECTIONS, ericCollection);
+					collectionsAdded++;
 				}
 				else
 				{
 					dataService.update(ERIC_COLLECTIONS, ericCollection);
+					collectionsUpdated++;
 				}
-				collectionCount++;
-			}
 
-			Iterable<Entity> nlBiobanks = dataService.findAll(BIOBANKS_ENTITY);
-			EntityMetaData ericBiobanksMeta = dataService.getEntityMetaData(ERIC_BIOBANKS);
-			for (Entity nlBiobank : nlBiobanks)
-			{
-				Entity ericBiobank = toEricBiobank(nlBiobank, ericBiobanksMeta);
-
-				if (dataService.findOne(ERIC_BIOBANKS, ericBiobank.getIdValue().toString()) == null)
+				Iterator<Entity> biobanks = nlSampleCollection.getEntities(BIOBANKS).iterator();
+				List<Entity> ericBiobanks = Lists.newArrayList();
+				if (biobanks.hasNext())
 				{
-					dataService.add(ERIC_BIOBANKS, ericBiobank);
+					biobanks.forEachRemaining(biobank -> ericBiobanks.add(toEricBiobank(biobank, ericBiobanksMeta)));
 				}
 				else
 				{
-					dataService.update(ERIC_BIOBANKS, ericBiobank);
+					ericBiobanks.add(toDummyEricBiobank(nlSampleCollection, ericBiobanksMeta));
 				}
-				biobankCount++;
+
+				for (Entity biobank : ericBiobanks)
+				{
+					if (dataService.findOne(ERIC_BIOBANKS, biobank.getIdValue().toString()) == null)
+					{
+						dataService.add(ERIC_BIOBANKS, biobank);
+						biobanksAdded++;
+					}
+					else
+					{
+						dataService.update(ERIC_BIOBANKS, biobank);
+						biobanksUpdated++;
+					}
+				}
 			}
 		}
 		catch (Exception e)
 		{
 			throw e;
 		}
-		LOG.info(String.format("Finished mapping. Mapped {} biobanks and {} sample collections.", biobankCount,
-				collectionCount));
+		LOG.info(String.format(
+				"Finished mapping. Added %d sample collections. Updated %d sample collections. Added %d biobanks. Updated %d biobanks.",
+				collectionsAdded, collectionsUpdated, biobanksAdded, biobanksUpdated));
 	}
 
 	/**
 	 * Maps a BBMRI-NL Sample Collections entity to a BBMRI-ERIC collections entity
 	 */
-	private Entity toEricCollection(Entity nlSampleCollection, EntityMetaData ericCollectionsMeta)
+	private Entity toEricCollection(Entity nlSampleCollection, EntityMetaData ericCollectionsMeta,
+			EntityMetaData ericBiobanksMeta)
 	{
 		Entity ericCollection = new MapEntity(ericCollectionsMeta);
 
@@ -186,14 +201,43 @@ public class NlToEricConverter2
 		return ericCollection;
 	}
 
+	private Entity toDummyEricBiobank(Entity nlSampleCollection, EntityMetaData ericBiobanksMeta)
+	{
+		Entity ericBiobank = new MapEntity(ericBiobanksMeta);
+
+		ericBiobank.set("contact", getDummyContact());
+		ericBiobank.set("contact_priority", 0);
+		ericBiobank.set("latitude", null);
+		ericBiobank.set("longitude", null);
+		ericBiobank.set("collaboration_commercial", null);
+		ericBiobank.set("collaboration_non_for_profit", null);
+		ericBiobank.set("id", toEricBiobankId(nlSampleCollection.getString("id")));
+		ericBiobank.set("name", toEricName(nlSampleCollection.getString("name")));
+		ericBiobank.set("juridical_person", "N/A");
+		ericBiobank.set("country", dataService.findOne("eu_bbmri_eric_countries", "NL"));
+		ericBiobank.set("it_support_available", null);
+		ericBiobank.set("it_staff_size", null);
+		ericBiobank.set("is_available", null);
+		ericBiobank.set("his_available", null);
+		ericBiobank.set("partner_charter_signed", true);
+		ericBiobank.set("acronym", nlSampleCollection.getString("acronym"));
+		ericBiobank.set("description", nlSampleCollection.getString("description"));
+		ericBiobank.set("url", nlSampleCollection.getString("website"));
+		ericBiobank.set("head", null);
+		ericBiobank.set("head_role", null);
+		ericBiobank.set("type", null);
+		ericBiobank.set("bioresource_reference", null);
+
+		return ericBiobank;
+	}
+
 	/**
-	 * Maps a BBMRI-NL Biobank entity to a BBMRI-ERIC biobank entity
+	 * Maps a BBMRI-NL Biobank entity to a BBMRI-ERIC biobank entity and adds it to the repository
 	 */
 	private Entity toEricBiobank(Entity nlBiobank, EntityMetaData ericBiobanksMeta)
 	{
 		Entity ericBiobank = new MapEntity(ericBiobanksMeta);
 
-		// TODO decide what to do when null
 		Iterator<Entity> contacts = nlBiobank.getEntities("contact_person").iterator();
 		ericBiobank.set("contact", contacts.hasNext() ? toEricContact(contacts.next()) : getDummyContact());
 
@@ -203,7 +247,7 @@ public class NlToEricConverter2
 		ericBiobank.set("collaboration_commercial", null);
 		ericBiobank.set("collaboration_non_for_profit", null);
 		ericBiobank.set("id", toEricBiobankId(nlBiobank.getString("id")));
-		ericBiobank.set("name", nlBiobank.getString("name"));
+		ericBiobank.set("name", toEricName(nlBiobank.getString("name")));
 
 		Iterator<Entity> juristic_persons = nlBiobank.getEntities("juristic_person").iterator();
 		String name;
@@ -331,22 +375,15 @@ public class NlToEricConverter2
 		return ericContact;
 	}
 
-	// TODO contact ID
-	private String toContactId(String id)
-	{
-		return null;
-	}
-
-	// TODO figure out identifier method
 	/**
 	 * Generates BBMRI ERIC identifier.
 	 * 
-	 * Unique collection ID withing BBMRI-ERIC based on MIABIS 2.0 standard, constructed from biobankID prefix +
+	 * Unique collection ID within BBMRI-ERIC based on MIABIS 2.0 standard, constructed from biobankID prefix +
 	 * :collection: + local collection ID string
 	 */
 	private String toEricCollectionId(String id)
 	{
-		return new StringBuilder().append("bbmri-eric:ID:").append("nl").append('_').append(id).toString();
+		return new StringBuilder().append("nl_").append(id).append(":collection:").append("nl_").append(id).toString();
 	}
 
 	/**
