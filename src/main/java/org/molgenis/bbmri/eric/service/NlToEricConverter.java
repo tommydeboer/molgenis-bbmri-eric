@@ -405,6 +405,7 @@ public class NlToEricConverter
 	 */
 	private int toOrderOfMagnitude(int numberOfDonors)
 	{
+		if (numberOfDonors == 0) throw new IllegalArgumentException("can't take log10 of 0");
 		return (int) Math.log10(numberOfDonors);
 	}
 }
