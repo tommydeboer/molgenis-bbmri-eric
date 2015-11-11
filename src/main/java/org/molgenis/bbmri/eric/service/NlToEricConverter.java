@@ -405,7 +405,6 @@ public class NlToEricConverter
 	 */
 	private int toOrderOfMagnitude(int numberOfDonors)
 	{
-		requireNonNull(numberOfDonors);
 		return (int) Math.log10(numberOfDonors);
 	}
 }
