@@ -86,12 +86,14 @@ public class NlToEricConverter
 	@RunAsSystem
 	public void convertNlToEric()
 	{
-		int collectionsAdded = 0;
-		int collectionsUpdated = 0;
-		int biobanksAdded = 0;
-		int biobanksUpdated = 0;
+
 		try
 		{
+			int collectionsAdded = 0;
+			int collectionsUpdated = 0;
+			int biobanksAdded = 0;
+			int biobanksUpdated = 0;
+
 			LOG.info("Start mapping BBMRI-NL data to BBMRI-ERIC schema");
 			Iterable<Entity> nlSampleCollections = dataService.findAll(SAMPLE_COLLECTIONS_ENTITY);
 			EntityMetaData ericBiobanksMeta = dataService.getEntityMetaData(ERIC_BIOBANKS);
@@ -136,15 +138,16 @@ public class NlToEricConverter
 						biobanksUpdated++;
 					}
 				}
+
+				LOG.info(String.format(
+						"Finished mapping. Added %d sample collections. Updated %d sample collections. Added %d biobanks. Updated %d biobanks.",
+						collectionsAdded, collectionsUpdated, biobanksAdded, biobanksUpdated));
 			}
 		}
 		catch (Exception e)
 		{
-			throw e;
+			LOG.error("Error mapping BBMRI-NL data to BBMRI-ERIC schema", e);
 		}
-		LOG.info(String.format(
-				"Finished mapping. Added %d sample collections. Updated %d sample collections. Added %d biobanks. Updated %d biobanks.",
-				collectionsAdded, collectionsUpdated, biobanksAdded, biobanksUpdated));
 	}
 
 	/**
