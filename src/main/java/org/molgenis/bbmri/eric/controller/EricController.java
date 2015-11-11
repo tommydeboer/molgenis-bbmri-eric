@@ -17,18 +17,11 @@ public class EricController
 	public static final String BASE_URI = "/bbmri";
 	private NlToEricConverter nlToEricConverter;
 
-	// MIME type for LDIF
-	public static final String APPLICATION_DIRECTORY_VALUE = "application/directory";
-
-	private final DataService dataService;
-
 	@Autowired
 	public EricController(DataService dataService, NlToEricConverter nlToEricConverter)
 	{
-		if (dataService == null) throw new IllegalArgumentException("dataService is null");
 		if (nlToEricConverter == null) throw new IllegalArgumentException("nlToEricConverter is null");
 
-		this.dataService = dataService;
 		this.nlToEricConverter = nlToEricConverter;
 	}
 
