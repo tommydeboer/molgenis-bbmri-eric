@@ -20,6 +20,7 @@ public class CollectionsRepositoryDecorator extends AbstractRepositoryDecorator<
 	public CollectionsRepositoryDecorator(Repository<Entity> decoratedRepository,
 			CollectionsQueryTransformer queryTransformer)
 	{
+		super(decoratedRepository);
 		this.decoratedRepository = requireNonNull(decoratedRepository);
 		this.queryTransformer = requireNonNull(queryTransformer);
 	}

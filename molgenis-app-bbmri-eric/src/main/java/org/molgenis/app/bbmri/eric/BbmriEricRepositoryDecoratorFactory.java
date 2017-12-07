@@ -5,8 +5,8 @@ import org.molgenis.data.aggregation.AggregateAnonymizer;
 import org.molgenis.data.cache.l1.L1Cache;
 import org.molgenis.data.cache.l2.L2Cache;
 import org.molgenis.data.cache.l3.L3Cache;
-import org.molgenis.data.elasticsearch.SearchService;
 import org.molgenis.data.index.IndexActionRegisterService;
+import org.molgenis.data.index.IndexedRepositoryDecoratorFactory;
 import org.molgenis.data.listeners.EntityListenersService;
 import org.molgenis.data.platform.decorators.MolgenisRepositoryDecoratorFactory;
 import org.molgenis.data.settings.AppSettings;
@@ -30,15 +30,16 @@ public class BbmriEricRepositoryDecoratorFactory extends MolgenisRepositoryDecor
 			EntityAttributesValidator entityAttributesValidator, AggregateAnonymizer aggregateAnonymizer,
 			AppSettings appSettings, DataService dataService, ExpressionValidator expressionValidator,
 			SystemRepositoryDecoratorRegistry repositoryDecoratorRegistry,
-			IndexActionRegisterService indexActionRegisterService, SearchService searchService, L1Cache l1Cache,
-			L2Cache l2Cache, TransactionInformation transactionInformation,
-			EntityListenersService entityListenersService, L3Cache l3Cache,
-			PlatformTransactionManager transactionManager, QueryValidator queryValidator,
+			IndexActionRegisterService indexActionRegisterService,
+			IndexedRepositoryDecoratorFactory indexedRepositoryDecoratorFactory, L1Cache l1Cache, L2Cache l2Cache,
+			TransactionInformation transactionInformation, EntityListenersService entityListenersService,
+			L3Cache l3Cache, PlatformTransactionManager transactionManager, QueryValidator queryValidator,
 			CollectionsQueryTransformer collectionsQueryTransformer)
 	{
 		super(entityManager, entityAttributesValidator, aggregateAnonymizer, appSettings, dataService,
-				expressionValidator, repositoryDecoratorRegistry, indexActionRegisterService, searchService, l1Cache,
-				l2Cache, transactionInformation, entityListenersService, l3Cache, transactionManager, queryValidator);
+				expressionValidator, repositoryDecoratorRegistry, indexActionRegisterService,
+				indexedRepositoryDecoratorFactory, l1Cache, l2Cache, transactionInformation, entityListenersService,
+				l3Cache, transactionManager, queryValidator);
 		this.collectionsQueryTransformer = requireNonNull(collectionsQueryTransformer);
 	}
 
