@@ -14,51 +14,61 @@ import static java.util.Objects.requireNonNull;
 
 public class CollectionsRepositoryDecorator extends AbstractRepositoryDecorator<Entity>
 {
-	private final Repository<Entity> decoratedRepository;
+	static final String COLLECTIONS_ID = "eu_bbmri_eric_collections";
+
 	private final CollectionsQueryTransformer queryTransformer;
 
-	public CollectionsRepositoryDecorator(Repository<Entity> decoratedRepository,
-			CollectionsQueryTransformer queryTransformer)
+	CollectionsRepositoryDecorator(Repository<Entity> decoratedRepository, CollectionsQueryTransformer queryTransformer)
 	{
 		super(decoratedRepository);
-		this.decoratedRepository = requireNonNull(decoratedRepository);
 		this.queryTransformer = requireNonNull(queryTransformer);
 	}
 
 	@Override
-	public Repository<Entity> delegate()
+	public long count(Query<Entity> query)
 	{
-		return decoratedRepository;
+		if (isCollectionsEntityType())
+		{
+			query = query != null ? queryTransformer.transformQuery(query) : null;
+		}
+		return delegate().count(query);
 	}
 
 	@Override
-	public long count(Query<Entity> q)
+	public Entity findOne(Query<Entity> query)
 	{
-		Query<Entity> transformedQuery = q != null ? queryTransformer.transformQuery(q) : null;
-		return super.count(transformedQuery);
+		if (isCollectionsEntityType())
+		{
+			query = query != null ? queryTransformer.transformQuery(query) : null;
+		}
+		return delegate().findOne(query);
 	}
 
 	@Override
-	public Entity findOne(Query<Entity> q)
+	public Stream<Entity> findAll(Query<Entity> query)
 	{
-		Query<Entity> transformedQuery = q != null ? queryTransformer.transformQuery(q) : null;
-		return super.findOne(transformedQuery);
-	}
-
-	@Override
-	public Stream<Entity> findAll(Query<Entity> q)
-	{
-		Query<Entity> transformedQuery = q != null ? queryTransformer.transformQuery(q) : null;
-		return super.findAll(transformedQuery);
+		if (isCollectionsEntityType())
+		{
+			query = query != null ? queryTransformer.transformQuery(query) : null;
+		}
+		return delegate().findAll(query);
 	}
 
 	@Override
 	public AggregateResult aggregate(AggregateQuery aggregateQuery)
 	{
-		Query<Entity> q = aggregateQuery.getQuery();
-		Query<Entity> transformedQuery = q != null ? queryTransformer.transformQuery(q) : null;
-		AggregateQuery transformedAggregateQuery = new AggregateQueryImpl(aggregateQuery.getAttributeX(),
-				aggregateQuery.getAttributeY(), aggregateQuery.getAttributeDistinct(), transformedQuery);
-		return super.aggregate(transformedAggregateQuery);
+		if (isCollectionsEntityType())
+		{
+			Query<Entity> q = aggregateQuery.getQuery();
+			Query<Entity> transformedQuery = q != null ? queryTransformer.transformQuery(q) : null;
+			aggregateQuery = new AggregateQueryImpl(aggregateQuery.getAttributeX(), aggregateQuery.getAttributeY(),
+					aggregateQuery.getAttributeDistinct(), transformedQuery);
+		}
+		return delegate().aggregate(aggregateQuery);
+	}
+
+	private boolean isCollectionsEntityType()
+	{
+		return getEntityType().getId().equals(COLLECTIONS_ID);
 	}
 }

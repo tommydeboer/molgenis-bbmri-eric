@@ -4,6 +4,7 @@ import org.mockito.Mock;
 import org.molgenis.data.Entity;
 import org.molgenis.data.Query;
 import org.molgenis.data.Repository;
+import org.molgenis.data.meta.model.EntityType;
 import org.molgenis.test.AbstractMockitoTest;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -12,8 +13,8 @@ import java.util.stream.Stream;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.molgenis.app.bbmri.eric.CollectionsRepositoryDecorator.COLLECTIONS_ID;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 public class CollectionsRepositoryDecoratorTest extends AbstractMockitoTest
 {
@@ -31,14 +32,12 @@ public class CollectionsRepositoryDecoratorTest extends AbstractMockitoTest
 	@BeforeMethod
 	public void setUpBeforeMethod()
 	{
+		EntityType entityType = mock(EntityType.class);
+		when(decoratedRepository.getEntityType()).thenReturn(entityType);
+		when(entityType.getId()).thenReturn(COLLECTIONS_ID);
+
 		when(queryTransformer.transformQuery(query)).thenReturn(transformedQuery);
 		collectionsRepositoryDecorator = new CollectionsRepositoryDecorator(decoratedRepository, queryTransformer);
-	}
-
-	@Test
-	public void testDelegate() throws Exception
-	{
-		assertEquals(collectionsRepositoryDecorator.delegate(), decoratedRepository);
 	}
 
 	@Test
