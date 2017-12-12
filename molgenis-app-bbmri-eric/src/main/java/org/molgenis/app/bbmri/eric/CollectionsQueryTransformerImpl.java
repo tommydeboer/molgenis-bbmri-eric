@@ -1,5 +1,6 @@
 package org.molgenis.app.bbmri.eric;
 
+import com.google.common.collect.TreeTraverser;
 import org.molgenis.data.DataService;
 import org.molgenis.data.Entity;
 import org.molgenis.data.Query;
@@ -16,13 +17,15 @@ import static java.util.stream.Collectors.toList;
 @Component
 public class CollectionsQueryTransformerImpl implements CollectionsQueryTransformer
 {
-	private static final String DISEASE_TYPES_ENTITY_ID = "eu_bbmri_eric_disease_types";
-	private static final String DISEASE_TYPES_ATTRIBUTE_DIAGNOSIS_AVAILABLE = "diagnosis_available";
+	static final String DISEASE_TYPES_ENTITY_ID = "eu_bbmri_eric_disease_types";
+	static final String DISEASE_TYPES_ATTRIBUTE_DIAGNOSIS_AVAILABLE = "diagnosis_available";
+
+	private static final TreeTraverser<QueryRule> RULE_TRAVERSER = TreeTraverser.using(QueryRule::getNestedRules);
 
 	private final Icd10ClassExpander icd10ClassExpander;
 	private final DataService dataService;
 
-	public CollectionsQueryTransformerImpl(Icd10ClassExpander icd10ClassExpander, DataService dataService)
+	CollectionsQueryTransformerImpl(Icd10ClassExpander icd10ClassExpander, DataService dataService)
 	{
 		this.icd10ClassExpander = requireNonNull(icd10ClassExpander);
 		this.dataService = requireNonNull(dataService);
@@ -31,15 +34,12 @@ public class CollectionsQueryTransformerImpl implements CollectionsQueryTransfor
 	@Override
 	public Query<Entity> transformQuery(Query<Entity> query)
 	{
-		if (isTransformableQuery(query))
+		if (query != null && query.getRules() != null && !query.getRules().isEmpty())
 		{
-			query.getRules().forEach(rule ->
-			{
-				if (rule.getField().equals(DISEASE_TYPES_ATTRIBUTE_DIAGNOSIS_AVAILABLE))
-				{
-					transformQueryRule(rule);
-				}
-			});
+			query.getRules()
+				 .forEach(rule -> RULE_TRAVERSER.preOrderTraversal(rule)
+												.filter(this::isTransformableRule)
+												.forEach(this::transformQueryRule));
 		}
 
 		return query;
@@ -70,26 +70,14 @@ public class CollectionsQueryTransformerImpl implements CollectionsQueryTransfor
 	}
 
 	/**
-	 * Returns <code>true</code> if query has a rule 'IN' or 'EQUALS' on the diagnosis_available attribute
+	 * Returns <code>true</code> if a rule is 'IN' or 'EQUALS' on the diagnosis_available attribute
 	 */
-	private boolean isTransformableQuery(Query<Entity> q)
+	private boolean isTransformableRule(QueryRule nestedRule)
 	{
-		if (q.getRules() == null || q.getRules().isEmpty())
-		{
-			return false;
-		}
-
-		for (QueryRule rule : q.getRules())
-		{
-
-			if (rule.getField() != null && rule.getField().equals(DISEASE_TYPES_ATTRIBUTE_DIAGNOSIS_AVAILABLE) && (
-					rule.getOperator() == QueryRule.Operator.IN || rule.getOperator() == QueryRule.Operator.EQUALS))
-			{
-				return true;
-			}
-		}
-
-		return false;
+		return nestedRule.getField() != null && nestedRule.getField()
+														  .equals(DISEASE_TYPES_ATTRIBUTE_DIAGNOSIS_AVAILABLE) && (
+				nestedRule.getOperator() == QueryRule.Operator.IN
+						|| nestedRule.getOperator() == QueryRule.Operator.EQUALS);
 	}
 
 	/**
