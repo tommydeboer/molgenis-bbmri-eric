@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.molgenis</groupId>
         <artifactId>molgenis-bbmri-eric</artifactId>
-        <version>5.2.0-BBMRI-ERIC</version>
+        <version>7.0.0-BBMRI-ERIC-SNAPSHOT</version>
     </parent>
     <artifactId>molgenis-app-bbmri-eric</artifactId>
     <packaging>war</packaging>
@@ -58,207 +58,207 @@
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-apps</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-bootstrap</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-core</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-data</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-security</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-dataexplorer</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-data-plugin</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-data-excel</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-data-csv</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-python</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-r</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-searchall</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-data-annotators</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-data-rest</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-jobs</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-data-vcf</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-semantic-mapper</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-data-import</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-data-elasticsearch</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-ontology</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-semantic-search</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-data-migrate</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-questionnaires</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-scripts</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-scripts-core</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-file-ingester</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-gavin</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-genomebrowser</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-data-i18n</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-data-security</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-data-index</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-fair</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-util</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-settings</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-swagger</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-amazon-bucket</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-navigator</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-metadata-manager</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-one-click-importer</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-web</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
         </dependency>
         <dependency>
             <groupId>org.molgenis</groupId>
             <artifactId>molgenis-test</artifactId>
-           <version>${molgenis.version}</version>
+            <version>${molgenis.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

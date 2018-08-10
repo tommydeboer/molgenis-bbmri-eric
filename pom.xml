@@ -9,7 +9,7 @@
     </parent>
     <groupId>org.molgenis</groupId>
     <artifactId>molgenis-bbmri-eric</artifactId>
-    <version>5.2.0-BBMRI-ERIC</version>
+    <version>7.0.0-BBMRI-ERIC-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <!-- More Project Information -->
